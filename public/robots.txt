@@ -1,0 +1,7 @@
+User-agent: *
+Allow: /game/
+Allow: /categories
+Allow: /top-games
+Allow: /new-games
+Allow: /all-games
+Sitemap: https://welovemods.com/sitemap.xml

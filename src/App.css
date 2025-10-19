@@ -1,0 +1,193 @@
+/* -----------------------
+   FUN GAME-STYLE THEME
+   (Enhanced U.S. Look)
+----------------------- */
+
+/* Font: rounded, playful */
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;600&display=swap');
+
+html, body {
+  font-family: "Fredoka One", Poppins, system-ui, -apple-system, "Segoe UI", Roboto, Arial !important;
+  background-color: var(--custom-background-color) !important;
+  color: #222 !important;
+  scroll-behavior: smooth;
+}
+
+/* -----------------------
+   COLOR PALETTE
+----------------------- */
+:root {
+  --custom-background-color: rgb(0, 170, 255) !important;   /* Bright ocean blue */
+  --custom-foreground-color: #fff8d9 !important;   /* Creamy white */
+  --custom-button-color-left: #00e676 !important;  /* Vivid green */
+  --custom-button-color-right: #2979ff !important; /* Electric blue */
+  --custom-accent-pink: #ff4081 !important;        /* Hot pink */
+  --custom-accent-yellow: #ffeb3b !important;      /* Bright yellow */
+  --custom-shadow: rgba(0, 0, 0, 0.25);
+}
+
+/* -----------------------
+   CARDS & CONTAINERS
+----------------------- */
+.app, .card, .box {
+  background-color: var(--custom-foreground-color) !important;
+  border: 3px solid var(--custom-accent-pink) !important;
+  border-radius: 18px !important;
+  box-shadow: 0 10px 20px var(--custom-shadow) !important;
+  color: #222 !important;
+  text-align: center !important;
+  transition: all 0.2s ease-in-out !important;
+}
+.app:hover, .card:hover, .box:hover {
+  transform: translateY(-4px) !important;
+  box-shadow: 0 14px 25px rgba(0, 0, 0, 0.35) !important;
+}
+
+/* -----------------------
+   BUTTONS
+----------------------- */
+.checker .container,
+.incentive,
+.action-btn {
+  background: linear-gradient(45deg, var(--custom-button-color-left), var(--custom-button-color-right)) !important;
+  color: #fff !important;
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+  border: 2px solid #000 !important;
+  border-radius: 12px !important;
+  box-shadow: 0 6px 0 #0003, 0 12px 15px var(--custom-shadow) !important;
+  font-weight: bold !important;
+  transition: 0.2s ease-in-out !important;
+}
+.checker .container:hover,
+.incentive:hover,
+.action-btn:hover {
+  filter: brightness(1.2) !important;
+  transform: translateY(-3px) !important;
+}
+
+/* -----------------------
+   BADGES
+----------------------- */
+.download-badge { 
+  background: var(--custom-accent-yellow) !important; 
+  color: #000 !important; 
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25) !important;
+}
+
+.version-badge { 
+  background: var(--custom-accent-pink) !important; 
+  color: #fff !important; 
+  border-radius: 6px !important;
+  padding: 6px 12px !important;
+  font-weight: 700 !important;
+  box-shadow: 0 2px 4px rgba(0,0,0,0.25) !important;
+}
+
+/* -----------------------
+   SPINNER
+----------------------- */
+.spinner-border { 
+  border-color: rgba(255,255,255,0.25) !important; 
+  border-top-color: var(--custom-accent-yellow) !important; 
+}
+
+/* -----------------------
+   TEXT
+----------------------- */
+.name { 
+  color: var(--custom-accent-pink) !important; 
+  text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
+  font-weight: 800 !important;
+}
+.description { 
+  color: #222 !important; 
+  font-weight: 500 !important;
+}
+
+/* -----------------------
+   RATINGS
+----------------------- */
+.rating {
+  color: var(--custom-accent-yellow) !important;
+  font-size: 1.25em !important;
+  text-shadow: 0 1px 1px rgba(0,0,0,0.3) !important;
+}
+
+/* -----------------------
+   INSTRUCTIONS (PRO STYLE)
+----------------------- */
+.instructions.pro-style {
+  background: linear-gradient(180deg, #fffbe7 0%, #fff2c2 100%);
+  border: 4px solid var(--custom-accent-yellow);
+  border-radius: 20px;
+  padding: 20px 25px;
+  margin: 25px auto;
+  box-shadow: 0 8px 16px rgba(0,0,0,0.25), 0 0 10px rgba(255, 235, 59, 0.4);
+  max-width: 520px;
+  min-width: 300px;
+  text-align: center;
+  color: #333;
+  font-family: "Poppins", Arial, sans-serif;
+  line-height: 1.6;
+  font-size: 1rem;
+  transition: all 0.25s ease-in-out;
+}
+.instructions.pro-style:hover {
+  transform: translateY(-3px);
+  box-shadow: 0 10px 22px rgba(0,0,0,0.3), 0 0 18px rgba(255, 235, 59, 0.6);
+}
+.instructions.pro-style .instructions-header {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  font-size: 1.25rem;
+  font-weight: 700;
+  margin-bottom: 10px;
+  color: var(--custom-accent-pink);
+}
+.instructions.pro-style .hl-time { color: #e53935; font-weight: 800; }
+.instructions.pro-style .hl-app { color: #00c853; font-weight: 800; }
+.instructions.pro-style .hl-item { color: #1976d2; font-weight: 800; }
+.instructions.pro-style .warning {
+  color: #d50000;
+  font-weight: 700;
+  font-size: 0.95rem;
+  margin-top: 12px;
+}
+.instructions.pro-style .icon {
+  animation: bounce 1.2s infinite;
+}
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-3px); }
+}
+
+/* -----------------------
+   NAVIGATION
+----------------------- */
+.nav-btn.home { background: linear-gradient(180deg, #ff4081, #f50057) !important; }
+.nav-btn.profile { background: linear-gradient(180deg, #00c853, #1b5e20) !important; }
+.nav-btn.settings { background: linear-gradient(180deg, #2196f3, #1565c0) !important; }
+
+/* -----------------------
+   TITLE & SMALL TEXT
+----------------------- */
+.title { display: none !important; }
+.fs-xs, .fs-sm, .description, .name { 
+  text-shadow: 0 1px 0 rgba(0,0,0,0.4) !important; 
+}
+
+/* -----------------------
+   RESPONSIVE TWEAKS
+----------------------- */
+@media (max-width: 600px) {
+  .instructions.pro-style {
+    max-width: 90%;
+    padding: 18px 15px;
+    font-size: 0.95rem;
+  }
+}

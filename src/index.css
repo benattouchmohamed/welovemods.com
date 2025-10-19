@@ -1,0 +1,261 @@
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Inter:wght@400;500;600;700&display=swap');
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Dark mode as default for browsers that support it */
+@media (prefers-color-scheme: dark) {
+  :root {
+    /* Copy all your --dark variables here */
+    --background: 200 80% 35%;
+    --foreground: 210 40% 98%;
+    --card: 48 80% 78%;
+    --card-foreground: 222 84% 6%;
+    --popover: 48 80% 78%;
+    --popover-foreground: 222 84% 6%;
+    --primary: 16 95% 56%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 48 80% 78%;
+    --secondary-foreground: 222 47% 12%;
+    --muted: 48 80% 80%;
+    --muted-foreground: 215 16% 46%;
+    --accent: 213 90% 60%;
+    --accent-foreground: 0 0% 100%;
+    --destructive: 354 85% 58%;
+    --destructive-foreground: 0 0% 100%;
+    --border: 16 95% 56%;
+    --input: 48 80% 85%;
+    --ring: 16 95% 56%;
+    /* cartoon colors */
+    --cartoon-sky: 200 80% 35%;
+    --cartoon-cream: 48 80% 78%;
+    --cartoon-orange: 16 95% 56%;
+    --cartoon-red: 354 85% 58%;
+    --cartoon-blue: 213 90% 60%;
+    --cartoon-green: 145 72% 38%;
+    --cartoon-purple: 288 60% 44%;
+    --cartoon-pink: 330 80% 60%;
+    --cartoon-yellow: 48 96% 55%;
+  }
+}
+:root {
+  /* Core Colors */
+  --background: 200 80% 60%; /* Softer sky blue */
+  --foreground: 220 70% 10%; /* Darker for contrast */
+  --card: 48 90% 94%; /* Creamy off-white */
+  --card-foreground: 220 70% 10%;
+  --primary: 15 90% 55%; /* Bright orange */
+  --primary-foreground: 0 0% 100%;
+  --secondary: 48 90% 85%; /* Light cream */
+  --secondary-foreground: 220 50% 20%;
+  --muted: 48 90% 88%;
+  --muted-foreground: 220 30% 40%;
+  --accent: 210 90% 55%; /* Vibrant blue */
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 80% 55%; /* Softer red */
+  --destructive-foreground: 0 0% 100%;
+  --border: 15 90% 50%;
+  --input: 48 90% 94%;
+  --ring: 15 90% 50%;
+  --radius: 1rem; /* Slightly softer radius */
+
+  /* Cartoon UI Colors */
+  --cartoon-sky: 200 80% 60%;
+  --cartoon-cream: 48 90% 85%;
+  --cartoon-orange: 15 90% 55%;
+  --cartoon-red: 0 80% 55%;
+  --cartoon-blue: 210 90% 55%;
+  --cartoon-green: 140 80% 40%;
+  --cartoon-purple: 290 80% 45%;
+  --cartoon-pink: 330 85% 60%;
+  --cartoon-yellow: 50 95% 55%;
+
+  /* Gradients */
+  --gradient-sky: linear-gradient(180deg, hsl(200, 80%, 50%), hsl(200, 80%, 70%));
+  --gradient-orange: linear-gradient(45deg, hsl(15, 90%, 55%), hsl(35, 90%, 50%));
+  --gradient-blue: linear-gradient(45deg, hsl(210, 90%, 55%), hsl(190, 90%, 50%));
+  --gradient-pink: linear-gradient(45deg, hsl(330, 85%, 60%), hsl(310, 90%, 65%));
+
+  /* Shadows */
+  --shadow-base: 0 6px 0 hsl(15, 90%, 45%), 0 8px 16px hsl(15, 90%, 45%, 0.25);
+  --shadow-sm: 0 4px 0 hsl(15, 90%, 45%), 0 6px 12px hsl(15, 90%, 45%, 0.2);
+  --shadow-lg: 0 8px 0 hsl(15, 90%, 45%), 0 12px 24px hsl(15, 90%, 45%, 0.3);
+  --shadow-blue: 0 6px 0 hsl(210, 90%, 45%), 0 8px 16px hsl(210, 90%, 45%, 0.25);
+  --shadow-pink: 0 6px 0 hsl(330, 85%, 50%), 0 8px 16px hsl(330, 85%, 50%, 0.25);
+  --shadow-green: 0 6px 0 hsl(140, 80%, 30%), 0 8px 16px hsl(140, 80%, 30%, 0.25);
+  --shadow-purple: 0 6px 0 hsl(290, 80%, 35%), 0 8px 16px hsl(290, 80%, 35%, 0.25);
+  --shadow-yellow: 0 6px 0 hsl(50, 95%, 45%), 0 8px 16px hsl(50, 95%, 45%, 0.25);
+  --shadow-soft: 0 4px 8px hsl(200, 80%, 50%, 0.15);
+  --shadow-glow: 0 0 12px hsl(15, 90%, 55%, 0.5);
+
+  --sidebar-background: 0 0% 98%;
+  --sidebar-foreground: 240 5.3% 26.1%;
+  --sidebar-primary: 240 5.9% 10%;
+  --sidebar-primary-foreground: 0 0% 98%;
+  --sidebar-accent: 240 4.8% 95.9%;
+  --sidebar-accent-foreground: 240 5.9% 10%;
+  --sidebar-border: 220 13% 91%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+}
+
+.dark {
+  /* Core Colors */
+  --background: 200 80% 40%;
+  --foreground: 200 20% 95%;
+  --card: 48 90% 80%;
+  --card-foreground: 200 20% 95%;
+  --primary: 15 90% 55%;
+  --primary-foreground: 0 0% 100%;
+  --secondary: 48 90% 75%;
+  --secondary-foreground: 220 50% 20%;
+  --muted: 48 90% 78%;
+  --muted-foreground: 220 30% 40%;
+  --accent: 210 90% 55%;
+  --accent-foreground: 0 0% 100%;
+  --destructive: 0 80% 55%;
+  --destructive-foreground: 0 0% 100%;
+  --border: 15 90% 50%;
+  --input: 48 90% 80%;
+  --ring: 15 90% 50%;
+
+  /* Cartoon UI Dark Colors */
+  --cartoon-sky: 200 80% 40%;
+  --cartoon-cream: 48 90% 75%;
+  --cartoon-orange: 15 90% 55%;
+  --cartoon-red: 0 80% 55%;
+  --cartoon-blue: 210 90% 55%;
+  --cartoon-green: 140 80% 40%;
+  --cartoon-purple: 290 80% 45%;
+  --cartoon-pink: 330 85% 60%;
+  --cartoon-yellow: 50 95% 55%;
+
+  /* Shadows for Dark Mode */
+  --shadow-base: 0 6px 0 hsl(15, 90%, 35%), 0 8px 16px hsl(15, 90%, 35%, 0.3);
+  --shadow-sm: 0 4px 0 hsl(15, 90%, 35%), 0 6px 12px hsl(15, 90%, 35%, 0.25);
+  --shadow-lg: 0 8px 0 hsl(15, 90%, 35%), 0 12px 24px hsl(15, 90%, 35%, 0.35);
+  --shadow-blue: 0 6px 0 hsl(210, 90%, 45%), 0 8px 16px hsl(210, 90%, 45%, 0.3);
+  --shadow-pink: 0 6px 0 hsl(330, 85%, 50%), 0 8px 16px hsl(330, 85%, 50%, 0.3);
+  --shadow-green: 0 6px 0 hsl(140, 80%, 30%), 0 8px 16px hsl(140, 80%, 30%, 0.3);
+  --shadow-purple: 0 6px 0 hsl(290, 80%, 35%), 0 8px 16px hsl(290, 80%, 35%, 0.3);
+  --shadow-yellow: 0 6px 0 hsl(50, 95%, 45%), 0 8px 16px hsl(50, 95%, 45%, 0.3);
+  --shadow-soft: 0 4px 8px hsl(200, 80%, 40%, 0.2);
+  --shadow-glow: 0 0 12px hsl(15, 90%, 55%, 0.6);
+  --sidebar-background: 240 5.9% 10%;
+  --sidebar-foreground: 240 4.8% 95.9%;
+  --sidebar-primary: 224.3 76.3% 48%;
+  --sidebar-primary-foreground: 0 0% 100%;
+  --sidebar-accent: 240 3.7% 15.9%;
+  --sidebar-accent-foreground: 240 4.8% 95.9%;
+  --sidebar-border: 240 3.7% 15.9%;
+  --sidebar-ring: 217.2 91.2% 59.8%;
+}
+
+body {
+  font-family: "Fredoka One", "Inter", sans-serif;
+  color: hsl(var(--foreground));
+  background: var(--gradient-sky);
+  background-attachment: fixed;
+  line-height: 1.6;
+  min-height: 100vh;
+}
+
+/* Decorative Elements */
+.cloud {
+  background: rgba(255, 255, 255, 0.7);
+  border-radius: 2rem;
+  position: absolute;
+  box-shadow: var(--shadow-soft);
+  animation: float 5s ease-in-out infinite;
+}
+
+.star {
+  background: hsl(var(--cartoon-yellow));
+  border-radius: 50%;
+  position: absolute;
+  box-shadow: var(--shadow-glow);
+  animation: twinkle 1.5s ease-in-out infinite alternate;
+}
+
+/* Utility Classes */
+.shadow-base { box-shadow: var(--shadow-base); }
+.shadow-sm { box-shadow: var(--shadow-sm); }
+.shadow-lg { box-shadow: var(--shadow-lg); }
+.shadow-blue { box-shadow: var(--shadow-blue); }
+.shadow-pink { box-shadow: var(--shadow-pink); }
+.shadow-green { box-shadow: var(--shadow-green); }
+.shadow-purple { box-shadow: var(--shadow-purple); }
+.shadow-yellow { box-shadow: var(--shadow-yellow); }
+.shadow-soft { box-shadow: var(--shadow-soft); }
+.shadow-glow { box-shadow: var(--shadow-glow); }
+
+/* Interactive Elements */
+.button {
+  background: var(--gradient-orange);
+  color: hsl(var(--primary-foreground));
+  padding: 0.75rem 1.5rem;
+  border-radius: var(--radius);
+  border: 2px solid hsl(var(--cartoon-orange), 0.9);
+  box-shadow: var(--shadow-base);
+  transition: all 0.2s ease;
+  font-family: "Fredoka One", sans-serif;
+  font-size: 1.1rem;
+  text-transform: uppercase;
+}
+
+.button:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-2px);
+}
+
+.button:active {
+  box-shadow: var(--shadow-sm);
+  transform: translateY(1px);
+}
+
+.card {
+  background: hsl(var(--card));
+  border-radius: var(--radius);
+  border: 2px solid hsl(var(--cartoon-blue));
+  box-shadow: var(--shadow-blue);
+  padding: 1.25rem;
+  transition: all 0.3s ease;
+}
+
+.card:hover {
+  box-shadow: var(--shadow-lg);
+  transform: translateY(-3px);
+}
+
+/* Attention-Grabbing Offer Text (Inspired by Past Requests) */
+.offer-highlight {
+  background: var(--gradient-pink);
+  color: hsl(var(--primary-foreground));
+  padding: 0.5rem 1rem;
+  border-radius: var(--radius);
+  box-shadow: var(--shadow-pink);
+  font-family: "Fredoka One", sans-serif;
+  font-size: 1.25rem;
+  text-align: center;
+  animation: pulse 1.5s ease-in-out infinite;
+}
+
+/* Animations */
+@keyframes float {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-15px); }
+}
+
+@keyframes twinkle {
+  0% { opacity: 0.6; transform: scale(1); }
+  100% { opacity: 1; transform: scale(1.3); }
+}
+
+@keyframes pulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.05); }
+  100% { transform: scale(1); }
+}
+
+.animate-float { animation: float 5s ease-in-out infinite; }
+.animate-twinkle { animation: twinkle 1.5s ease-in-out infinite alternate; }
+.animate-pulse { animation: pulse 1.5s ease-in-out infinite; }
