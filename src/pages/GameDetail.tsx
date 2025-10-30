@@ -42,9 +42,15 @@ const GameDetail = () => {
   };
 
   const handleDownload = () => {
-    setIsDownloading(true);
-    window.location.href = "https://applocked.org/cl/i/8dkk3k";
-  };
+  if (!game) return;
+  setIsDownloading(true);
+
+  // ⏳ يمكن إضافة تأخير بسيط لإظهار أن التحميل جارٍ
+  setTimeout(() => {
+    // الانتقال إلى صفحة التحميل مع اسم اللعبة في query
+    navigate(`/Download?game=${encodeURIComponent(game.title)}`);
+  }, 800);
+};
 
   // 🎨 Logic colors for tags
   const tagColors: Record<string, { base: string; dark: string; text?: string }> = {
