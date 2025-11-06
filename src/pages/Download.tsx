@@ -7,7 +7,8 @@ import {
   Monitor,
   Gamepad2,
   Gift,
-  ChevronDown,
+  Star,
+  Zap,
 } from "lucide-react";
 import Navbar from "@/components/Navbar";
 import { fetchOffers, type Offer } from "@/services/offerService";
@@ -24,10 +25,10 @@ const Download = () => {
   useEffect(() => {
     const loadOffers = async () => {
       try {
-        const fetchedOffers = await fetchOffers();
-        setOffers(fetchedOffers);
-      } catch (error) {
-        console.error("Failed to fetch offers:", error);
+        const fetched = await fetchOffers();
+        setOffers(fetched);
+      } catch (e) {
+        console.error(e);
         setError("Failed to load offers. Try the link below.");
       } finally {
         setLoading(false);
@@ -36,171 +37,233 @@ const Download = () => {
     loadOffers();
   }, []);
 
-  const getIconComponent = (iconName: string) => {
-    switch (iconName) {
-      case "Smartphone":
-        return <Smartphone className="w-8 h-8 text-cartoon-cream" />;
-      case "Monitor":
-        return <Monitor className="w-8 h-8 text-cartoon-cream" />;
-      case "Gamepad2":
-        return <Gamepad2 className="w-8 h-8 text-cartoon-cream" />;
-      case "Gift":
-        return <Gift className="w-8 h-8 text-cartoon-cream" />;
-      default:
-        return <DollarSign className="w-8 h-8 text-cartoon-cream" />;
-    }
+  const getIcon = (name: string) => {
+    const size = "w-5 h-5 sm:w-6 sm:h-6";
+    const icons: Record<string, JSX.Element> = {
+      Smartphone: <Smartphone className={`${size} text-cartoon-cream`} />,
+      Monitor: <Monitor className={`${size} text-cartoon-cream`} />,
+      Gamepad2: <Gamepad2 className={`${size} text-cartoon-cream`} />,
+      Gift: <Gift className={`${size} text-cartoon-cream`} />,
+    };
+    return icons[name] || <DollarSign className={`${size} text-cartoon-cream`} />;
   };
 
+  const renderStars = (rating: number, isFirst: boolean) => (
+    <div className={`flex items-center gap-0.5 ${isFirst ? "text-cartoon-orange" : "text-yellow-500"}`}>
+      {[...Array(5)].map((_, i) => (
+        <Star
+          key={i}
+          className={`w-3.5 h-3.5 sm:w-4 sm:h-4 ${
+            i < Math.floor(rating) ? "fill-current" : "fill-none stroke-current"
+          }`}
+        />
+      ))}
+      <span className="ml-1 font-bold text-xs sm:text-sm">{rating.toFixed(1)}</span>
+    </div>
+  );
+
   return (
-    <div className="min-h-screen relative overflow-hidden bg-gradient-to-b from-cartoon-cream/10 to-white">
+    <div className="min-h-screen bg-gradient-to-b from-cartoon-cream/30 to-white">
       <Navbar />
-      <main className="pt-20 pb-12">
-        <div className="container mx-auto px-4 max-w-4xl">
-          {loading ? (
-            <div className="flex justify-center items-center h-[40vh]">
-              <div className="w-16 h-16 border-4 border-cartoon-orange border-t-transparent rounded-full animate-spin"></div>
+
+      <main className="pt-16 pb-10 sm:pt-20">
+        <div className="max-w-2xl mx-auto px-4 sm:px-6">
+
+          {/* LOADING */}
+          {loading && (
+            <div className="flex justify-center py-20">
+              <div className="w-10 h-10 border-4 border-cartoon-orange border-t-transparent rounded-full animate-spin" />
             </div>
-          ) : error ? (
-            <div className="text-center text-cartoon-red font-bold">
-              {error}
+          )}
+
+          {/* ERROR */}
+          {error && (
+            <div className="text-center py-12">
+              <p className="text-cartoon-red font-bold mb-4">{error}</p>
               <a
                 href="https://appinstallcheck.com/cl/i/8dkk3k"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="block bg-gradient-to-r from-cartoon-blue to-cartoon-purple text-cartoon-cream font-black py-3 px-6 rounded-full text-center hover:shadow-lg transition-all hover:-translate-y-1 mt-4 max-w-sm mx-auto"
+                className="inline-block bg-gradient-to-r from-cartoon-blue to-cartoon-purple text-cartoon-cream font-black py-2.5 px-6 rounded-full text-sm shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
               >
                 Try Offers Here
               </a>
             </div>
-          ) : (
-            <>
-              {/* Instructions Block */}
-              <div className="bg-gradient-to-b from-cartoon-cream to-white border-4 border-cartoon-blue rounded-3xl p-8 shadow-[0_0_20px_rgba(0,0,255,0.2)] mb-10 text-center">
-                <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold text-cartoon-blue mb-3 drop-shadow-sm leading-tight">
-                  Unlock{" "}
-                  <span className="fancy-span text-cartoon-purple break-words">{gameName}</span>
-                </h1>
+          )}
 
-                <p className="text-lg font-bold mb-3 text-cartoon-blue">
-                  Complete{" "}
-                  <span className="fancy-span text-cartoon-green">1 offer</span>{" "}
-                  to unlock and get the{" "}
-                  <span className="fancy-span text-cartoon-orange">game</span>.
-                </p>
+          {/* SUCCESS */}
+          {!loading && !error && (
+            <> <br />
+              {/* HERO */}
+              <section className="bg-white rounded-2xl shadow-lg border-2 border-cartoon-blue p-5 sm:p-7 mb-6 text-center overflow-hidden">
+                <div className="relative">
+                  <div className="absolute inset-0 bg-gradient-to-r from-cartoon-pink/5 to-cartoon-purple/5 rounded-2xl" />
+                  <div className="relative z-10">
+                    <h1 className="text-2xl sm:text-3xl font-black text-cartoon-blue mb-2">
+                      Unlock  <br /><span className="text-cartoon-purple drop-shadow-sm">{gameName}</span>
+                    </h1>
 
-                <p className="text-lg font-bold mb-3 text-cartoon-blue">
-                  Once you finish{" "}
-                  <span className="fancy-span text-cartoon-green">1 offer</span>
-                  , your download will start{" "}
-                  <span className="fancy-span text-cartoon-red">automatically!</span>
-                </p>
+                    <p className="text-sm sm:text-base font-bold text-cartoon-blue mb-1">
+                      Complete <span className="text-cartoon-green">1 offer</span> to get the{" "}
+                      <span className="text-cartoon-orange">game</span>.
+                    </p>
+                    <p className="text-sm sm:text-base font-bold text-cartoon-blue">
+                      Download starts <span className="text-cartoon-red">automatically!</span>
+                    </p>
 
-                <div className="flex flex-col items-center justify-center gap-3 text-cartoon-blue mt-6">
-                  <span className="fancy-span font-bold text-lg bg-cartoon-cream border border-cartoon-blue px-4 py-1 rounded-full shadow-sm">
-                    0/1 offer completed
-                  </span>
+                    <div className="mt-5 flex flex-col items-center gap-3">
+                      <span className="bg-cartoon-cream border-2 border-cartoon-blue text-cartoon-blue font-bold text-xs sm:text-sm px-3 py-1 rounded-full shadow">
+                        0 / 1 offer completed
+                      </span>
 
-                  {/* Guide Button */}
-                  <button
-                    onClick={() => setShowGuide(true)}
-                    className="flex items-center justify-center gap-2 bg-gradient-to-r from-blue-500 via-purple-500 to-pink-500 text-white font-bold px-6 py-3 rounded-2xl shadow-lg hover:scale-105 transition-all duration-200"
-                  >
-                    <span>How to Complete Offers Guide</span>
-                  </button>
+                      <button
+                        onClick={() => setShowGuide(true)}
+                        className="flex items-center gap-2 bg-gradient-to-r from-cartoon-pink to-cartoon-purple text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition"
+                      >
+                        How-to Guide
+                      </button>
+                    </div>
+                  </div>
                 </div>
-                
+              </section>
+
+              {/* NOTE 1: APP DOWNLOAD TIP */}
+              <div className="relative mb-8 overflow-hidden rounded-2xl shadow-2xl">
+                <div className="absolute inset-0 bg-gradient-to-r from-cartoon-orange via-cartoon-pink to-cartoon-purple opacity-90" />
+                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm" />
+
+                <div className="relative p-4 sm:p-5 flex items-center gap-3">
+                  <div className="relative flex-shrink-0">
+                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-cartoon-cream shadow-lg flex items-center justify-center animate-pulse">
+                      <Star className="w-6 h-6 sm:w-7 sm:h-7 text-cartoon-orange fill-current" />
+                    </div>
+                    <div className="absolute -inset-1 bg-cartoon-orange/30 rounded-full blur-md animate-pulse" />
+                  </div>
+
+                  <p className="text-white font-black text-sm sm:text-base leading-tight">
+                    Try offers of <span className="underline decoration-2 decoration-cartoon-cream">downloading apps</span> –{" "}
+                    <span className="text-cartoon-green drop-shadow-lg">it’s so easy and 100% faster!</span>
+                  </p>
+                </div>
               </div>
 
-              
-
-              {/* Guide Popup */}
+              {/* GUIDE MODAL */}
               {showGuide && (
-                <div className="fixed inset-0 bg-black bg-opacity-70 flex items-center justify-center z-50 p-4">
-                  <div className="relative bg-white rounded-2xl shadow-2xl max-w-lg w-full overflow-hidden">
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+                  <div className="relative bg-white rounded-2xl max-w-xs sm:max-w-sm w-full overflow-hidden shadow-2xl">
                     <button
                       onClick={() => setShowGuide(false)}
-                      className="absolute top-3 right-3 bg-red-500 hover:bg-red-600 text-white w-8 h-8 rounded-full flex items-center justify-center font-bold z-10 transition-colors"
+                      className="absolute top-2 right-2 w-8 h-8 bg-cartoon-red text-white rounded-full flex items-center justify-center font-bold text-sm hover:bg-red-600 transition"
                     >
                       X
                     </button>
-                    <img
-                      src="/images/guide.png"
-                      alt="How to Complete Offers Guide"
-                      className="w-full h-auto rounded-lg"
-                    />
+                    <img src="/images/guide.png" alt="Guide" className="w-full" />
                   </div>
                 </div>
               )}
 
-              {/* Offers Grid */}
-              <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-10">
-                {offers.map((offer, index) => (
-                  <div
-                    key={offer.id}
-                    className={`bg-cartoon-cream border-4 ${
-                      index % 2 === 0
-                        ? "border-cartoon-purple shadow-[0_8px_0_#a855f7]"
-                        : "border-cartoon-pink shadow-[0_8px_0_#ec4899]"
-                    } rounded-3xl p-6 hover:shadow-lg transition-all hover:-translate-y-1 duration-200`}
-                  >
-                    <div className="flex items-start gap-4">
-                      <div className="p-1 rounded-xl w-20 h-20 flex items-center justify-center bg-cartoon-pink shadow-md">
-                        {offer.image ? (
-                          <img
-                            src={offer.image}
-                            alt={offer.title}
-                            className="w-full h-full object-cover rounded-xl"
-                          />
-                        ) : (
-                          getIconComponent(offer.icon)
-                        )}
-                      </div>
-                      <div className="flex-1">
-                        <h3 className="text-xl font-black text-cartoon-red mb-2">
-                          {offer.title}
-                        </h3>
-                        <p className="text-cartoon-blue mb-3 leading-relaxed text-sm">
-                          {offer.description}
-                        </p>
-                        <div className="flex items-center gap-4 mb-4">
-                          <div className="flex items-center gap-1 text-cartoon-blue">
-                            <Clock className="w-4 h-4" />
-                            <span className="font-bold text-sm">
-                              {offer.timeEstimate}
-                            </span>
-                          </div>
-                          <div className="flex items-center gap-1 text-cartoon-green">
-                            <span className="font-bold text-sm">
-                              {offer.difficulty}
-                            </span>
-                          </div>
+              {/* OFFERS GRID */}
+              <div className="grid gap-4 sm:gap-5">
+                {offers.map((o, i) => {
+                  const isFirst = i === 0;
+
+                  // Override first offer: 1 min + So Easy!
+                  const displayTime = isFirst ? "1 min" : o.timeEstimate;
+                  const displayDifficulty = isFirst ? "So Easy!" : o.difficulty;
+
+                  const buttonText = isFirst ? "Download Now" : "Complete Offer";
+                  const buttonGradient = isFirst
+                    ? "from-cartoon-green to-cartoon-orange"
+                    : "from-cartoon-blue to-cartoon-purple";
+
+                  const rating = isFirst ? 5.0 : 4.5;
+
+                  return (
+                    <article
+                      key={o.id}
+                      className={`
+                        bg-cartoon-cream rounded-2xl p-4 sm:p-5
+                        border-2 shadow hover:shadow-lg transition-all hover:-translate-y-0.5
+                        ${i % 2 === 0 ? "border-cartoon-purple" : "border-cartoon-pink"}
+                        ${isFirst ? "ring-2 ring-cartoon-orange/50" : ""}
+                      `}
+                    >
+                      <div className="flex gap-3 sm:gap-4">
+                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-cartoon-pink p-2 flex items-center justify-center flex-shrink-0 shadow-md">
+                          {o.image ? (
+                            <img src={o.image} alt={o.title} className="w-full h-full object-cover rounded-lg" />
+                          ) : (
+                            getIcon(o.icon)
+                          )}
                         </div>
-                        <a
-                          href={offer.url}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="block bg-gradient-to-r from-cartoon-blue to-cartoon-purple text-cartoon-cream font-black py-3 px-6 rounded-full text-center hover:shadow-lg transition-all hover:-translate-y-1 duration-200"
-                        >
-                          Complete Offer
-                        </a>
+
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-start justify-between mb-1">
+                            <h3 className="font-black text-base sm:text-lg text-cartoon-blue line-clamp-2 flex-1 pr-2">
+                              {o.title}
+                            </h3>
+                            {isFirst && (
+                              <span className="bg-cartoon-orange text-cartoon-cream text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
+                                Recommended
+                              </span>
+                            )}
+                          </div>
+
+                          <p className="text-xs sm:text-sm text-gray-700 mt-1 line-clamp-2">
+                            {o.description}
+                          </p>
+
+                          <div className="flex items-center justify-between mt-2">
+                            <div className="flex items-center gap-3 text-xs sm:text-sm">
+                              <div className="flex items-center gap-1 text-cartoon-blue">
+                                <Clock className="w-3.5 h-3.5" />
+                                <span className="font-bold">{displayTime}</span>
+                              </div>
+                              <span className={`font-bold ${isFirst ? "text-cartoon-green" : "text-cartoon-green"}`}>
+                                {displayDifficulty}
+                              </span>
+                            </div>
+
+                            {renderStars(rating, isFirst)}
+                          </div>
+
+                          <a
+                            href={o.url}
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className={`
+                              mt-3 block w-full text-cartoon-cream font-black text-center py-2.5 rounded-xl text-sm shadow
+                              bg-gradient-to-r ${buttonGradient}
+                              hover:shadow-md transition-all hover:-translate-y-0.5
+                              ${isFirst ? "animate-pulse" : ""}
+                            `}
+                          >
+                            {buttonText}
+                          </a>
+                        </div>
                       </div>
-                    </div>
-                  </div>
-                ))}
+                    </article>
+                  );
+                })}
               </div>
 
-              {/* Waiting Block */}
-              <div className="bg-gradient-to-r from-cartoon-red to-cartoon-pink border-4 border-cartoon-red rounded-3xl p-6 shadow-[0_8px_0_#dc2626] text-center">
-                <p className="text-cartoon-cream/90 font-bold mb-4 text-lg">
-                  Finish your offer to download!
+              {/* TRAFFIC BOOSTER */}
+              <div className="mt-6 bg-gradient-to-r from-cartoon-purple to-cartoon-blue rounded-2xl p-5 text-center shadow-xl border-2 border-cartoon-cream">
+                <div className="flex items-center justify-center gap-2 mb-2">
+                
+                  <p className="text-cartoon-cream font-black text-sm sm:text-base">
+                    Once you complete 1 offer → <span className="text-cartoon-green">auto-redirect & download!</span>
+                  </p>
+                
+                </div>
+
+                <div className="bg-cartoon-cream text-cartoon-purple font-black text-xs sm:text-sm py-1.5 px-4 rounded-full inline-block shadow-md">
+                  Top 1 site for most games in the world
+                </div>
+
+                <p className="text-cartoon-cream/90 text-xs sm:text-sm mt-3 font-bold">
+                  Most users get their game in <span className="text-cartoon-orange">&lt; 3 min!</span>
                 </p>
-                <span className="inline-block bg-gradient-to-r from-cartoon-blue to-cartoon-purple/50 text-cartoon-cream font-black py-3 px-6 rounded-full opacity-50 cursor-not-allowed">
-                  Waiting for completion
-                  <span className="inline-block ml-1 animate-[pulse_1.5s_ease-in-out_infinite]">
-                    ...
-                  </span>
-                  <br />
-                </span>
               </div>
               <br />
             </>
