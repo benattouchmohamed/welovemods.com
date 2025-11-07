@@ -540,7 +540,7 @@ const GameDetail = () => {
         </main>
       )}
 
-      <Footer />
+      
     </div>
   );
 };
