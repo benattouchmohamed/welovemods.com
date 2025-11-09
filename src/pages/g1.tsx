@@ -94,47 +94,17 @@ const G1: React.FC = () => {
         alt="Website Logo"
         style={{
           width: "250px",
-          marginBottom: "20px",
-          border: "4px solid #ffd700",
+          marginBottom: "40px",
+          border: "4px solid #010101ff",
           borderRadius: "16px",
           backgroundColor: "#fff",
           padding: "10px",
         }}
       />
 
-      <p
-        style={{
-          fontSize: "20px",
-          color: "#333",
-          backgroundColor: "#ffe4e1",
-          padding: "15px",
-          borderRadius: "12px",
-          border: "2px solid #ff69b4",
-          maxWidth: "400px",
-          marginBottom: "25px",
-        }}
-      >
-        <strong>
-          Please click the button below to open in your device browser and
-          download the games.
-        </strong>
-      </p>
+     
 
-      <button
-        onClick={openInRealBrowser}
-        style={{
-          backgroundColor: "#ffcc00",
-          color: "#333",
-          border: "none",
-          padding: "12px 25px",
-          borderRadius: "12px",
-          fontSize: "18px",
-          fontWeight: "bold",
-          cursor: "pointer",
-        }}
-      >
-        Open in Browser
-      </button>
+     
 
       <div
         style={{
@@ -167,10 +137,7 @@ const G1: React.FC = () => {
         </span>
       </div>
 
-      <p style={{ fontSize: "13px", color: "#666", marginTop: "12px" }}>
-        Detected TikTok in-app browser — tap the button to open in your device
-        browser.
-      </p>
+     
     </div>
   );
 };
