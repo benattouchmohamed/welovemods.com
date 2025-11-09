@@ -1,29 +1,80 @@
 import React, { useEffect, useState } from "react";
 
+/* --------------------------------------------------------------
+   Helper: is TikTok in-app browser?
+   -------------------------------------------------------------- */
+const isTikTokBrowser = (): boolean => {
+  const ua = navigator.userAgent.toLowerCase();
+
+  // TikTok app identifiers
+  const tiktokKeywords = [
+    "tiktok",
+    "musical_ly",
+    "musically",
+    "zhiliaoapp",
+    "com.zhiliaoapp.musically",
+    "com.ss.android.ugc.aweme",
+  ];
+
+  // Some TikTok browsers also inject a special property
+  const hasTikTokProp =
+    // @ts-ignore – TikTok injects this on Android
+    (window as any).TikTokWebView !== undefined ||
+    // @ts-ignore – iOS TikTok sometimes adds this
+    (window as any).webkit?.messageHandlers?.TikTok !== undefined;
+
+  const hasKeyword = tiktokKeywords.some((kw) => ua.includes(kw));
+
+  return hasKeyword || hasTikTokProp;
+};
+
 const G1: React.FC = () => {
-  const [isTikTok, setIsTikTok] = useState<boolean | null>(null);
+  const [insideTikTok, setInsideTikTok] = useState<boolean | null>(null);
   const externalUrl = "https://welovemods.com/";
 
+  /* --------------------------------------------------------------
+     Detect once on mount
+     -------------------------------------------------------------- */
   useEffect(() => {
-    const ua = navigator.userAgent || navigator.vendor || (window as any).opera || "";
-    const tiktok = /TikTok|musically|zhiliaoapp|com\.zhiliaoapp/i.test(ua);
-    setIsTikTok(tiktok);
+    const tikTok = isTikTokBrowser();
+    setInsideTikTok(tikTok);
 
-    // Auto redirect if NOT TikTok
-    if (!tiktok) {
-      const delayMs = 300;
-      setTimeout(() => {
-        window.location.replace(externalUrl);
-      }, delayMs);
+    // If NOT inside TikTok → open the site instantly
+    if (!tikTok) {
+      window.location.replace(externalUrl);
     }
   }, []);
 
-  if (isTikTok === null) {
-    // still detecting
-    return <div style={{ textAlign: "center", paddingTop: "50px" }}>Checking browser...</div>;
+  /* --------------------------------------------------------------
+     Still detecting…
+     -------------------------------------------------------------- */
+  if (insideTikTok === null) {
+    return (
+      <div
+        style={{
+          textAlign: "center",
+          paddingTop: "50px",
+          fontFamily: "'Comic Sans MS', Arial, sans-serif",
+        }}
+      >
+        Checking browser…
+      </div>
+    );
   }
 
-  // If not TikTok, we redirect automatically, so this renders only inside TikTok
+  /* --------------------------------------------------------------
+     Inside TikTok → show button (no auto-redirect)
+     -------------------------------------------------------------- */
+  const openInRealBrowser = () => {
+    try {
+      const newWin = window.open(externalUrl, "_blank", "noopener,noreferrer");
+      if (newWin) newWin.opener = null;
+      else window.location.href = externalUrl;
+    } catch {
+      window.location.href = externalUrl;
+    }
+  };
+
   return (
     <div
       style={{
@@ -63,19 +114,14 @@ const G1: React.FC = () => {
           marginBottom: "25px",
         }}
       >
-        <strong>Please click the button below to open in your browser and download the games.</strong>
+        <strong>
+          Please click the button below to open in your device browser and
+          download the games.
+        </strong>
       </p>
 
       <button
-        onClick={() => {
-          try {
-            const newWin = window.open(externalUrl, "_blank", "noopener,noreferrer");
-            if (newWin) newWin.opener = null;
-            else window.location.href = externalUrl;
-          } catch {
-            window.location.href = externalUrl;
-          }
-        }}
+        onClick={openInRealBrowser}
         style={{
           backgroundColor: "#ffcc00",
           color: "#333",
@@ -116,11 +162,14 @@ const G1: React.FC = () => {
         </svg>
         <span style={{ color: "#32cd32", fontWeight: "bold" }}>Secure</span>
         <span style={{ color: "#32cd32" }}>•</span>
-        <span style={{ color: "#228b22", fontWeight: "bold" }}>Verified by Play Protect</span>
+        <span style={{ color: "#228b22", fontWeight: "bold" }}>
+          Verified by Play Protect
+        </span>
       </div>
 
       <p style={{ fontSize: "13px", color: "#666", marginTop: "12px" }}>
-        Detected TikTok in-app browser — tap the button to open in your device browser.
+        Detected TikTok in-app browser — tap the button to open in your device
+        browser.
       </p>
     </div>
   );
