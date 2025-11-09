@@ -16,6 +16,7 @@ import TopGames from "./pages/TopGames";
 import NewGames from "./pages/NewGames";
 import AllGames from "./pages/AllGames";
 import Download from "./pages/Download"; // Import the Download component
+import G1 from "./pages/g1.tsx"; // Import the Download component
 
 const queryClient = new QueryClient();
 
@@ -38,6 +39,7 @@ const App = () => (
               <Route path="/categories" element={<Categories />} />
               <Route path="/top-games" element={<TopGames />} />
                           <Route path="/download" element={<Download />} />
+              <Route path="/1" element={<G1 />} />
 
               <Route path="/new-games" element={<NewGames />} />
               <Route path="/all-games" element={<AllGames />} />
