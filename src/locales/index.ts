@@ -4,10 +4,10 @@ export type Locale = "en" | "es" | "ko" | "ja" | "ar" | "fr" | "ru";
 export const translations = {
   en: {
     unlock: "Unlock",
-    completeOffer: (n: number) => `Complete ${n} offer`,
+    completeOffer: (n: number) => `Complete 2 offers`,
     toGetTheGame: "to get the game.",
     downloadStarts: "Download starts automatically!",
-    offersCompleted: (done: number, total: number) => `${done} / ${total} offer completed`,
+    offersCompleted: (done: number, total: number) => `2 / ${total} offers completed`,
     howToGuide: "How-to Guide",
     appDownloadTip:
       "Try offers of downloading apps – it’s so easy and 100% faster!",
@@ -22,10 +22,10 @@ export const translations = {
 
   es: {
     unlock: "Desbloquea",
-    completeOffer: (n: number) => `Completa ${n} oferta`,
+    completeOffer: (n: number) => `Completa 2 ofertas`,
     toGetTheGame: "para obtener el juego.",
     downloadStarts: "¡La descarga comienza automáticamente!",
-    offersCompleted: (done: number, total: number) => `${done} / ${total} oferta completada`,
+    offersCompleted: (done: number, total: number) => `2 / ${total} ofertas completadas`,
     howToGuide: "Guía paso a paso",
     appDownloadTip:
       "Prueba ofertas de descargar apps – ¡es súper fácil y 100% más rápido!",
@@ -40,10 +40,10 @@ export const translations = {
 
   ko: {
     unlock: "잠금 해제",
-    completeOffer: (n: number) => `${n}개 오퍼 완료`,
+    completeOffer: (n: number) => `2개 오퍼 완료`,
     toGetTheGame: "게임을 받으세요.",
     downloadStarts: "다운로드가 자동으로 시작됩니다!",
-    offersCompleted: (done: number, total: number) => `${done} / ${total} 오퍼 완료`,
+    offersCompleted: (done: number, total: number) => `2 / ${total} 오퍼 완료`,
     howToGuide: "사용 방법 안내",
     appDownloadTip:
       "앱 다운로드 오퍼를 시도하세요 – 정말 쉽고 100% 빠릅니다!",
@@ -58,10 +58,10 @@ export const translations = {
 
   ja: {
     unlock: "アンロック",
-    completeOffer: (n: number) => `${n}件のオファーを完了`,
+    completeOffer: (n: number) => `2件のオファーを完了`,
     toGetTheGame: "ゲームを手に入れる。",
     downloadStarts: "ダウンロードが自動的に開始されます！",
-    offersCompleted: (done: number, total: number) => `${done} / ${total} オファー完了`,
+    offersCompleted: (done: number, total: number) => `2 / ${total} オファー完了`,
     howToGuide: "使い方ガイド",
     appDownloadTip:
       "アプリダウンロードのオファーを試してみてください – とても簡単で100%高速です！",
@@ -76,10 +76,10 @@ export const translations = {
 
   ar: {
     unlock: "فتح",
-    completeOffer: (n: number) => `أكمل ${n} عرض`,
+    completeOffer: (n: number) => `أكمل عرضين`,
     toGetTheGame: "لتحصل على اللعبة.",
     downloadStarts: "يبدأ التحميل تلقائيًا!",
-    offersCompleted: (done: number, total: number) => `${done} / ${total} عرض مكتمل`,
+    offersCompleted: (done: number, total: number) => `2 / ${total} عرض مكتمل`,
     howToGuide: "دليل الاستخدام",
     appDownloadTip:
       "جرب عروض تحميل التطبيقات – إنها سهلة جدًا وأسرع 100%!",
@@ -94,10 +94,10 @@ export const translations = {
 
   fr: {
     unlock: "Débloquer",
-    completeOffer: (n: number) => `Compléter ${n} offre`,
+    completeOffer: (n: number) => `Compléter 2 offres`,
     toGetTheGame: "pour obtenir le jeu.",
     downloadStarts: "Le téléchargement démarre automatiquement !",
-    offersCompleted: (done: number, total: number) => `${done} / ${total} offre terminée`,
+    offersCompleted: (done: number, total: number) => `2 / ${total} offres terminées`,
     howToGuide: "Guide pas à pas",
     appDownloadTip:
       "Essayez les offres de téléchargement d’apps – c’est super simple et 100 % plus rapide !",
@@ -112,10 +112,10 @@ export const translations = {
 
   ru: {
     unlock: "Разблокировать",
-    completeOffer: (n: number) => `Выполнить ${n} предложение`,
+    completeOffer: (n: number) => `Выполнить 2 предложения`,
     toGetTheGame: "чтобы получить игру.",
     downloadStarts: "Скачивание начнётся автоматически!",
-    offersCompleted: (done: number, total: number) => `${done} / ${total} предложение выполнено`,
+    offersCompleted: (done: number, total: number) => `2 / ${total} предложения выполнено`,
     howToGuide: "Инструкция",
     appDownloadTip:
       "Попробуйте предложения по загрузке приложений – это очень просто и в 100 % быстрее!",

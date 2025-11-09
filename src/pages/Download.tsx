@@ -275,6 +275,7 @@
 // };
 
 // export default Download;
+
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
@@ -288,15 +289,13 @@ import {
   Globe,
   ChevronDown,
 } from "lucide-react";
+import ReactCountryFlag from "react-country-flag"; // <-- SVG FLAGS
 import Navbar from "@/components/Navbar";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 
 /* ────────────────────────────────────────────────────────────────────────
-   Language Picker – under "How-to Guide"
-   ──────────────────────────────────────────────────────────────────────── */
-/* ────────────────────────────────────────────────────────────────────────
-   Language Picker – under "How-to Guide" + SCROLLBAR + DEFAULT ENGLISH
+   Language Picker – US Flag + Scrollable + Always Show English
    ──────────────────────────────────────────────────────────────────────── */
 const LangPicker = () => {
   const [locale, setLocale] = useLocale();
@@ -304,7 +303,7 @@ const LangPicker = () => {
   const ref = useRef<HTMLDivElement>(null);
 
   const languages = [
-    { code: "en", flag: "GB", name: "English" },
+    { code: "en", flag: "US", name: "English" },     // US FLAG
     { code: "es", flag: "ES", name: "Español" },
     { code: "ko", flag: "KR", name: "한국어" },
     { code: "ja", flag: "JP", name: "日本語" },
@@ -313,8 +312,8 @@ const LangPicker = () => {
     { code: "ru", flag: "RU", name: "Русский" },
   ] as const;
 
-  // ALWAYS SHOW ENGLISH as current, even if locale is different
-  const current = languages.find((l) => l.code === "en")!; // Force English
+  // ALWAYS SHOW ENGLISH (US flag) as current
+  const current = languages.find((l) => l.code === "en")!;
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
@@ -326,13 +325,19 @@ const LangPicker = () => {
 
   return (
     <div ref={ref} className="relative flex justify-center">
+      {/* BUTTON */}
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:shadow-lg transition-all"
-        aria-label={`Current language: English`}
+        aria-label="Current language: English"
       >
         <Globe className="w-4 h-4 text-cartoon-blue" />
-        <span className="text-lg">{current.flag}</span>
+        <ReactCountryFlag
+          countryCode={current.flag}
+          svg
+          style={{ width: "1.3em", height: "1.3em" }}
+          className="rounded-sm"
+        />
         <ChevronDown
           className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`}
         />
@@ -354,7 +359,12 @@ const LangPicker = () => {
               className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition
                 ${locale === lang.code ? "bg-cartoon-blue/10 text-cartoon-blue" : "hover:bg-gray-50"}`}
             >
-              <span className="text-xl">{lang.flag}</span>
+              <ReactCountryFlag
+                countryCode={lang.flag}
+                svg
+                style={{ width: "1.5em", height: "1.5em" }}
+                className="rounded-sm"
+              />
               <span className="text-sm font-medium">{lang.name}</span>
             </button>
           ))}
@@ -365,7 +375,7 @@ const LangPicker = () => {
 };
 
 /* ────────────────────────────────────────────────────────────────────────
-   Main Download Page – FULL i18n + Language Picker under Guide
+   Main Download Page
    ──────────────────────────────────────────────────────────────────────── */
 const Download = () => {
   const navigate = useNavigate();
@@ -373,7 +383,7 @@ const Download = () => {
   const gameName = searchParams.get("game") || "Game";
 
   const [locale] = useLocale();
-  const i18n = t(locale); // <-- Real translations from locales/index.ts
+  const i18n = t(locale);
 
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
@@ -451,7 +461,9 @@ const Download = () => {
 
           {/* SUCCESS */}
           {!loading && !error && (
-            <> <br />
+            <>
+              <br />
+
               {/* HERO */}
               <section className="bg-white rounded-2xl shadow-lg border-2 border-cartoon-blue p-5 sm:p-7 mb-6 text-center overflow-hidden">
                 <div className="relative">
@@ -462,7 +474,7 @@ const Download = () => {
                     </h1>
 
                     <p className="text-sm sm:text-base font-bold text-cartoon-blue mb-1">
-                      {i18n.completeOffer(1)} <span className="text-cartoon-green">{i18n.toGetTheGame}</span>
+                      {i18n.completeOffer(2)} <span className="text-cartoon-green">{i18n.toGetTheGame}</span>
                     </p>
                     <p className="text-sm sm:text-base font-bold text-cartoon-blue">
                       {i18n.downloadStarts}
@@ -470,7 +482,7 @@ const Download = () => {
 
                     <div className="mt-5 flex flex-col items-center gap-3">
                       <span className="bg-cartoon-cream border-2 border-cartoon-blue text-cartoon-blue font-bold text-xs sm:text-sm px-3 py-1 rounded-full shadow">
-                        {i18n.offersCompleted(0, 1)}
+                        {i18n.offersCompleted(0, 2)}
                       </span>
 
                       <button
@@ -480,14 +492,14 @@ const Download = () => {
                         {i18n.howToGuide}
                       </button>
 
-                      {/* LANGUAGE PICKER – under How-to Guide */}
+                      {/* LANGUAGE PICKER */}
                       <LangPicker />
                     </div>
                   </div>
                 </div>
               </section>
 
-              {/* NOTE 1: APP DOWNLOAD TIP */}
+              {/* APP DOWNLOAD TIP */}
               <div className="relative mb-8 overflow-hidden rounded-2xl shadow-2xl">
                 <div className="absolute inset-0 bg-gradient-to-r from-cartoon-orange via-cartoon-pink to-cartoon-purple opacity-90" />
                 <div className="absolute inset-0 bg-white/10 backdrop-blur-sm" />
@@ -609,7 +621,7 @@ const Download = () => {
               <div className="mt-6 bg-gradient-to-r from-cartoon-purple to-cartoon-blue rounded-2xl p-5 text-center shadow-xl border-2 border-cartoon-cream">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <p className="text-cartoon-cream font-black text-sm sm:text-base">
-                    {i18n.onceComplete || "Once you complete 1 offer"} → <span className="text-cartoon-green">{i18n.autoRedirect}</span>
+                    {i18n.onceComplete || "Once you complete 2 offer"} → <span className="text-cartoon-green">{i18n.autoRedirect}</span>
                   </p>
                 </div>
 
