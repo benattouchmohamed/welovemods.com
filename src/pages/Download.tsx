@@ -275,7 +275,6 @@
 // };
 
 // export default Download;
-
 import React, { useEffect, useState, useRef } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
 import {
@@ -295,7 +294,7 @@ import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 
 /* ────────────────────────────────────────────────────────────────────────
-   Language Picker – US Flag + Scrollable + Always Show English
+   Language Picker – Correct Flag + Name Based on Current Locale
    ──────────────────────────────────────────────────────────────────────── */
 const LangPicker = () => {
   const [locale, setLocale] = useLocale();
@@ -303,7 +302,7 @@ const LangPicker = () => {
   const ref = useRef<HTMLDivElement>(null);
 
   const languages = [
-    { code: "en", flag: "US", name: "English" },     // US FLAG
+    { code: "en", flag: "US", name: "English" },
     { code: "es", flag: "ES", name: "Español" },
     { code: "ko", flag: "KR", name: "한국어" },
     { code: "ja", flag: "JP", name: "日本語" },
@@ -312,12 +311,14 @@ const LangPicker = () => {
     { code: "ru", flag: "RU", name: "Русский" },
   ] as const;
 
-  // ALWAYS SHOW ENGLISH (US flag) as current
-  const current = languages.find((l) => l.code === "en")!;
+  // FIXED: Use actual locale, fallback to English
+  const current = languages.find((l) => l.code === locale) ?? languages[0];
 
   useEffect(() => {
     const handler = (e: MouseEvent) => {
-      if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
+      if (ref.current && !ref.current.contains(e.target as Node)) {
+        setOpen(false);
+      }
     };
     if (open) document.addEventListener("mousedown", handler);
     return () => document.removeEventListener("mousedown", handler);
@@ -325,11 +326,11 @@ const LangPicker = () => {
 
   return (
     <div ref={ref} className="relative flex justify-center">
-      {/* BUTTON */}
+      {/* BUTTON – Shows Correct Flag & Name */}
       <button
         onClick={() => setOpen((v) => !v)}
         className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/90 backdrop-blur-sm shadow-md hover:shadow-lg transition-all"
-        aria-label="Current language: English"
+        aria-label={`Current language: ${current.name}`}
       >
         <Globe className="w-4 h-4 text-cartoon-blue" />
         <ReactCountryFlag
@@ -338,6 +339,9 @@ const LangPicker = () => {
           style={{ width: "1.3em", height: "1.3em" }}
           className="rounded-sm"
         />
+        <span className="text-sm font-medium hidden sm:inline">
+          {current.name}
+        </span>
         <ChevronDown
           className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`}
         />
@@ -345,10 +349,7 @@ const LangPicker = () => {
 
       {/* SCROLLABLE DROPDOWN */}
       {open && (
-        <div
-          className="absolute bottom-full mb-3 w-56 bg-white rounded-xl shadow-xl border overflow-hidden z-50
-                     max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-cartoon-blue/30 scrollbar-track-cartoon-cream/50"
-        >
+        <div className="absolute bottom-full mb-3 w-56 bg-white rounded-xl shadow-xl border overflow-hidden z-50 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-cartoon-blue/30 scrollbar-track-cartoon-cream/50">
           {languages.map((lang) => (
             <button
               key={lang.code}
@@ -356,8 +357,11 @@ const LangPicker = () => {
                 setLocale(lang.code as any);
                 setOpen(false);
               }}
-              className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition
-                ${locale === lang.code ? "bg-cartoon-blue/10 text-cartoon-blue" : "hover:bg-gray-50"}`}
+              className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition ${
+                locale === lang.code
+                  ? "bg-cartoon-blue/10 text-cartoon-blue"
+                  : "hover:bg-gray-50"
+              }`}
             >
               <ReactCountryFlag
                 countryCode={lang.flag}
@@ -381,10 +385,8 @@ const Download = () => {
   const navigate = useNavigate();
   const [searchParams] = useSearchParams();
   const gameName = searchParams.get("game") || "Game";
-
   const [locale] = useLocale();
   const i18n = t(locale);
-
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
@@ -417,7 +419,11 @@ const Download = () => {
   };
 
   const renderStars = (rating: number, isFirst: boolean) => (
-    <div className={`flex items-center gap-0.5 ${isFirst ? "text-cartoon-orange" : "text-yellow-500"}`}>
+    <div
+      className={`flex items-center gap-0.5 ${
+        isFirst ? "text-cartoon-orange" : "text-yellow-500"
+      }`}
+    >
       {[...Array(5)].map((_, i) => (
         <Star
           key={i}
@@ -426,17 +432,20 @@ const Download = () => {
           }`}
         />
       ))}
-      <span className="ml-1 font-bold text-xs sm:text-sm">{rating.toFixed(1)}</span>
+      <span className="ml-1 font-bold text-xs sm:text-sm">
+        {rating.toFixed(1)}
+      </span>
     </div>
   );
 
   return (
-    <div dir={locale === "ar" ? "rtl" : "ltr"} className="min-h-screen bg-gradient-to-b from-cartoon-cream/30 to-white">
+    <div
+      dir={locale === "ar" ? "rtl" : "ltr"}
+      className="min-h-screen bg-gradient-to-b from-cartoon-cream/30 to-white"
+    >
       <Navbar />
-
       <main className="pt-16 pb-10 sm:pt-20">
         <div className="max-w-2xl mx-auto px-4 sm:px-6">
-
           {/* LOADING */}
           {loading && (
             <div className="flex justify-center py-20">
@@ -470,28 +479,30 @@ const Download = () => {
                   <div className="absolute inset-0 bg-gradient-to-r from-cartoon-pink/5 to-cartoon-purple/5 rounded-2xl" />
                   <div className="relative z-10">
                     <h1 className="text-2xl sm:text-3xl font-black text-cartoon-blue mb-2">
-                      {i18n.unlock}  <br /><span className="text-cartoon-purple drop-shadow-sm">{gameName}</span>
+                      {i18n.unlock} <br />
+                      <span className="text-cartoon-purple drop-shadow-sm">
+                        {gameName}
+                      </span>
                     </h1>
-
                     <p className="text-sm sm:text-base font-bold text-cartoon-blue mb-1">
-                      {i18n.completeOffer(2)} <span className="text-cartoon-green">{i18n.toGetTheGame}</span>
+                      {i18n.completeOffer(2)}{" "}
+                      <span className="text-cartoon-green">
+                        {i18n.toGetTheGame}
+                      </span>
                     </p>
                     <p className="text-sm sm:text-base font-bold text-cartoon-blue">
                       {i18n.downloadStarts}
                     </p>
-
                     <div className="mt-5 flex flex-col items-center gap-3">
                       <span className="bg-cartoon-cream border-2 border-cartoon-blue text-cartoon-blue font-bold text-xs sm:text-sm px-3 py-1 rounded-full shadow">
                         {i18n.offersCompleted(0, 2)}
                       </span>
-
                       <button
                         onClick={() => setShowGuide(true)}
                         className="flex items-center gap-2 bg-gradient-to-r from-cartoon-pink to-cartoon-purple text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition"
                       >
                         {i18n.howToGuide}
                       </button>
-
                       {/* LANGUAGE PICKER */}
                       <LangPicker />
                     </div>
@@ -503,7 +514,6 @@ const Download = () => {
               <div className="relative mb-8 overflow-hidden rounded-2xl shadow-2xl">
                 <div className="absolute inset-0 bg-gradient-to-r from-cartoon-orange via-cartoon-pink to-cartoon-purple opacity-90" />
                 <div className="absolute inset-0 bg-white/10 backdrop-blur-sm" />
-
                 <div className="relative p-4 sm:p-5 flex items-center gap-3">
                   <div className="relative flex-shrink-0">
                     <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-cartoon-cream shadow-lg flex items-center justify-center animate-pulse">
@@ -511,7 +521,6 @@ const Download = () => {
                     </div>
                     <div className="absolute -inset-1 bg-cartoon-orange/30 rounded-full blur-md animate-pulse" />
                   </div>
-
                   <p className="text-white font-black text-sm sm:text-base leading-tight">
                     {i18n.appDownloadTip}
                   </p>
@@ -537,36 +546,36 @@ const Download = () => {
               <div className="grid gap-4 sm:gap-5">
                 {offers.map((o, i) => {
                   const isFirst = i === 0;
-
                   const displayTime = isFirst ? "1 min" : o.timeEstimate;
-                  const displayDifficulty = isFirst ? i18n.easy || "So Easy!" : o.difficulty;
-
-                  const buttonText = isFirst ? i18n.downloadNow : i18n.completeOfferBtn;
+                  const displayDifficulty =
+                    isFirst ? i18n.easy || "So Easy!" : o.difficulty;
+                  const buttonText = isFirst
+                    ? i18n.downloadNow
+                    : i18n.completeOfferBtn;
                   const buttonGradient = isFirst
                     ? "from-cartoon-green to-cartoon-orange"
                     : "from-cartoon-blue to-cartoon-purple";
-
                   const rating = isFirst ? 5.0 : 4.5;
 
                   return (
                     <article
                       key={o.id}
-                      className={`
-                        bg-cartoon-cream rounded-2xl p-4 sm:p-5
-                        border-2 shadow hover:shadow-lg transition-all hover:-translate-y-0.5
-                        ${i % 2 === 0 ? "border-cartoon-purple" : "border-cartoon-pink"}
-                        ${isFirst ? "ring-2 ring-cartoon-orange/50" : ""}
-                      `}
+                      className={`bg-cartoon-cream rounded-2xl p-4 sm:p-5 border-2 shadow hover:shadow-lg transition-all hover:-translate-y-0.5 ${
+                        i % 2 === 0 ? "border-cartoon-purple" : "border-cartoon-pink"
+                      } ${isFirst ? "ring-2 ring-cartoon-orange/50" : ""}`}
                     >
                       <div className="flex gap-3 sm:gap-4">
                         <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-cartoon-pink p-2 flex items-center justify-center flex-shrink-0 shadow-md">
                           {o.image ? (
-                            <img src={o.image} alt={o.title} className="w-full h-full object-cover rounded-lg" />
+                            <img
+                              src={o.image}
+                              alt={o.title}
+                              className="w-full h-full object-cover rounded-lg"
+                            />
                           ) : (
                             getIcon(o.icon)
                           )}
                         </div>
-
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between mb-1">
                             <h3 className="font-black text-base sm:text-lg text-cartoon-blue line-clamp-2 flex-1 pr-2">
@@ -578,11 +587,9 @@ const Download = () => {
                               </span>
                             )}
                           </div>
-
                           <p className="text-xs sm:text-sm text-gray-700 mt-1 line-clamp-2">
                             {o.description}
                           </p>
-
                           <div className="flex items-center justify-between mt-2">
                             <div className="flex items-center gap-3 text-xs sm:text-sm">
                               <div className="flex items-center gap-1 text-cartoon-blue">
@@ -593,20 +600,15 @@ const Download = () => {
                                 {displayDifficulty}
                               </span>
                             </div>
-
                             {renderStars(rating, isFirst)}
                           </div>
-
                           <a
                             href={o.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className={`
-                              mt-3 block w-full text-cartoon-cream font-black text-center py-2.5 rounded-xl text-sm shadow
-                              bg-gradient-to-r ${buttonGradient}
-                              hover:shadow-md transition-all hover:-translate-y-0.5
-                              ${isFirst ? "animate-pulse" : ""}
-                            `}
+                            className={`mt-3 block w-full text-cartoon-cream font-black text-center py-2.5 rounded-xl text-sm shadow bg-gradient-to-r ${buttonGradient} hover:shadow-md transition-all hover:-translate-y-0.5 ${
+                              isFirst ? "animate-pulse" : ""
+                            }`}
                           >
                             {buttonText}
                           </a>
@@ -621,14 +623,15 @@ const Download = () => {
               <div className="mt-6 bg-gradient-to-r from-cartoon-purple to-cartoon-blue rounded-2xl p-5 text-center shadow-xl border-2 border-cartoon-cream">
                 <div className="flex items-center justify-center gap-2 mb-2">
                   <p className="text-cartoon-cream font-black text-sm sm:text-base">
-                    {i18n.onceComplete || "Once you complete 2 offer"} → <span className="text-cartoon-green">{i18n.autoRedirect}</span>
+                    {i18n.onceComplete || "Once you complete 2 offer"} →{" "}
+                    <span className="text-cartoon-green">
+                      {i18n.autoRedirect}
+                    </span>
                   </p>
                 </div>
-
                 <div className="bg-cartoon-cream text-cartoon-purple font-black text-xs sm:text-sm py-1.5 px-4 rounded-full inline-block shadow-md">
                   {i18n.topSite}
                 </div>
-
                 <p className="text-cartoon-cream/90 text-xs sm:text-sm mt-3 font-bold">
                   {i18n.mostUsers("< 3 min")}
                 </p>
