@@ -10,6 +10,7 @@ import {
   Star,
   Globe,
   ChevronDown,
+  ArrowDown,
 } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
 import Navbar from "@/components/Navbar";
@@ -17,7 +18,7 @@ import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 
 /* ────────────────────────────────────────────────────────────────────────
-   Language Picker – Correct Flag + Name Based on Current Locale
+   Language Picker
    ──────────────────────────────────────────────────────────────────────── */
 const LangPicker = () => {
   const [locale, setLocale] = useLocale();
@@ -47,29 +48,29 @@ const LangPicker = () => {
   }, [open]);
 
   return (
-    <div ref={ref} className="relative flex justify-center">
+    <div ref={ref} className="relative">
       <button
         onClick={() => setOpen((v) => !v)}
-        className="flex items-center gap-1.5 px-4 py-2 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-md hover:shadow-lg transition-all"
+        className="flex items-center gap-1.5 px-3 py-1.5 rounded-full bg-white/90 dark:bg-gray-800/90 backdrop-blur-sm shadow-md hover:shadow-lg transition-all text-xs"
         aria-label={`Current language: ${current.name}`}
       >
-        <Globe className="w-4 h-4 text-cartoon-blue dark:text-cartoon-blue" />
+        <Globe className="w-3.5 h-3.5 text-cartoon-blue dark:text-cartoon-blue" />
         <ReactCountryFlag
           countryCode={current.flag}
           svg
-          style={{ width: "1.3em", height: "1.3em" }}
+          style={{ width: "1.1em", height: "1.1em" }}
           className="rounded-sm"
         />
-        <span className="text-sm font-medium hidden sm:inline text-gray-900 dark:text-white">
+        <span className="hidden xs:inline text-xs font-medium text-gray-900 dark:text-white">
           {current.name}
         </span>
         <ChevronDown
-          className={`w-4 h-4 transition-transform ${open ? "rotate-180" : ""}`}
+          className={`w-3.5 h-3.5 transition-transform ${open ? "rotate-180" : ""}`}
         />
       </button>
 
       {open && (
-        <div className="absolute bottom-full mb-3 w-56 bg-white dark:bg-gray-800 rounded-xl shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50 max-h-60 overflow-y-auto scrollbar-thin scrollbar-thumb-cartoon-blue/30 dark:scrollbar-thumb-cartoon-blue/50 scrollbar-track-cartoon-cream/50 dark:scrollbar-track-gray-700">
+        <div className="absolute bottom-full mb-2 w-48 bg-white dark:bg-gray-800 rounded-lg shadow-xl border border-gray-200 dark:border-gray-700 overflow-hidden z-50 max-h-56 overflow-y-auto scrollbar-thin scrollbar-thumb-cartoon-blue/30 dark:scrollbar-thumb-cartoon-blue/50">
           {languages.map((lang) => (
             <button
               key={lang.code}
@@ -77,7 +78,7 @@ const LangPicker = () => {
                 setLocale(lang.code as any);
                 setOpen(false);
               }}
-              className={`flex w-full items-center gap-3 px-4 py-2.5 text-left transition ${
+              className={`flex w-full items-center gap-2.5 px-3 py-2 text-left text-xs transition ${
                 locale === lang.code
                   ? "bg-cartoon-blue/10 text-cartoon-blue"
                   : "hover:bg-gray-100 dark:hover:bg-gray-700"
@@ -86,10 +87,10 @@ const LangPicker = () => {
               <ReactCountryFlag
                 countryCode={lang.flag}
                 svg
-                style={{ width: "1.5em", height: "1.5em" }}
+                style={{ width: "1.3em", height: "1.3em" }}
                 className="rounded-sm"
               />
-              <span className="text-sm font-medium text-gray-900 dark:text-white">
+              <span className="font-medium text-gray-900 dark:text-white">
                 {lang.name}
               </span>
             </button>
@@ -99,6 +100,48 @@ const LangPicker = () => {
     </div>
   );
 };
+
+/* ────────────────────────────────────────────────────────────────────────
+   Support Note – Compact & Petite (Like a Sticky Note)
+   ──────────────────────────────────────────────────────────────────────── */
+/* ────────────────────────────────────────────────────────────────────────
+   Support Note – Compact & Petite (Like a Sticky Note)
+   ──────────────────────────────────────────────────────────────────────── */
+const SupportNote = () => {
+  const [locale] = useLocale();
+  const i18n = t(locale);
+
+  /*  Split the translation into the four visual blocks
+      The order in every language is:
+      1. “100% FREE • NOT A VIRUS”
+      2. “You help me with 0.2$ per offer → You get the game!”
+      3. “Just follow the steps.”
+      4. “Thanks!”                                   */
+  const parts = i18n.supportNote.split('\n');
+
+  return (
+    <div className="bg-yellow-50 border-2 border-yellow-400 rounded-xl p-3 shadow-md mb-5 text-xs sm:text-sm">
+      <p className="font-bold text-orange-800 text-center leading-tight space-y-0.5">
+        {/* 1. 100% FREE • NOT A VIRUS */}
+        <span className="block text-green-600">{parts[0]}</span>
+
+        {/* 2. You help me … → You get the game! */}
+        <span className="block text-cartoon-blue dark:text-cartoon-blue">
+          {parts[1]}
+        </span>
+
+        {/* 3. Just follow the steps. */}
+        <span className="block text-gray-700 dark:text-gray-300">
+          {parts[2]}
+        </span>
+
+        {/* 4. Thanks! */}
+        <span className="block text-orange-500">{parts[3]}</span>
+      </p>
+    </div>
+  );
+};
+
 
 /* ────────────────────────────────────────────────────────────────────────
    Main Download Page
@@ -130,7 +173,7 @@ const Download = () => {
   }, [locale, i18n.error]);
 
   const getIcon = (name: string) => {
-    const size = "w-5 h-5 sm:w-6 sm:h-6";
+    const size = "w-5 h-5";
     const icons: Record<string, JSX.Element> = {
       Smartphone: <Smartphone className={`${size} text-cartoon-cream`} />,
       Monitor: <Monitor className={`${size} text-cartoon-cream`} />,
@@ -140,16 +183,12 @@ const Download = () => {
     return icons[name] || <DollarSign className={`${size} text-cartoon-cream`} />;
   };
 
-  /* ──────── Stars – NO NUMBERS, just 5 stars (recommended = orange) ──────── */
   const renderStars = (isRecommended: boolean) => {
     const color = isRecommended ? "text-cartoon-orange" : "text-yellow-500 dark:text-yellow-400";
     return (
       <div className={`flex items-center gap-0.5 ${color}`}>
         {[...Array(5)].map((_, i) => (
-          <Star
-            key={i}
-            className="w-3.5 h-3.5 sm:w-4 sm:h-4 fill-current"
-          />
+          <Star key={i} className="w-3 h-3 fill-current" />
         ))}
       </div>
     );
@@ -158,11 +197,11 @@ const Download = () => {
   return (
     <div
       dir={locale === "ar" ? "rtl" : "ltr"}
-      className="min-h-screen bg-gradient-to-b from-cartoon-cream/30 to-white dark:from-gray-900 dark:to-gray-800 transition-colors"
+      className="min-h-screen bg-gradient-to-b from-cartoon-cream/30 to-white dark:from-gray-900 dark:to-gray-800 transition-colors pb-20"
     >
       <Navbar />
       <main className="pt-16 pb-10 sm:pt-20">
-        <div className="max-w-2xl mx-auto px-4 sm:px-6">
+        <div className="max-w-xl mx-auto px-4 sm:px-6">
           {/* LOADING */}
           {loading && (
             <div className="flex justify-center py-20">
@@ -173,12 +212,12 @@ const Download = () => {
           {/* ERROR */}
           {error && (
             <div className="text-center py-12">
-              <p className="text-cartoon-red dark:text-red-400 font-bold mb-4">{error}</p>
+              <p className="text-cartoon-red dark:text-red-400 font-bold mb-4 text-sm">{error}</p>
               <a
                 href="https://appinstallcheck.com/cl/i/8dkk3k"
                 target="_blank"
                 rel="noopener noreferrer"
-                className="inline-block bg-gradient-to-r from-cartoon-blue to-cartoon-purple text-cartoon-cream font-black py-2.5 px-6 rounded-full text-sm shadow-lg hover:shadow-xl transition-all hover:-translate-y-0.5"
+                className="inline-block bg-gradient-to-r from-cartoon-blue to-cartoon-purple text-cartoon-cream font-black py-2 px-5 rounded-full text-xs shadow-lg hover:shadow-xl transition-all"
               >
                 {i18n.tryOffers || "Try Offers Here"}
               </a>
@@ -188,56 +227,44 @@ const Download = () => {
           {/* SUCCESS */}
           {!loading && !error && (
             <>
-              <br />
-
-              {/* HERO */}
-              <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-cartoon-blue dark:border-cartoon-blue/50 p-5 sm:p-7 mb-6 text-center overflow-hidden">
-                <div className="relative">
-                  <div className="absolute inset-0 bg-gradient-to-r from-cartoon-pink/5 to-cartoon-purple/5 dark:from-cartoon-pink/10 dark:to-cartoon-purple/10 rounded-2xl" />
-                  <div className="relative z-10">
-                    <h1 className="text-2xl sm:text-3xl font-black text-cartoon-blue dark:text-cartoon-blue mb-2">
-                      {i18n.unlock} <br />
-                      <span className="text-cartoon-purple dark:text-cartoon-purple drop-shadow-sm">
-                        {gameName}
-                      </span>
-                    </h1>
-                    <p className="text-sm sm:text-base font-bold text-cartoon-blue dark:text-cartoon-blue mb-1">
-                      {i18n.completeOffer(2)}{" "}
-                      <span className="text-cartoon-green dark:text-cartoon-green">
-                        {i18n.toGetTheGame}
-                      </span>
-                    </p>
-                    <p className="text-sm sm:text-base font-bold text-cartoon-blue dark:text-cartoon-blue">
-                      {i18n.downloadStarts}
-                    </p>
-                    <div className="mt-5 flex flex-col items-center gap-3">
-                      <span className="bg-cartoon-cream dark:bg-gray-700 border-2 border-cartoon-blue dark:border-cartoon-blue text-cartoon-blue dark:text-cartoon-blue font-bold text-xs sm:text-sm px-3 py-1 rounded-full shadow">
-                        {i18n.offersCompleted(0, 2)}
-                      </span>
-                      <button
-                        onClick={() => setShowGuide(true)}
-                        className="flex items-center gap-2 bg-gradient-to-r from-cartoon-pink to-cartoon-purple text-white font-bold text-sm px-5 py-2.5 rounded-xl shadow-md hover:shadow-lg hover:scale-105 transition"
-                      >
-                        {i18n.howToGuide}
-                      </button>
-                      <LangPicker />
-                    </div>
-                  </div>
+              {/* HERO */}<br />
+              <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-cartoon-blue dark:border-cartoon-blue/50 p-4 sm:p-6 mb-5 text-center">
+                <h1 className="text-xl sm:text-2xl font-black text-cartoon-blue dark:text-cartoon-blue mb-1">
+                  {i18n.unlock} <br />
+                  <span className="text-cartoon-purple drop-shadow-sm">{gameName}</span>
+                </h1>
+                <p className="text-xs sm:text-sm font-bold text-cartoon-blue dark:text-cartoon-blue mb-1">
+                  {i18n.completeOffer(2)}{" "}
+                  <span className="text-cartoon-green">{i18n.toGetTheGame}</span>
+                </p>
+                <p className="text-xs sm:text-sm font-bold text-cartoon-blue dark:text-cartoon-blue">
+                  {i18n.downloadStarts}
+                </p>
+                <div className="mt-4 flex flex-col items-center gap-2.5">
+                  <span className="bg-cartoon-cream dark:bg-gray-700 border border-cartoon-blue text-cartoon-blue font-bold text-xs px-3 py-1 rounded-full">
+                    {i18n.offersCompleted(0, 2)}
+                  </span>
+                  <button
+                    onClick={() => setShowGuide(true)}
+                    className="bg-gradient-to-r from-cartoon-pink to-cartoon-purple text-white font-bold text-xs px-4 py-2 rounded-lg shadow hover:scale-105 transition"
+                  >
+                    {i18n.howToGuide}
+                  </button>
+                  <LangPicker />
                 </div>
               </section>
 
+              {/* SUPPORT NOTE – COMPACT */}
+              <SupportNote />
+
               {/* APP DOWNLOAD TIP */}
-              <div className="relative mb-8 overflow-hidden rounded-2xl shadow-2xl">
+              <div className="relative mb-6 overflow-hidden rounded-xl shadow-lg">
                 <div className="absolute inset-0 bg-gradient-to-r from-cartoon-orange via-cartoon-pink to-cartoon-purple opacity-90" />
-                <div className="absolute inset-0 bg-white/10 backdrop-blur-sm" />
-                <div className="relative p-4 sm:p-5 flex items-center gap-3">
-                  <div className="relative flex-shrink-0">
-                    <div className="w-10 h-10 sm:w-12 sm:h-12 rounded-full bg-cartoon-cream dark:bg-gray-700 shadow-lg flex items-center justify-center animate-pulse">
-                      <Star className="w-6 h-6 sm:w-7 sm:h-7 text-cartoon-orange fill-current" />
-                    </div>
-                    <div className="absolute -inset-1 bg-cartoon-orange/30 rounded-full blur-md animate-pulse" />
+                <div className="relative p-3 flex items-center gap-2">
+                  <div className="w-8 h-8 rounded-full bg-cartoon-cream dark:bg-gray-700 shadow flex items-center justify-center">
+                    <Star className="w-5 h-5 text-cartoon-orange fill-current" />
                   </div>
-                  <p className="text-white font-black text-sm sm:text-base leading-tight">
+                  <p className="text-white font-black text-xs leading-tight">
                     {i18n.appDownloadTip}
                   </p>
                 </div>
@@ -245,11 +272,11 @@ const Download = () => {
 
               {/* GUIDE MODAL */}
               {showGuide && (
-                <div className="fixed inset-0 bg-black/70 dark:bg-black/80 flex items-center justify-center z-50 p-4">
-                  <div className="relative bg-white dark:bg-gray-800 rounded-2xl max-w-xs sm:max-w-sm w-full overflow-hidden shadow-2xl">
+                <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4">
+                  <div className="relative bg-white dark:bg-gray-800 rounded-xl max-w-xs w-full overflow-hidden shadow-2xl">
                     <button
                       onClick={() => setShowGuide(false)}
-                      className="absolute top-2 right-2 w-8 h-8 bg-cartoon-red text-white rounded-full flex items-center justify-center font-bold text-sm hover:bg-red-600 transition"
+                      className="absolute top-2 right-2 w-7 h-7 bg-cartoon-red text-white rounded-full flex items-center justify-center text-sm font-bold z-10"
                     >
                       X
                     </button>
@@ -259,24 +286,25 @@ const Download = () => {
               )}
 
               {/* OFFERS GRID */}
-              <div className="grid gap-4 sm:gap-5">
+              <div className="grid gap-4" id="offers">
                 {offers.map((o, i) => {
-                  const isRecommended = i < 2; // Only first 2
+                  const isRecommended = i < 2;
 
                   return (
                     <article
                       key={o.id}
-                      className={`bg-cartoon-cream dark:bg-gray-800 rounded-2xl p-4 sm:p-5 border-2 shadow hover:shadow-lg transition-all hover:-translate-y-0.5 ${
+                      data-offer-id={o.id}
+                      className={`bg-cartoon-cream dark:bg-gray-800 rounded-xl p-3.5 border-2 shadow hover:shadow-md transition-all ${
                         i % 2 === 0 ? "border-cartoon-purple" : "border-cartoon-pink"
-                      } ${isRecommended ? "ring-2 ring-cartoon-orange/50" : ""}`}
+                      } ${isRecommended ? "ring-2 ring-cartoon-orange/40" : ""}`}
                     >
-                      <div className="flex gap-3 sm:gap-4">
-                        <div className="w-14 h-14 sm:w-16 sm:h-16 rounded-xl bg-cartoon-pink dark:bg-cartoon-pink/20 p-2 flex items-center justify-center flex-shrink-0 shadow-md">
+                      <div className="flex gap-3">
+                        <div className="w-12 h-12 rounded-lg bg-cartoon-pink dark:bg-cartoon-pink/20 p-1.5 flex items-center justify-center flex-shrink-0 shadow-sm">
                           {o.image ? (
                             <img
                               src={o.image}
                               alt={o.title}
-                              className="w-full h-full object-cover rounded-lg"
+                              className="w-full h-full object-cover rounded"
                             />
                           ) : (
                             getIcon(o.icon)
@@ -284,25 +312,25 @@ const Download = () => {
                         </div>
                         <div className="flex-1 min-w-0">
                           <div className="flex items-start justify-between mb-1">
-                            <h3 className="font-black text-base sm:text-lg text-cartoon-blue dark:text-cartoon-blue line-clamp-2 flex-1 pr-2">
+                            <h3 className="font-black text-sm text-cartoon-blue dark:text-cartoon-blue line-clamp-2 pr-1">
                               {o.title}
                             </h3>
                             {isRecommended && (
-                              <span className="bg-cartoon-orange text-cartoon-cream text-xs font-bold px-2 py-0.5 rounded-full whitespace-nowrap">
+                              <span className="bg-cartoon-orange text-cartoon-cream text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                                 {i18n.recommended}
                               </span>
                             )}
                           </div>
-                          <p className="text-xs sm:text-sm text-gray-700 dark:text-gray-300 mt-1 line-clamp-2">
+                          <p className="text-xs text-gray-700 dark:text-gray-300 line-clamp-2">
                             {o.description}
                           </p>
-                          <div className="flex items-center justify-between mt-2">
-                            <div className="flex items-center gap-3 text-xs sm:text-sm">
-                              <div className="flex items-center gap-1 text-cartoon-blue dark:text-cartoon-blue">
-                                <Clock className="w-3.5 h-3.5" />
+                          <div className="flex items-center justify-between mt-2 text-xs">
+                            <div className="flex items-center gap-2">
+                              <div className="flex items-center gap-1 text-cartoon-blue">
+                                <Clock className="w-3 h-3" />
                                 <span className="font-bold">{o.timeEstimate}</span>
                               </div>
-                              <span className="font-bold text-cartoon-green dark:text-cartoon-green">
+                              <span className="font-bold text-cartoon-green">
                                 {o.difficulty}
                               </span>
                             </div>
@@ -312,7 +340,7 @@ const Download = () => {
                             href={o.url}
                             target="_blank"
                             rel="noopener noreferrer"
-                            className="mt-3 block w-full text-cartoon-cream font-black text-center py-2.5 rounded-xl text-sm shadow bg-gradient-to-r from-cartoon-blue to-cartoon-purple hover:shadow-md transition-all hover:-translate-y-0.5"
+                            className="mt-2.5 block w-full text-center py-2 rounded-lg text-xs font-black text-cartoon-cream bg-gradient-to-r from-cartoon-blue to-cartoon-purple shadow hover:shadow-md transition"
                           >
                             {i18n.completeOfferBtn}
                           </a>
@@ -324,26 +352,22 @@ const Download = () => {
               </div>
 
               {/* TRAFFIC BOOSTER */}
-              <div className="mt-6 bg-gradient-to-r from-cartoon-purple to-cartoon-blue rounded-2xl p-5 text-center shadow-xl border-2 border-cartoon-cream dark:border-gray-700">
-                <div className="flex items-center justify-center gap-2 mb-2">
-                  <p className="text-cartoon-cream dark:text-cartoon-cream font-black text-sm sm:text-base">
-                    {i18n.onceComplete || "Once you complete 2 offers"} →{" "}
-                    <span className="text-cartoon-green dark:text-cartoon-green">
-                      {i18n.autoRedirect}
-                    </span>
-                  </p>
-                </div>
-                <div className="bg-cartoon-cream dark:bg-gray-700 text-cartoon-purple dark:text-cartoon-purple font-black text-xs sm:text-sm py-1.5 px-4 rounded-full inline-block shadow-md">
+              <div className="mt-6 bg-gradient-to-r from-cartoon-purple to-cartoon-blue rounded-xl p-4 text-center shadow-lg border border-cartoon-cream dark:border-gray-700 text-xs">
+                <p className="text-cartoon-cream font-black mb-1">
+                  {i18n.onceComplete} →{" "}
+                  <span className="text-cartoon-green">{i18n.autoRedirect}</span>
+                </p>
+                <div className="bg-cartoon-cream dark:bg-gray-700 text-cartoon-purple font-black text-[10px] py-1 px-3 rounded-full inline-block">
                   {i18n.topSite}
                 </div>
-                <p className="text-cartoon-cream/90 dark:text-cartoon-cream/80 text-xs sm:text-sm mt-3 font-bold">
+                <p className="text-cartoon-cream/80 text-[10px] mt-2 font-bold">
                   {i18n.mostUsers("< 3 min")}
                 </p>
               </div>
-              <br />
             </>
           )}
         </div>
+
       </main>
     </div>
   );
