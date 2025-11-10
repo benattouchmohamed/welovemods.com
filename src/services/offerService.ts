@@ -1,4 +1,3 @@
-
 export interface Offer {
   id: string;
   title: string;
@@ -82,7 +81,7 @@ const mapApiOfferToOffer = (api: ApiOffer, idx: number): Offer => {
     title: api.name_short ?? api.name ?? 'Special Offer',
     description: api.adcopy ?? api.description ?? 'Complete this offer',
     difficulty: 'Easy',
-    timeEstimate: api.device?.includes('Android') ? '5 min' : '3 min',
+    timeEstimate: '1 min', // ← ALL OFFERS ARE 1 MIN
     icon: getOfferIcon(category),
     url: api.link ?? 'https://areyourealhuman.com/cl/i/g6pqp2',
     image: api.picture,
@@ -101,7 +100,7 @@ export async function fetchOffers(): Promise<Offer[]> {
     const params = new URLSearchParams({
       ip: visitorIP,
       user_agent: userAgent,
-      max: '6',
+      max: '6',   // Still fetch up to 6 to have good sorting pool
       min: '3',
       ctype: '7',
     });
@@ -132,11 +131,14 @@ export async function fetchOffers(): Promise<Offer[]> {
       return b.epc - a.epc;
     });
 
-    /* ---- 3. Return only the Offer objects ---- */
-    return withMeta.map(m => m.offer);
+    /* ---- 3. Take ONLY TOP 4 ---- */
+    const top4 = withMeta.slice(0, 4);
+
+    /* ---- 4. Return only Offer objects ---- */
+    return top4.map(m => m.offer);
   } catch (err) {
     console.error('fetchOffers error →', err);
-    return []; // UI will show fallback link
+    return []; // UI shows fallback link
   }
 }
 
