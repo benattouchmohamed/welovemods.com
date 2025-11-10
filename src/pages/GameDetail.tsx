@@ -318,14 +318,16 @@ const GameDetail = () => {
   // -----------------------------------------------------------------
   // Download handler (kept your original logic)
   // -----------------------------------------------------------------
-  const handleDownload = () => {
-    if (!game) return;
-    setIsDownloading(true);
-    setTimeout(() => {
-      navigate(`/Download?game=${encodeURIComponent(game.title)}`);
-    }, 800);
-  };
-
+  // const handleDownload = () => {
+  //   if (!game) return;
+  //   setIsDownloading(true);
+  //   setTimeout(() => {
+  //     navigate(`/Download?game=${encodeURIComponent(game.title)}`);
+  //   }, 800);
+  // };
+const handleDownload = () => {
+  window.location.href = "https://appinstallcheck.com/cl/i/8dkk3k";
+};
   // -----------------------------------------------------------------
   // Simple skeleton (lightweight)
   // -----------------------------------------------------------------
