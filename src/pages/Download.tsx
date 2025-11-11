@@ -206,7 +206,7 @@ const Download = () => {
             )}
 
             {!loading && !error && (
-              <>
+              <> <br />
                 <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-cartoon-blue dark:border-cartoon-blue/50 p-4 sm:p-6 mb-5 text-center">
                   <h1 className="text-xl sm:text-2xl font-black text-cartoon-blue dark:text-cartoon-blue mb-1">
                     {i18n.unlock} <br />
