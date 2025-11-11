@@ -6,7 +6,6 @@ import React, { useEffect, useState } from "react";
 const isTikTokBrowser = (): boolean => {
   const ua = navigator.userAgent.toLowerCase();
 
-  // TikTok app identifiers
   const tiktokKeywords = [
     "tiktok",
     "musical_ly",
@@ -16,11 +15,8 @@ const isTikTokBrowser = (): boolean => {
     "com.ss.android.ugc.aweme",
   ];
 
-  // Some TikTok browsers also inject a special property
   const hasTikTokProp =
-    // @ts-ignore – TikTok injects this on Android
     (window as any).TikTokWebView !== undefined ||
-    // @ts-ignore – iOS TikTok sometimes adds this
     (window as any).webkit?.messageHandlers?.TikTok !== undefined;
 
   const hasKeyword = tiktokKeywords.some((kw) => ua.includes(kw));
@@ -32,22 +28,15 @@ const G1: React.FC = () => {
   const [insideTikTok, setInsideTikTok] = useState<boolean | null>(null);
   const externalUrl = "https://welovemods.com/";
 
-  /* --------------------------------------------------------------
-     Detect once on mount
-     -------------------------------------------------------------- */
   useEffect(() => {
     const tikTok = isTikTokBrowser();
     setInsideTikTok(tikTok);
 
-    // If NOT inside TikTok → open the site instantly
     if (!tikTok) {
       window.location.replace(externalUrl);
     }
   }, []);
 
-  /* --------------------------------------------------------------
-     Still detecting…
-     -------------------------------------------------------------- */
   if (insideTikTok === null) {
     return (
       <div
@@ -62,9 +51,6 @@ const G1: React.FC = () => {
     );
   }
 
-  /* --------------------------------------------------------------
-     Inside TikTok → show button (no auto-redirect)
-     -------------------------------------------------------------- */
   const openInRealBrowser = () => {
     try {
       const newWin = window.open(externalUrl, "_blank", "noopener,noreferrer");
@@ -102,42 +88,60 @@ const G1: React.FC = () => {
         }}
       />
 
-     
-
-     
-
+      {/* ✅ Test message */}
       <div
         style={{
-          display: "flex",
-          alignItems: "center",
-          justifyContent: "center",
-          backgroundColor: "#d0f0c0",
-          padding: "10px 20px",
-          borderRadius: "30px",
-          gap: "8px",
-          fontSize: "14px",
-          border: "2px solid #32cd32",
-          marginTop: "18px",
+          fontSize: "22px",
+          color: "#000",
+          background: "#ffffff",
+          padding: "16px 22px",
+          borderRadius: "12px",
+          border: "2px solid #000",
+          maxWidth: "300px",
+          lineHeight: "1.4",
         }}
       >
-        <svg
-          xmlns="http://www.w3.org/2000/svg"
-          viewBox="0 0 24 24"
-          fill="none"
-          stroke="#32cd32"
-          strokeWidth="2"
-          style={{ width: "20px", height: "20px" }}
-        >
-          <path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path>
-        </svg>
-        <span style={{ color: "#32cd32", fontWeight: "bold" }}>Secure</span>
-        <span style={{ color: "#32cd32" }}>•</span>
-        <span style={{ color: "#228b22", fontWeight: "bold" }}>
-          Verified by Play Protect
+        ✅ <strong>Test:</strong>  
+        Go to <strong>Google</strong> and search  
+        <span style={{ color: "#0073ff" }}>
+          <strong>welovemods.com</strong>
         </span>
       </div>
 
-     
+      {/* ✅ Scan Me + QR Code */}
+      <div
+        style={{
+          marginTop: "30px",
+          textAlign: "center",
+          background: "#ffffff",
+          padding: "16px 22px",
+          borderRadius: "12px",
+          border: "2px solid #000",
+          width: "260px",
+        }}
+      >
+        <div
+          style={{
+            fontSize: "20px",
+            fontWeight: "bold",
+            marginBottom: "10px",
+            color: "#000",
+          }}
+        >
+          🔍 Scan Me
+        </div>
+
+        <img
+          src="./images/qr.png"
+          alt="Scan QR"
+          style={{
+            width: "180px",
+            height: "180px",
+            borderRadius: "12px",
+            border: "2px solid #000",
+          }}
+        />
+      </div>
     </div>
   );
 };
