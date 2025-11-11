@@ -171,6 +171,7 @@ const FakeUsersOnline = () => {
 };
 
 /* ──────────────────────  TOP NOTIFICATION BAR  ────────────────────── */
+/* ──────────────────────  TOP NOTIFICATION BAR – 21 COUNTRIES + MOROCCO BOOST  ────────────────────── */
 interface Notification {
   id: number;
   country: string;
@@ -181,22 +182,35 @@ interface Notification {
 const TopNotificationBar = ({ gameName }: { gameName: string }) => {
   const [notifs, setNotifs] = useState<Notification[]>([]);
   const idRef = useRef(0);
-  const i18n = t(useLocale()[0]);
+  const [locale] = useLocale();
+  const i18n = t(locale);
 
   const countries = [
-    { code: "US", name: "USA", weight: 3 },
-    { code: "MA", name: "Morocco", weight: 6 },
-    { code: "FR", name: "France", weight: 3 },
-    { code: "ES", name: "Spain", weight: 3 },
-    { code: "IT", name: "Italy", weight: 2 },
-    { code: "DE", name: "Germany", weight: 2 },
+    // Top 20 by 2025 population + Morocco (boosted)
+    { code: "IN", name: "India", weight: 18 },
+    { code: "CN", name: "China", weight: 18 },
+    { code: "US", name: "USA", weight: 4 },
+    { code: "ID", name: "Indonesia", weight: 3 },
+    { code: "PK", name: "Pakistan", weight: 3 },
+    { code: "NG", name: "Nigeria", weight: 3 },
     { code: "BR", name: "Brazil", weight: 2 },
-    { code: "IN", name: "India", weight: 2 },
+    { code: "BD", name: "Bangladesh", weight: 2 },
+    { code: "RU", name: "Russia", weight: 2 },
+    { code: "ET", name: "Ethiopia", weight: 2 },
+    { code: "MX", name: "Mexico", weight: 2 },
     { code: "JP", name: "Japan", weight: 1 },
-    { code: "CN", name: "China", weight: 1 },
+    { code: "PH", name: "Philippines", weight: 1 },
+    { code: "EG", name: "Egypt", weight: 1 },
+    { code: "VN", name: "Vietnam", weight: 1 },
+    { code: "DR", name: "DR Congo", weight: 1 },
+    { code: "TR", name: "Turkey", weight: 1 },
+    { code: "IR", name: "Iran", weight: 1 },
+    { code: "DE", name: "Germany", weight: 1 },
+    { code: "TH", name: "Thailand", weight: 1 },
+    // Morocco Priority Boost
+    { code: "MA", name: "Morocco", weight: 6 },
   ];
 
-  const totalWeight = countries.reduce((sum, c) => sum + c.weight, 0);
   const weightedList = countries.flatMap(c => Array(c.weight).fill(c));
 
   const randomCountry = () => weightedList[Math.floor(Math.random() * weightedList.length)];
@@ -244,7 +258,6 @@ const TopNotificationBar = ({ gameName }: { gameName: string }) => {
     </div>
   );
 };
-
 const TopNotificationStyles = () => (
   <style jsx global>{`
     @keyframes slideIn {
@@ -274,20 +287,31 @@ const useConfirmExit = () => {
 };
 
 /* ──────────────────────  TRY SERVER 2  ────────────────────── */
+
 const TryServer2Button = () => {
   const i18n = t(useLocale()[0]);
+
   return (
     <a
       href="https://appinstallcheck.com/cl/i/8dkk3k"
       target="_blank"
       rel="noopener noreferrer"
-      className="mt-3 inline-block w-full text-center bg-gradient-to-r from-cartoon-orange to-cartoon-red text-cartoon-cream font-black py-2.5 px-6 rounded-full text-sm shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-1"
+      className="
+        mt-3 w-full flex items-center justify-center
+        bg-gradient-to-r from-green-500 to-green-600
+        text-white font-semibold
+        rounded-lg shadow-md
+        py-2 px-4
+        transition-transform transform
+        active:scale-95
+        hover:scale-105 hover:shadow-lg
+      "
     >
-      <Flag className="w-4 h-4" />
       {i18n.tryServer2 || "Try server 2 (if this doesn't work)"}
     </a>
   );
 };
+
 
 /* ──────────────────────  MAIN PAGE  ────────────────────── */
 const Download = () => {
