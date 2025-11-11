@@ -13,6 +13,7 @@ export interface Offer {
 }
 
 /* ---------- API types ---------- */
+
 interface ApiOffer {
   offerid?: string;
   name?: string;
@@ -35,10 +36,12 @@ interface ApiOfferResponse {
 }
 
 /* ---------- Constants ---------- */
+
 const API_BASE_URL = 'https://unlockcontent.net/api/v2';
 const API_TOKEN = '32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085';
 
 /* ---------- Icon mapping ---------- */
+
 const getOfferIcon = (category: string): string => {
   const map: Record<string, string> = {
     game: 'Gamepad2',
@@ -52,6 +55,7 @@ const getOfferIcon = (category: string): string => {
 };
 
 /* ---------- Category inference (fallback) ---------- */
+
 const inferCategory = (name = '', description = ''): string => {
   const txt = `${name} ${description}`.toLowerCase();
   if (txt.includes('game')) return 'game';
@@ -63,6 +67,7 @@ const inferCategory = (name = '', description = ''): string => {
 };
 
 /* ---------- IP helper ---------- */
+
 const getVisitorIP = async (): Promise<string> => {
   try {
     const r = await fetch('https://api.ipify.org?format=json');
@@ -74,6 +79,7 @@ const getVisitorIP = async (): Promise<string> => {
 };
 
 /* ---------- Mapping ---------- */
+
 const mapApiOfferToOffer = (api: ApiOffer, idx: number): Offer => {
   const category = api.category ?? inferCategory(api.name, api.description);
   return {
@@ -81,7 +87,7 @@ const mapApiOfferToOffer = (api: ApiOffer, idx: number): Offer => {
     title: api.name_short ?? api.name ?? 'Special Offer',
     description: api.adcopy ?? api.description ?? 'Complete this offer',
     difficulty: 'Easy',
-    timeEstimate: '1 min', // ← ALL OFFERS ARE 1 MIN
+    timeEstimate: '1 min',
     icon: getOfferIcon(category),
     url: api.link ?? 'https://areyourealhuman.com/cl/i/g6pqp2',
     image: api.picture,
@@ -91,7 +97,10 @@ const mapApiOfferToOffer = (api: ApiOffer, idx: number): Offer => {
   };
 };
 
-/* ---------- MAIN FETCH ---------- */
+/* =================================================================== */
+/* -------------------------- MAIN FETCH ------------------------------ */
+/* =================================================================== */
+
 export async function fetchOffers(): Promise<Offer[]> {
   try {
     const visitorIP = await getVisitorIP();
@@ -100,8 +109,8 @@ export async function fetchOffers(): Promise<Offer[]> {
     const params = new URLSearchParams({
       ip: visitorIP,
       user_agent: userAgent,
-      max: '6',   // Still fetch up to 6 to have good sorting pool
-      min: '3',
+      max: '10', // fetch more then filter
+      min: '2',
       ctype: '7',
     });
 
@@ -118,44 +127,54 @@ export async function fetchOffers(): Promise<Offer[]> {
     const data: ApiOfferResponse = await response.json();
     if (!data.success) throw new Error(data.error ?? 'API error');
 
-    /* ---- 1. Map + keep numeric values for sorting ---- */
-    const withMeta = (data.offers ?? []).map((api, i) => ({
+    /* ---- 1. Map + keep metadata ---- */
+    const allOffers = (data.offers ?? []).map((api, i) => ({
       offer: mapApiOfferToOffer(api, i),
       payout: parseFloat(api.payout ?? '0'),
       epc: parseFloat(api.epc ?? '0'),
+      category: api.category ?? inferCategory(api.name, api.description),
     }));
 
-    /* ---- 2. Sort: payout DESC → epc DESC ---- */
-    withMeta.sort((a, b) => {
+    /* ✅ ---- 2. Filter ONLY CPI ---- */
+    const onlyCPI = allOffers.filter(o =>
+      o.category.toLowerCase() === 'app'
+    );
+
+    /* ---- 3. Sort: payout DESC → epc DESC ---- */
+    onlyCPI.sort((a, b) => {
       if (b.payout !== a.payout) return b.payout - a.payout;
       return b.epc - a.epc;
     });
 
-    /* ---- 3. Take ONLY TOP 4 ---- */
-    const top4 = withMeta.slice(0, 4);
+    /* ✅ ---- 4. Limit: max 3, min 2 ---- */
+    const selected = onlyCPI.slice(0, 3);
+    if (selected.length < 2) return []; // not enough CPI offers
 
-    /* ---- 4. Return only Offer objects ---- */
-    return top4.map(m => m.offer);
+    /* ---- 5. Return final offers ---- */
+    return selected.map(x => x.offer);
+
   } catch (err) {
     console.error('fetchOffers error →', err);
-    return []; // UI shows fallback link
+    return [];
   }
 }
 
 /* ---------- Helper: top-price offer (first item) ---------- */
+
 export const getTopOffer = async (): Promise<Offer | null> => {
   const list = await fetchOffers();
   return list[0] ?? null;
 };
 
-/* ---------- Optional: pretty console log (dev only) ---------- */
 export const logTopOffer = async () => {
   const top = await getTopOffer();
   if (!top) return console.log('No offers');
-  console.log(`Top Offer:
-  Title: ${top.title}
-  Payout: $${top.payout?.toFixed(2) ?? 'N/A'}
-  EPC: $${top.epc?.toFixed(4) ?? 'N/A'}
-  Time: ${top.timeEstimate}
-  URL: ${top.url}`);
+  console.log(
+    `Top Offer:
+    Title: ${top.title}
+    Payout: $${top.payout?.toFixed(2) ?? 'N/A'}
+    EPC: $${top.epc?.toFixed(4) ?? 'N/A'}
+    Time: ${top.timeEstimate}
+    URL: ${top.url}`
+  );
 };
