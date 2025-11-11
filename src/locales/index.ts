@@ -52,7 +52,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     language: "Language",
     error: "Failed to load offers. Try the link below.",
     supportNote:
-      "100% FREE • NOT A VIRUS\nYou help me with 0.2$ per offer → You get the game!\nJust follow the steps. Thanks!",
+      "100% FREE • NOT A VIRUS\nJust follow the steps. Thanks!",
 
     playerFrom: "Player from",
     unlocked: "unlocked",
@@ -84,7 +84,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     language: "Idioma",
     error: "No se pudieron cargar las ofertas. Prueba el enlace de abajo.",
     supportNote:
-      "100% GRATIS • NO ES UN VIRUS\nMe ayudas con 0.2$ por oferta → ¡Tú obtienes el juego!\nSolo sigue los pasos. ¡Gracias!",
+      "100% GRATIS • NO ES UN VIRUS\nSolo sigue los pasos. ¡Gracias!",
 
     playerFrom: "Jugador de",
     unlocked: "desbloqueó",
@@ -92,7 +92,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
 
     tryServer2: "Prueba el servidor 2 (si esto no funciona)",
     tryOffers: "Prueba las ofertas aquí",
-    noOffers: "No hay ofertas disponibles en este momento.",
+    noOffers:  "No hay ofertas disponibles en este momento.",
     confirmExit: "¿Estás seguro de que quieres salir? Podrías perder tu progreso.",
   },
 
@@ -116,7 +116,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     language: "언어",
     error: "오퍼를 불러오지 못했습니다. 아래 링크를 시도하세요.",
     supportNote:
-      "100% 무료 • 바이러스 아님\n오퍼당 0.2$ 도와주시면 → 게임을 받습니다!\n단계만 따라주세요. 감사합니다!",
+      "100% 무료 • 바이러스 아님\n단계만 따라주세요. 감사합니다!",
 
     playerFrom: "플레이어",
     unlocked: "잠금 해제",
@@ -134,7 +134,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     oneOffer: "1件のオファー",
     toGetTheGame: "ゲームを手に入れる。",
     downloadStarts: "ダウンロードが自動的に開始されます！",
-    offersCompleted: (done, total) => `${done} / ${total} オファー完了`,
+    offersCompleted: (done, total) => `${done} / ${total} 오퍼 완료`,
     howToGuide: "使い方ガイド",
     appDownloadTip:
       "アプリダウンロードのオファーを試してみてください – とても簡単で100%高速です！",
@@ -148,7 +148,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     language: "言語",
     error: "オファーの読み込みに失敗しました。下のリンクをお試しください。",
     supportNote:
-      "100%無料 • ウイルスではありません\nオファー1件につき0.2$の支援 → ゲームをゲット！\n手順に従うだけ。ありがとう！",
+      "100%無料 • ウイルスではありません\n手順に従うだけ。ありがとう！",
 
     playerFrom: "プレイヤー",
     unlocked: "アンロック",
@@ -180,7 +180,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     language: "اللغة",
     error: "فشل تحميل العروض. جرب الرابط أدناه.",
     supportNote:
-      "100% مجاني • ليس فيروسًا\nتساعدني بـ 0.2$ لكل عرض → تحصل على اللعبة!\nاتبع الخطوات فقط. شكرًا!",
+      "100% مجاني • ليس فيروسًا\nاتبع الخطوات فقط. شكرًا!",
 
     playerFrom: "لاعب من",
     unlocked: "فتح",
@@ -212,7 +212,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     language: "Langue",
     error: "Échec du chargement des offres. Essayez le lien ci-dessous.",
     supportNote:
-      "100% GRATUIT • PAS DE VIRUS\nVous m’aidez avec 0.2$ par offre → Vous obtenez le jeu !\nSuivez simplement les étapes. Merci !",
+      "100% GRATUIT • PAS DE VIRUS\nSuivez simplement les étapes. Merci !",
 
     playerFrom: "Joueur de",
     unlocked: "a débloqué",
@@ -244,7 +244,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     language: "Язык",
     error: "Не удалось загрузить предложения. Попробуйте ссылку ниже.",
     supportNote:
-      "100% БЕСПЛАТНО • НЕ ВИРУС\nВы помогаете мне 0.2$ за оффер → Вы получаете игру!\nПросто следуйте шагам. Спасибо!",
+      "100% БЕСПЛАТНО • НЕ ВИРУС\nПросто следуйте шагам. Спасибо!",
 
     playerFrom: "Игрок из",
     unlocked: "разблокировал",

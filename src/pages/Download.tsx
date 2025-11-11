@@ -1,8 +1,7 @@
-/* Download.tsx – MULTI-COUNTRY NOTIFICATIONS + MOROCCO PRIORITY */
 import React, { useEffect, useState, useRef, memo, lazy, Suspense } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
-  Clock, DollarSign, Smartphone, Monitor, Gamepad2, Gift, Star, Users, Flag,
+  Clock, DollarSign, Smartphone, Monitor, Gamepad2, Gift, Star, Users,
 } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
 import { fetchOffers, type Offer } from "@/services/offerService";
@@ -79,7 +78,7 @@ const OfferSkeleton = () => (
 
 const TipBannerSkeleton = () => (
   <div className="relative mb-6 overflow-hidden rounded-xl shadow-lg h-12 animate-pulse">
-    <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 opacity-90" />
+    <div className="absolute inset-0 bg-gradient-to-r via-pink-400 to-purple-400 opacity-90" />
   </div>
 );
 
@@ -98,7 +97,7 @@ const OfferCard = memo(({ o, i, i18n }: { o: Offer; i: number; i18n: any }) => {
       className={`
         bg-white dark:bg-gray-800 rounded-xl p-3.5 border-2 shadow hover:shadow-md transition-all
         ${i % 2 === 0 ? "border-cartoon-purple" : "border-cartoon-pink"}
-        ${isRecommended ? "ring-2 ring-cartoon-orange/40" : ""}
+        ${isRecommended ? "ring-2 ring-cartoon-blue/40" : ""}
       `}
     >
       <div className="flex gap-3">
@@ -115,7 +114,7 @@ const OfferCard = memo(({ o, i, i18n }: { o: Offer; i: number; i18n: any }) => {
               {o.title}
             </h3>
             {isRecommended && (
-              <span className="bg-cartoon-orange text-cartoon-cream text-[10px] font-bold px-1.5 py-0.5 rounded-full">
+              <span className="bg-cartoon-blue text-cartoon-cream text-[10px] font-bold px-1.5 py-0.5 rounded-full">
                 {i18n.recommended}
               </span>
             )}
@@ -129,7 +128,7 @@ const OfferCard = memo(({ o, i, i18n }: { o: Offer; i: number; i18n: any }) => {
               </div>
               <span className="font-bold text-cartoon-green">{o.difficulty}</span>
             </div>
-            <div className={`flex items-center gap-0.5 ${isRecommended ? "text-cartoon-orange" : "text-yellow-500 dark:text-yellow-400"}`}>
+            <div className={`flex items-center gap-0.5 ${isRecommended ? "text-cartoon-yellow" : "text-yellow-500 dark:text-yellow-400"}`}>
               {[...Array(5)].map((_, i) => (
                 <Star key={i} className="w-3 h-3 fill-current" />
               ))}
@@ -170,7 +169,6 @@ const FakeUsersOnline = () => {
   );
 };
 
-/* ──────────────────────  TOP NOTIFICATION BAR  ────────────────────── */
 /* ──────────────────────  TOP NOTIFICATION BAR – 21 COUNTRIES + MOROCCO BOOST  ────────────────────── */
 interface Notification {
   id: number;
@@ -186,7 +184,6 @@ const TopNotificationBar = ({ gameName }: { gameName: string }) => {
   const i18n = t(locale);
 
   const countries = [
-    // Top 20 by 2025 population + Morocco (boosted)
     { code: "IN", name: "India", weight: 18 },
     { code: "CN", name: "China", weight: 18 },
     { code: "US", name: "USA", weight: 4 },
@@ -207,8 +204,7 @@ const TopNotificationBar = ({ gameName }: { gameName: string }) => {
     { code: "IR", name: "Iran", weight: 1 },
     { code: "DE", name: "Germany", weight: 1 },
     { code: "TH", name: "Thailand", weight: 1 },
-    // Morocco Priority Boost
-    { code: "MA", name: "Morocco", weight: 6 },
+    { code: "MA", name: "Morocco", weight: 6 }, // Morocco boosted
   ];
 
   const weightedList = countries.flatMap(c => Array(c.weight).fill(c));
@@ -258,6 +254,7 @@ const TopNotificationBar = ({ gameName }: { gameName: string }) => {
     </div>
   );
 };
+
 const TopNotificationStyles = () => (
   <style jsx global>{`
     @keyframes slideIn {
@@ -286,8 +283,7 @@ const useConfirmExit = () => {
   }, [i18n.confirmExit]);
 };
 
-/* ──────────────────────  TRY SERVER 2  ────────────────────── */
-
+/* ──────────────────────  TRY SERVER 2 BUTTON  ────────────────────── */
 const TryServer2Button = () => {
   const i18n = t(useLocale()[0]);
 
@@ -311,7 +307,6 @@ const TryServer2Button = () => {
     </a>
   );
 };
-
 
 /* ──────────────────────  MAIN PAGE  ────────────────────── */
 const Download = () => {
@@ -373,7 +368,7 @@ const Download = () => {
           ${isScrolling ? "no-select-while-scrolling" : "no-select-while-scrolling selectable"}`}
       >
         <TopNotificationBar gameName={gameName} />
-
+        <br />
         <main className="pt-16 pb-10 sm:pt-20">
           <div className="max-w-xl mx-auto px-4 sm:px-6">
             <div className="flex justify-center mb-4">
@@ -442,20 +437,21 @@ const Download = () => {
                   <SupportNote />
                 </Suspense>
 
-                <div className="relative mb-6 overflow-hidden rounded-xl shadow-lg">
-                  <div className="absolute inset-0 bg-gradient-to-r from-cartoon-orange via-cartoon-pink to-cartoon-purple opacity-90" />
-                  <div className="relative p-3 flex items-center gap-2">
-                    <div className="w-8 h-8 rounded-full bg-cartoon-cream dark:bg-gray-700 shadow flex items-center justify-center">
-                      <Star className="w-5 h-5 text-cartoon-orange fill-current" />
-                    </div>
-                    <p className="text-white font-black text-xs leading-tight">{i18n.appDownloadTip}</p>
-                  </div>
-                </div>
-
                 {showGuide && (
-                  <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={() => setShowGuide(false)}>
-                    <div className="relative bg-white dark:bg-gray-800 rounded-xl max-w-xs w-full overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
-                      <button onClick={() => setShowGuide(false)} className="absolute top-2 right-2 w-7 h-7 bg-cartoon-red text-white rounded-full flex items-center justify-center text-sm font-bold z-10">X</button>
+                  <div
+                    className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
+                    onClick={() => setShowGuide(false)}
+                  >
+                    <div
+                      className="relative bg-white dark:bg-gray-800 rounded-xl max-w-xs w-full overflow-hidden shadow-2xl"
+                      onClick={e => e.stopPropagation()}
+                    >
+                      <button
+                        onClick={() => setShowGuide(false)}
+                        className="absolute top-2 right-2 w-7 h-7 bg-cartoon-red text-white rounded-full flex items-center justify-center text-sm font-bold z-10"
+                      >
+                        X
+                      </button>
                       <img src="/images/guide.png" alt="Guide" className="w-full" loading="lazy" />
                     </div>
                   </div>
@@ -465,18 +461,6 @@ const Download = () => {
                   {offers.map((o, i) => (
                     <OfferCard key={o.id} o={o} i={i} i18n={i18n} />
                   ))}
-                </div>
-
-                <div className="mt-6 bg-gradient-to-r from-cartoon-purple to-cartoon-blue rounded-xl p-4 text-center shadow-lg border border-cartoon-cream dark:border-gray-700 text-xs">
-                  <p className="text-cartoon-cream font-black mb-1">
-                    {i18n.onceComplete} to <span className="text-cartoon-green">{i18n.autoRedirect}</span>
-                  </p>
-                  <div className="bg-cartoon-cream dark:bg-gray-700 text-cartoon-purple font-black text-[10px] py-1 px-3 rounded-full inline-block">
-                    {i18n.topSite}
-                  </div>
-                  <p className="text-cartoon-cream/80 text-[10px] mt-2 font-bold">
-                    {i18n.mostUsers("< 3 min")}
-                  </p>
                 </div>
               </>
             )}
