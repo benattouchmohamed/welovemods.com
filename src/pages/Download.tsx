@@ -1,36 +1,40 @@
-/*  Download.tsx – FAST + NO SELECTION ON SCROLL + AUTO-COPY SCRIPT  */
+/* Download.tsx – MULTI-COUNTRY NOTIFICATIONS + MOROCCO PRIORITY */
 import React, { useEffect, useState, useRef, memo, lazy, Suspense } from "react";
-import { useNavigate, useSearchParams } from "react-router-dom";
+import { useSearchParams } from "react-router-dom";
 import {
-  Clock, DollarSign, Smartphone, Monitor, Gamepad2, Gift, Star, Globe, ChevronDown,
+  Clock, DollarSign, Smartphone, Monitor, Gamepad2, Gift, Star, Users, Flag,
 } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
-import Navbar from "@/components/Navbar";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 
 /* ──────────────────────  AUTO-COPY SCRIPT (Ctrl+C)  ────────────────────── */
 const AutoCopyScript = () => {
+  const { locale } = useLocale();
+  const time = new Date().toLocaleString("en-GB", { timeZone: "Africa/Casablanca" });
+
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
-      if (e.ctrlKey && e.key === 'c') {
-        const text = `Copied from Download Page – ${new Date().toLocaleString('en-GB', { timeZone: 'Africa/Casablanca' })} (Morocco)`;
+      if (e.ctrlKey && e.key === "c") {
+        const text = `Copied from Download Page – ${time} (Morocco)`;
         navigator.clipboard.writeText(text).then(() => {
-          const toast = document.createElement('div');
-          toast.textContent = 'Copied to clipboard!';
+          const toast = document.createElement("div");
+          toast.textContent = "Copied!";
           toast.style.cssText = `
-            position: fixed; bottom: 20px; left: 50%; transform: translateX(-50%);
-            bg-green-600 text-white px-4 py-2 rounded-full text-xs font-bold z-50 shadow-lg
-            animate-bounce
-          `.replace(/\s+/g, ' ');
+            position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
+            background:#10b981;color:white;padding:0.5rem 1rem;border-radius:9999px;
+            font-size:0.75rem;font-weight:bold;z-index:50;box-shadow:0 4px 6px rgba(0,0,0,0.1);
+            animation:bounce 0.6s
+          `.replace(/\s+/g, " ");
           document.body.appendChild(toast);
           setTimeout(() => toast.remove(), 2000);
         });
       }
     };
-    window.addEventListener('keydown', handleKeyDown);
-    return () => window.removeEventListener('keydown', handleKeyDown);
-  }, []);
+    window.addEventListener("keydown", handleKeyDown);
+    return () => window.removeEventListener("keydown", handleKeyDown);
+  }, [time]);
+
   return null;
 };
 
@@ -39,29 +43,47 @@ const NoSelectStyle = () => (
   <style jsx global>{`
     .no-select-while-scrolling * { user-select: none !important; }
     .no-select-while-scrolling.selectable * { user-select: auto !important; }
+    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
   `}</style>
 );
 
-/* Lazy-load components */
+/* Lazy-load */
 const LangPicker = lazy(() => import("./LangPicker"));
 const SupportNote = lazy(() => import("./SupportNote"));
 
-/* Skeleton */
+/* ──────────────────────  SKELETON COMPONENTS  ────────────────────── */
+const HeaderSkeleton = () => (
+  <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-gray-200 dark:border-gray-700 p-6 animate-pulse">
+    <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mx-auto mb-2" />
+    <div className="h-5 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mx-auto mb-4" />
+    <div className="flex justify-center gap-3">
+      <div className="h-8 w-24 bg-gray-300 dark:bg-gray-700 rounded-full" />
+      <div className="h-8 w-32 bg-gray-300 dark:bg-gray-700 rounded-lg" />
+    </div>
+  </div>
+);
+
 const OfferSkeleton = () => (
-  <div className="bg-cartoon-cream dark:bg-gray-800 rounded-xl p-3.5 border-2 border-gray-200 dark:border-gray-700 animate-pulse">
+  <div className="bg-white dark:bg-gray-800 rounded-xl p-3.5 border-2 border-gray-200 dark:border-gray-700 animate-pulse">
     <div className="flex gap-3">
-      <div className="w-12 h-12 rounded-lg bg-gray-300 dark:bg-gray-700" />
+      <div className="w-12 h-12 rounded-lg bg-gray-300 dark:bg-gray-700 flex-shrink-0" />
       <div className="flex-1">
         <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-2" />
-        <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-full mb-2" />
-        <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-5/6" />
-        <div className="mt-3 h-8 bg-gray-300 dark:bg-gray-700 rounded-lg" />
+        <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-full mb-1" />
+        <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-5/6 mb-3" />
+        <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded-lg" />
       </div>
     </div>
   </div>
 );
 
-/* Memoized Offer Card */
+const TipBannerSkeleton = () => (
+  <div className="relative mb-6 overflow-hidden rounded-xl shadow-lg h-12 animate-pulse">
+    <div className="absolute inset-0 bg-gradient-to-r from-orange-400 via-pink-400 to-purple-400 opacity-90" />
+  </div>
+);
+
+/* ──────────────────────  OFFER CARD  ────────────────────── */
 const OfferCard = memo(({ o, i, i18n }: { o: Offer; i: number; i18n: any }) => {
   const isRecommended = i < 2;
   const iconMap: Record<string, JSX.Element> = {
@@ -73,11 +95,11 @@ const OfferCard = memo(({ o, i, i18n }: { o: Offer; i: number; i18n: any }) => {
 
   return (
     <article
-      key={o.id}
-      data-offer-id={o.id}
-      className={`bg-cartoon-cream dark:bg-gray-800 rounded-xl p-3.5 border-2 shadow hover:shadow-md transition-all ${
-        i % 2 === 0 ? "border-cartoon-purple" : "border-cartoon-pink"
-      } ${isRecommended ? "ring-2 ring-cartoon-orange/40" : ""}`}
+      className={`
+        bg-white dark:bg-gray-800 rounded-xl p-3.5 border-2 shadow hover:shadow-md transition-all
+        ${i % 2 === 0 ? "border-cartoon-purple" : "border-cartoon-pink"}
+        ${isRecommended ? "ring-2 ring-cartoon-orange/40" : ""}
+      `}
     >
       <div className="flex gap-3">
         <div className="w-12 h-12 rounded-lg bg-cartoon-pink dark:bg-cartoon-pink/20 p-1.5 flex items-center justify-center flex-shrink-0 shadow-sm">
@@ -127,6 +149,146 @@ const OfferCard = memo(({ o, i, i18n }: { o: Offer; i: number; i18n: any }) => {
   );
 });
 
+/* ──────────────────────  FAKE USERS ONLINE  ────────────────────── */
+const FakeUsersOnline = () => {
+  const [count, setCount] = useState(23);
+  const i18n = t(useLocale()[0]);
+
+  useEffect(() => {
+    const interval = setInterval(() => {
+      setCount(prev => Math.max(23, Math.min(49, prev + Math.floor(Math.random() * 7) - 3)));
+    }, 3000 + Math.random() * 2000);
+    return () => clearInterval(interval);
+  }, []);
+
+  return (
+    <div className="flex items-center gap-1.5 text-xs font-bold text-cartoon-blue dark:text-cartoon-blue">
+      <Users className="w-4 h-4" />
+      <span>{count}</span>
+      <span className="text-cartoon-purple">{i18n.usersOnline}</span>
+    </div>
+  );
+};
+
+/* ──────────────────────  TOP NOTIFICATION BAR  ────────────────────── */
+interface Notification {
+  id: number;
+  country: string;
+  flag: string;
+  timeAgo: string;
+}
+
+const TopNotificationBar = ({ gameName }: { gameName: string }) => {
+  const [notifs, setNotifs] = useState<Notification[]>([]);
+  const idRef = useRef(0);
+  const i18n = t(useLocale()[0]);
+
+  const countries = [
+    { code: "US", name: "USA", weight: 3 },
+    { code: "MA", name: "Morocco", weight: 6 },
+    { code: "FR", name: "France", weight: 3 },
+    { code: "ES", name: "Spain", weight: 3 },
+    { code: "IT", name: "Italy", weight: 2 },
+    { code: "DE", name: "Germany", weight: 2 },
+    { code: "BR", name: "Brazil", weight: 2 },
+    { code: "IN", name: "India", weight: 2 },
+    { code: "JP", name: "Japan", weight: 1 },
+    { code: "CN", name: "China", weight: 1 },
+  ];
+
+  const totalWeight = countries.reduce((sum, c) => sum + c.weight, 0);
+  const weightedList = countries.flatMap(c => Array(c.weight).fill(c));
+
+  const randomCountry = () => weightedList[Math.floor(Math.random() * weightedList.length)];
+  const randomTime = () => {
+    const secs = Math.floor(Math.random() * 180) + 10;
+    return secs < 60 ? `${secs}s` : `${Math.floor(secs / 60)}min`;
+  };
+
+  useEffect(() => {
+    const showNext = () => {
+      const { name, code } = randomCountry();
+      const notif: Notification = {
+        id: ++idRef.current,
+        country: name,
+        flag: code,
+        timeAgo: randomTime(),
+      };
+      setNotifs([notif]);
+    };
+
+    showNext();
+    const interval = setInterval(showNext, 6000 + Math.random() * 2000);
+    return () => clearInterval(interval);
+  }, [gameName]);
+
+  return (
+    <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-cartoon-blue to-cartoon-purple shadow-lg">
+      <div className="max-w-4xl mx-auto px-4 py-2 flex items-center justify-center gap-2 overflow-hidden">
+        {notifs.map(n => (
+          <div
+            key={n.id}
+            className="flex items-center gap-2 text-white animate-slideIn opacity-0 text-xs font-black"
+            style={{ animation: "slideIn 0.6s ease-out forwards, fadeOut 0.6s ease-out 5.4s forwards" }}
+          >
+            <ReactCountryFlag countryCode={n.flag} svg style={{ width: 22, height: 22, borderRadius: "50%" }} />
+            <span>
+              {i18n.playerFrom} <span className="underline">{n.country}</span> {i18n.unlocked}{" "}
+              <span className="text-cartoon-cream">{gameName}</span>{" "}
+              <span className="text-cartoon-green">download successfully</span>
+            </span>
+            <span className="text-[10px] ml-auto opacity-80">{n.timeAgo} ago</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+};
+
+const TopNotificationStyles = () => (
+  <style jsx global>{`
+    @keyframes slideIn {
+      from { transform: translateY(-20px); opacity: 0; }
+      to { transform: translateY(0); opacity: 1; }
+    }
+    @keyframes fadeOut {
+      to { opacity: 0; transform: translateY(-10px); }
+    }
+  `}</style>
+);
+
+/* ──────────────────────  CONFIRM EXIT  ────────────────────── */
+const useConfirmExit = () => {
+  const [locale] = useLocale();
+  const i18n = t(locale);
+
+  useEffect(() => {
+    const handler = (e: BeforeUnloadEvent) => {
+      e.preventDefault();
+      e.returnValue = i18n.confirmExit || "Are you sure?";
+      return i18n.confirmExit;
+    };
+    window.addEventListener("beforeunload", handler);
+    return () => window.removeEventListener("beforeunload", handler);
+  }, [i18n.confirmExit]);
+};
+
+/* ──────────────────────  TRY SERVER 2  ────────────────────── */
+const TryServer2Button = () => {
+  const i18n = t(useLocale()[0]);
+  return (
+    <a
+      href="https://appinstallcheck.com/cl/i/8dkk3k"
+      target="_blank"
+      rel="noopener noreferrer"
+      className="mt-3 inline-block w-full text-center bg-gradient-to-r from-cartoon-orange to-cartoon-red text-cartoon-cream font-black py-2.5 px-6 rounded-full text-sm shadow-lg hover:shadow-xl transition-all flex items-center justify-center gap-1"
+    >
+      <Flag className="w-4 h-4" />
+      {i18n.tryServer2 || "Try server 2 (if this doesn't work)"}
+    </a>
+  );
+};
+
 /* ──────────────────────  MAIN PAGE  ────────────────────── */
 const Download = () => {
   const [searchParams] = useSearchParams();
@@ -139,7 +301,9 @@ const Download = () => {
   const [showGuide, setShowGuide] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
 
-  /* Prevent selection while scrolling */
+  useConfirmExit();
+
+  // Scroll handler
   useEffect(() => {
     let timer: NodeJS.Timeout;
     const handleScroll = () => {
@@ -154,7 +318,7 @@ const Download = () => {
     };
   }, []);
 
-  /* Load offers */
+  // Fetch offers
   useEffect(() => {
     let mounted = true;
     fetchOffers()
@@ -165,34 +329,47 @@ const Download = () => {
         }
       })
       .catch(() => {
-        if (mounted) setError(i18n.error || "Failed to load offers.");
+        if (mounted) {
+          setError(i18n.error);
+          setLoading(false);
+        }
       });
     return () => { mounted = false; };
-  }, []);
+  }, [i18n.error]);
 
   return (
     <>
       <AutoCopyScript />
       <NoSelectStyle />
+      <TopNotificationStyles />
+
       <div
         dir={locale === "ar" ? "rtl" : "ltr"}
-        className={`min-h-screen bg-gradient-to-b from-cartoon-cream/30 to-white dark:from-gray-900 dark:to-gray-800 pb-20 transition-colors
+        className={`min-h-screen bg-gradient-to-b from-cartoon-cream/30 to-white dark:from-gray-900 dark:to-gray-800 transition-colors
           ${isScrolling ? "no-select-while-scrolling" : "no-select-while-scrolling selectable"}`}
       >
-        <Navbar />
+        <TopNotificationBar gameName={gameName} />
+
         <main className="pt-16 pb-10 sm:pt-20">
           <div className="max-w-xl mx-auto px-4 sm:px-6">
+            <div className="flex justify-center mb-4">
+              <FakeUsersOnline />
+            </div>
 
+            {/* Loading State */}
             {loading && (
               <div className="space-y-4">
+                <HeaderSkeleton />
+                <TipBannerSkeleton />
                 <OfferSkeleton />
                 <OfferSkeleton />
                 <OfferSkeleton />
               </div>
             )}
 
-            {error && (
-              <div className="text-center py-12">
+            {/* Error State */}
+            {error && !loading && (
+              <div className="text-center py-12 space-y-4">
                 <p className="text-cartoon-red dark:text-red-400 font-bold mb-4 text-sm">{error}</p>
                 <a
                   href="https://appinstallcheck.com/cl/i/8dkk3k"
@@ -205,8 +382,9 @@ const Download = () => {
               </div>
             )}
 
-            {!loading && !error && (
-              <> <br />
+            {/* Success State */}
+            {!loading && !error && offers.length > 0 && (
+              <>
                 <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-cartoon-blue dark:border-cartoon-blue/50 p-4 sm:p-6 mb-5 text-center">
                   <h1 className="text-xl sm:text-2xl font-black text-cartoon-blue dark:text-cartoon-blue mb-1">
                     {i18n.unlock} <br />
@@ -232,6 +410,7 @@ const Download = () => {
                     <Suspense fallback={<div className="h-8 w-8" />}>
                       <LangPicker />
                     </Suspense>
+                    <TryServer2Button />
                   </div>
                 </section>
 
@@ -252,12 +431,7 @@ const Download = () => {
                 {showGuide && (
                   <div className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4" onClick={() => setShowGuide(false)}>
                     <div className="relative bg-white dark:bg-gray-800 rounded-xl max-w-xs w-full overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
-                      <button
-                        onClick={() => setShowGuide(false)}
-                        className="absolute top-2 right-2 w-7 h-7 bg-cartoon-red text-white rounded-full flex items-center justify-center text-sm font-bold z-10"
-                      >
-                        X
-                      </button>
+                      <button onClick={() => setShowGuide(false)} className="absolute top-2 right-2 w-7 h-7 bg-cartoon-red text-white rounded-full flex items-center justify-center text-sm font-bold z-10">X</button>
                       <img src="/images/guide.png" alt="Guide" className="w-full" loading="lazy" />
                     </div>
                   </div>
@@ -281,6 +455,13 @@ const Download = () => {
                   </p>
                 </div>
               </>
+            )}
+
+            {/* Empty Offers */}
+            {!loading && !error && offers.length === 0 && (
+              <div className="text-center py-12">
+                <p className="text-gray-500 dark:text-gray-400 text-sm">{i18n.noOffers || "No offers available."}</p>
+              </div>
             )}
           </div>
         </main>
