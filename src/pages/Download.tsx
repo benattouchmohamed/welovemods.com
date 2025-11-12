@@ -1,7 +1,7 @@
 import React, { useEffect, useState, useRef, memo, lazy, Suspense } from "react";
 import { useSearchParams } from "react-router-dom";
 import {
-  Clock, DollarSign, Smartphone, Monitor, Gamepad2, Gift, Star, Users,
+  Clock, DollarSign, Smartphone, Monitor, Gamepad2, Gift, Star, Users, X,
 } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
 import { fetchOffers, type Offer } from "@/services/offerService";
@@ -82,71 +82,168 @@ const TipBannerSkeleton = () => (
   </div>
 );
 
-/* ──────────────────────  OFFER CARD  ────────────────────── */
-const OfferCard = memo(({ o, i, i18n }: { o: Offer; i: number; i18n: any }) => {
-  const isRecommended = i < 2;
+/* ──────────────────────  OFFER MODAL (FULL BOX)  ────────────────────── */
+interface OfferModalProps {
+  offer: Offer | null;
+  onClose: () => void;
+  i18n: any;
+}
+
+const OfferModal = ({ offer, onClose, i18n }: OfferModalProps) => {
+  if (!offer) return null;
+
   const iconMap: Record<string, JSX.Element> = {
-    Smartphone: <Smartphone className="w-5 h-5 text-cartoon-cream" />,
-    Monitor: <Monitor className="w-5 h-5 text-cartoon-cream" />,
-    Gamepad2: <Gamepad2 className="w-5 h-5 text-cartoon-cream" />,
-    Gift: <Gift className="w-5 h-5 text-cartoon-cream" />,
+    Smartphone: <Smartphone className="w-10 h-10 text-cartoon-cream" />,
+    Monitor: <Monitor className="w-10 h-10 text-cartoon-cream" />,
+    Gamepad2: <Gamepad2 className="w-10 h-10 text-cartoon-cream" />,
+    Gift: <Gift className="w-10 h-10 text-cartoon-cream" />,
   };
 
   return (
-    <article
-      className={`
-        bg-white dark:bg-gray-800 rounded-xl p-3.5 border-2 shadow hover:shadow-md transition-all
-        ${i % 2 === 0 ? "border-cartoon-purple" : "border-cartoon-pink"}
-        ${isRecommended ? "ring-2 ring-cartoon-blue/40" : ""}
-      `}
+    <div
+      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
+      onClick={onClose}
     >
-      <div className="flex gap-3">
-        <div className="w-12 h-12 rounded-lg bg-cartoon-pink dark:bg-cartoon-pink/20 p-1.5 flex items-center justify-center flex-shrink-0 shadow-sm">
-          {o.image ? (
-            <img src={o.image} alt={o.title} className="w-full h-full object-cover rounded" loading="lazy" />
-          ) : (
-            iconMap[o.icon] || <DollarSign className="w-5 h-5 text-cartoon-cream" />
-          )}
-        </div>
-        <div className="flex-1 min-w-0">
-          <div className="flex items-start justify-between mb-1">
-            <h3 className="font-black text-sm text-cartoon-blue dark:text-cartoon-blue line-clamp-2 pr-1">
-              {o.title}
-            </h3>
-            {isRecommended && (
-              <span className="bg-cartoon-blue text-cartoon-cream text-[10px] font-bold px-1.5 py-0.5 rounded-full">
-                {i18n.recommended}
-              </span>
+      <div
+        className="relative bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-cartoon-blue/50"
+        onClick={(e) => e.stopPropagation()}
+      >
+        {/* Close Button */}
+        <button
+          onClick={onClose}
+          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition"
+        >
+          <X className="w-6 h-6" />
+        </button>
+
+        {/* Offer Image / Icon */}
+        <div className="flex justify-center mb-5">
+          <div className="w-24 h-24 rounded-xl bg-cartoon-pink dark:bg-cartoon-pink/20 p-3 flex items-center justify-center shadow-lg">
+            {offer.image ? (
+              <img
+                src={offer.image}
+                alt={offer.title}
+                className="w-full h-full object-cover rounded-lg"
+                loading="lazy"
+              />
+            ) : (
+              iconMap[offer.icon] || <DollarSign className="w-12 h-12 text-cartoon-cream" />
             )}
           </div>
-          <p className="text-xs text-gray-700 dark:text-gray-300 line-clamp-2">{o.description}</p>
-          <div className="flex items-center justify-between mt-2 text-xs">
-            <div className="flex items-center gap-2">
-              <div className="flex items-center gap-1 text-cartoon-blue">
-                <Clock className="w-3 h-3" />
-                <span className="font-bold">{o.timeEstimate}</span>
-              </div>
-              <span className="font-bold text-cartoon-green">{o.difficulty}</span>
-            </div>
-            <div className={`flex items-center gap-0.5 ${isRecommended ? "text-cartoon-yellow" : "text-yellow-500 dark:text-yellow-400"}`}>
-              {[...Array(5)].map((_, i) => (
-                <Star key={i} className="w-3 h-3 fill-current" />
-              ))}
-            </div>
-          </div>
-          <a
-            href={o.url}
-            target="_blank"
-            rel="noopener noreferrer"
-            className="mt-2.5 block w-full text-center py-2 rounded-lg text-xs font-black text-cartoon-cream bg-gradient-to-r from-cartoon-blue to-cartoon-purple shadow hover:shadow-md transition"
-          >
-            {i18n.completeOfferBtn}
-          </a>
         </div>
+
+        {/* Title */}
+        <h3 className="text-2xl font-black text-center text-cartoon-blue dark:text-cartoon-blue mb-3">
+          {offer.title}
+        </h3>
+
+        {/* Description */}
+        <p className="text-sm text-gray-700 dark:text-gray-300 text-center mb-6 line-clamp-4">
+          {offer.description}
+        </p>
+
+        {/* Details */}
+        <div className="flex justify-center items-center gap-6 mb-8 text-sm">
+          <div className="flex items-center gap-1.5 text-cartoon-blue">
+            <Clock className="w-4 h-4" />
+            <span className="font-bold">{offer.timeEstimate}</span>
+          </div>
+          <span className="font-bold text-cartoon-green">{offer.difficulty}</span>
+          <div className="flex items-center gap-0.5 text-yellow-500 dark:text-yellow-400">
+            {[...Array(5)].map((_, i) => (
+              <Star key={i} className="w-4 h-4 fill-current" />
+            ))}
+          </div>
+        </div>
+
+        {/* Unlock Now Button */}
+        <a
+          href={offer.url}
+          target="_blank"
+          rel="noopener noreferrer"
+          className="block w-full text-center py-3.5 rounded-xl text-base font-black text-white bg-gradient-to-r from-green-500 to-green-600 shadow-lg hover:shadow-xl transition-transform hover:scale-105"
+        >
+          {i18n.unlockNow || "Unlock Now"}
+        </a>
       </div>
-    </article>
+    </div>
   );
-});
+};
+
+/* ──────────────────────  OFFER CARD  ────────────────────── */
+const OfferCard = memo(
+  ({
+    o,
+    i,
+    i18n,
+    onOpenModal,
+  }: {
+    o: Offer;
+    i: number;
+    i18n: any;
+    onOpenModal: (offer: Offer) => void;
+  }) => {
+    const iconMap: Record<string, JSX.Element> = {
+      Smartphone: <Smartphone className="w-5 h-5 text-cartoon-cream" />,
+      Monitor: <Monitor className="w-5 h-5 text-cartoon-cream" />,
+      Gamepad2: <Gamepad2 className="w-5 h-5 text-cartoon-cream" />,
+      Gift: <Gift className="w-5 h-5 text-cartoon-cream" />,
+    };
+
+    return (
+      <article
+        className={`
+          bg-white dark:bg-gray-800 rounded-xl p-3.5 border-2 shadow hover:shadow-md transition-all
+          ${i % 2 === 0 ? "border-cartoon-purple" : "border-cartoon-pink"}
+        `}
+      >
+        <div className="flex gap-3">
+          <div className="w-12 h-12 rounded-lg bg-cartoon-pink dark:bg-cartoon-pink/20 p-1.5 flex items-center justify-center flex-shrink-0 shadow-sm">
+            {o.image ? (
+              <img
+                src={o.image}
+                alt={o.title}
+                className="w-full h-full object-cover rounded"
+                loading="lazy"
+              />
+            ) : (
+              iconMap[o.icon] || <DollarSign className="w-5 h-5 text-cartoon-cream" />
+            )}
+          </div>
+
+          <div className="flex-1 min-w-0">
+            <h3 className="font-black text-sm text-cartoon-blue dark:text-cartoon-blue line-clamp-2 mb-1">
+              {o.title}
+            </h3>
+            <p className="text-xs text-gray-700 dark:text-gray-300 line-clamp-2">{o.description}</p>
+
+            <div className="flex items-center justify-between mt-2 text-xs">
+              <div className="flex items-center gap-2">
+                <div className="flex items-center gap-1 text-cartoon-blue">
+                  <Clock className="w-3 h-3" />
+                  <span className="font-bold">{o.timeEstimate}</span>
+                </div>
+                <span className="font-bold text-cartoon-green">{o.difficulty}</span>
+              </div>
+              <div className="flex items-center gap-0.5 text-yellow-500 dark:text-yellow-400">
+                {[...Array(5)].map((_, i) => (
+                  <Star key={i} className="w-3 h-3 fill-current" />
+                ))}
+              </div>
+            </div>
+
+            <button
+              onClick={() => onOpenModal(o)}
+              className="mt-2.5 block w-full text-center py-2 rounded-lg text-xs font-black text-cartoon-cream bg-gradient-to-r from-cartoon-blue to-cartoon-purple shadow hover:shadow-md transition"
+            >
+              {i18n.completeOfferBtn}
+            </button>
+          </div>
+        </div>
+      </article>
+    );
+  }
+);
 
 /* ──────────────────────  FAKE USERS ONLINE  ────────────────────── */
 const FakeUsersOnline = () => {
@@ -155,7 +252,7 @@ const FakeUsersOnline = () => {
 
   useEffect(() => {
     const interval = setInterval(() => {
-      setCount(prev => Math.max(23, Math.min(49, prev + Math.floor(Math.random() * 7) - 3)));
+      setCount((prev) => Math.max(23, Math.min(49, prev + Math.floor(Math.random() * 7) - 3)));
     }, 3000 + Math.random() * 2000);
     return () => clearInterval(interval);
   }, []);
@@ -169,7 +266,7 @@ const FakeUsersOnline = () => {
   );
 };
 
-/* ──────────────────────  TOP NOTIFICATION BAR – 21 COUNTRIES + MOROCCO BOOST  ────────────────────── */
+/* ──────────────────────  TOP NOTIFICATION BAR  ────────────────────── */
 interface Notification {
   id: number;
   country: string;
@@ -204,11 +301,10 @@ const TopNotificationBar = ({ gameName }: { gameName: string }) => {
     { code: "IR", name: "Iran", weight: 1 },
     { code: "DE", name: "Germany", weight: 1 },
     { code: "TH", name: "Thailand", weight: 1 },
-    { code: "MA", name: "Morocco", weight: 6 }, // Morocco boosted
+    { code: "MA", name: "Morocco", weight: 6 },
   ];
 
-  const weightedList = countries.flatMap(c => Array(c.weight).fill(c));
-
+  const weightedList = countries.flatMap((c) => Array(c.weight).fill(c));
   const randomCountry = () => weightedList[Math.floor(Math.random() * weightedList.length)];
   const randomTime = () => {
     const secs = Math.floor(Math.random() * 180) + 10;
@@ -235,7 +331,7 @@ const TopNotificationBar = ({ gameName }: { gameName: string }) => {
   return (
     <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-cartoon-blue to-cartoon-purple shadow-lg">
       <div className="max-w-4xl mx-auto px-4 py-2 flex items-center justify-center gap-2 overflow-hidden">
-        {notifs.map(n => (
+        {notifs.map((n) => (
           <div
             key={n.id}
             className="flex items-center gap-2 text-white animate-slideIn opacity-0 text-xs font-black"
@@ -319,6 +415,7 @@ const Download = () => {
   const [error, setError] = useState<string | null>(null);
   const [showGuide, setShowGuide] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
+  const [modalOffer, setModalOffer] = useState<Offer | null>(null);
 
   useConfirmExit();
 
@@ -341,7 +438,7 @@ const Download = () => {
   useEffect(() => {
     let mounted = true;
     fetchOffers()
-      .then(fetched => {
+      .then((fetched) => {
         if (mounted) {
           setOffers(fetched);
           setLoading(false);
@@ -353,8 +450,13 @@ const Download = () => {
           setLoading(false);
         }
       });
-    return () => { mounted = false; };
+    return () => {
+      mounted = false;
+    };
   }, [i18n.error]);
+
+  const openModal = (offer: Offer) => setModalOffer(offer);
+  const closeModal = () => setModalOffer(null);
 
   return (
     <>
@@ -444,7 +546,7 @@ const Download = () => {
                   >
                     <div
                       className="relative bg-white dark:bg-gray-800 rounded-xl max-w-xs w-full overflow-hidden shadow-2xl"
-                      onClick={e => e.stopPropagation()}
+                      onClick={(e) => e.stopPropagation()}
                     >
                       <button
                         onClick={() => setShowGuide(false)}
@@ -459,7 +561,13 @@ const Download = () => {
 
                 <div className="grid gap-4" id="offers">
                   {offers.map((o, i) => (
-                    <OfferCard key={o.id} o={o} i={i} i18n={i18n} />
+                    <OfferCard
+                      key={o.id}
+                      o={o}
+                      i={i}
+                      i18n={i18n}
+                      onOpenModal={openModal}
+                    />
                   ))}
                 </div>
               </>
@@ -474,6 +582,9 @@ const Download = () => {
           </div>
         </main>
       </div>
+
+      {/* MODAL BOX */}
+      <OfferModal offer={modalOffer} onClose={closeModal} i18n={i18n} />
     </>
   );
 };

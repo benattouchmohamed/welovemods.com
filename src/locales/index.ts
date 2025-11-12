@@ -13,7 +13,7 @@ interface TranslationFunctions {
   appDownloadTip: string;
   downloadNow: string;
   completeOfferBtn: string;
-  recommended: string;
+  // recommended: string; → REMOVED
   topSite: string;
   autoRedirect: string;
   mostUsers: (time: string) => string;
@@ -31,6 +31,9 @@ interface TranslationFunctions {
   tryOffers?: string;
   noOffers?: string;
   confirmExit?: string;
+
+  // New: Modal
+  unlockNow?: string;
 }
 
 export const translations: Record<Locale, TranslationFunctions> = {
@@ -45,14 +48,16 @@ export const translations: Record<Locale, TranslationFunctions> = {
     appDownloadTip: "Try offers of downloading apps – it’s so easy and 100% faster!",
     downloadNow: "Download Now",
     completeOfferBtn: "Complete Offer",
-    recommended: "Recommended",
+    // recommended: "Recommended", → REMOVED
     topSite: "Top 1 site for most games in the world",
     autoRedirect: "auto-redirect & download!",
     mostUsers: (time) => `Most users get their game in ${time}!`,
     language: "Language",
     error: "Failed to load offers. Try the link below.",
     supportNote:
-      "100% FREE • NOT A VIRUS\nJust follow the steps. Thanks!",
+      "100% FREE • NOT A VIRUS\n" +
+      "Try offers: download & run 30s – so easy to verify you're human!\n" +
+      "Just follow the steps. Thanks!",
 
     playerFrom: "Player from",
     unlocked: "unlocked",
@@ -62,6 +67,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
     tryOffers: "Try Offers Here",
     noOffers: "No offers available at the moment.",
     confirmExit: "Are you sure you want to leave? Your progress may be lost.",
+
+    unlockNow: "Unlock Now",
   },
 
   es: {
@@ -76,7 +83,6 @@ export const translations: Record<Locale, TranslationFunctions> = {
       "Prueba ofertas de descargar apps – ¡es súper fácil y 100% más rápido!",
     downloadNow: "Descargar ahora",
     completeOfferBtn: "Completar oferta",
-    recommended: "Recomendado",
     topSite: "Sitio #1 para la mayoría de los juegos del mundo",
     autoRedirect: "¡redirección automática y descarga!",
     mostUsers: (time) =>
@@ -84,7 +90,9 @@ export const translations: Record<Locale, TranslationFunctions> = {
     language: "Idioma",
     error: "No se pudieron cargar las ofertas. Prueba el enlace de abajo.",
     supportNote:
-      "100% GRATIS • NO ES UN VIRUS\nSolo sigue los pasos. ¡Gracias!",
+      "100% GRATIS • NO ES UN VIRUS\n" +
+      "Prueba ofertas: descarga y ejecuta 30s – ¡tan fácil para verificar que eres humano!\n" +
+      "Solo sigue los pasos. ¡Gracias!",
 
     playerFrom: "Jugador de",
     unlocked: "desbloqueó",
@@ -92,8 +100,10 @@ export const translations: Record<Locale, TranslationFunctions> = {
 
     tryServer2: "Prueba el servidor 2 (si esto no funciona)",
     tryOffers: "Prueba las ofertas aquí",
-    noOffers:  "No hay ofertas disponibles en este momento.",
+    noOffers: "No hay ofertas disponibles en este momento.",
     confirmExit: "¿Estás seguro de que quieres salir? Podrías perder tu progreso.",
+
+    unlockNow: "Desbloquear Ahora",
   },
 
   ko: {
@@ -108,7 +118,6 @@ export const translations: Record<Locale, TranslationFunctions> = {
       "앱 다운로드 오퍼를 시도하세요 – 정말 쉽고 100% 빠릅니다!",
     downloadNow: "지금 다운로드",
     completeOfferBtn: "오퍼 완료",
-    recommended: "추천",
     topSite: "세계 대부분의 게임을 위한 1위 사이트",
     autoRedirect: "자동 리다이렉트 & 다운로드!",
     mostUsers: (time) =>
@@ -116,7 +125,9 @@ export const translations: Record<Locale, TranslationFunctions> = {
     language: "언어",
     error: "오퍼를 불러오지 못했습니다. 아래 링크를 시도하세요.",
     supportNote:
-      "100% 무료 • 바이러스 아님\n단계만 따라주세요. 감사합니다!",
+      "100% 무료 • 바이러스 아님\n" +
+      "오퍼 시도: 앱 다운로드 후 30초 실행 – 인간 확인 너무 쉬움!\n" +
+      "단계만 따라주세요. 감사합니다!",
 
     playerFrom: "플레이어",
     unlocked: "잠금 해제",
@@ -126,6 +137,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
     tryOffers: "여기서 오퍼 시도",
     noOffers: "현재 사용 가능한 오퍼가 없습니다.",
     confirmExit: "정말 나가시겠습니까? 진행 상황이 손실될 수 있습니다.",
+
+    unlockNow: "지금 잠금 해제",
   },
 
   ja: {
@@ -134,13 +147,12 @@ export const translations: Record<Locale, TranslationFunctions> = {
     oneOffer: "1件のオファー",
     toGetTheGame: "ゲームを手に入れる。",
     downloadStarts: "ダウンロードが自動的に開始されます！",
-    offersCompleted: (done, total) => `${done} / ${total} 오퍼 완료`,
+    offersCompleted: (done, total) => `${done} / ${total} オファー完了`,
     howToGuide: "使い方ガイド",
     appDownloadTip:
       "アプリダウンロードのオファーを試してみてください – とても簡単で100%高速です！",
     downloadNow: "今すぐダウンロード",
     completeOfferBtn: "オファーを完了",
-    recommended: "おすすめ",
     topSite: "世界中のほとんどのゲームで1位のサイト",
     autoRedirect: "自動リダイレクト＆ダウンロード！",
     mostUsers: (time) =>
@@ -148,7 +160,9 @@ export const translations: Record<Locale, TranslationFunctions> = {
     language: "言語",
     error: "オファーの読み込みに失敗しました。下のリンクをお試しください。",
     supportNote:
-      "100%無料 • ウイルスではありません\n手順に従うだけ。ありがとう！",
+      "100%無料 • ウイルスではありません\n" +
+      "オファー試す：アプリDL後30秒実行 – 人間証明超簡単！\n" +
+      "手順に従うだけ。ありがとう！",
 
     playerFrom: "プレイヤー",
     unlocked: "アンロック",
@@ -158,6 +172,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
     tryOffers: "ここでオファーを試す",
     noOffers: "現在オファーはありません。",
     confirmExit: "本当に終了しますか？進行状況が失われる可能性があります。",
+
+    unlockNow: "今すぐアンロック",
   },
 
   ar: {
@@ -172,7 +188,6 @@ export const translations: Record<Locale, TranslationFunctions> = {
       "جرب عروض تحميل التطبيقات – إنها سهلة جدًا وأسرع 100%!",
     downloadNow: "تحميل الآن",
     completeOfferBtn: "إكمال العرض",
-    recommended: "موصى به",
     topSite: "الموقع الأول لمعظم الألعاب في العالم",
     autoRedirect: "إعادة توجيه تلقائي وتحميل!",
     mostUsers: (time) =>
@@ -180,7 +195,9 @@ export const translations: Record<Locale, TranslationFunctions> = {
     language: "اللغة",
     error: "فشل تحميل العروض. جرب الرابط أدناه.",
     supportNote:
-      "100% مجاني • ليس فيروسًا\nاتبع الخطوات فقط. شكرًا!",
+      "100% مجاني • ليس فيروسًا\n" +
+      "جرب العروض: حمل التطبيق وشغّله 30 ثانية – سهل جدًا لتأكيد أنك بشري!\n" +
+      "اتبع الخطوات فقط. شكرًا!",
 
     playerFrom: "لاعب من",
     unlocked: "فتح",
@@ -190,6 +207,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
     tryOffers: "جرب العروض هنا",
     noOffers: "لا توجد عروض متاحة الآن.",
     confirmExit: "هل أنت متأكد من الخروج؟ قد تفقد تقدمك.",
+
+    unlockNow: "افتح الآن",
   },
 
   fr: {
@@ -204,7 +223,6 @@ export const translations: Record<Locale, TranslationFunctions> = {
       "Essayez les offres de téléchargement d’apps – c’est super simple et 100 % plus rapide !",
     downloadNow: "Télécharger maintenant",
     completeOfferBtn: "Terminer l’offre",
-    recommended: "Recommandé",
     topSite: "Site n°1 pour la plupart des jeux dans le monde",
     autoRedirect: "redirection automatique & téléchargement !",
     mostUsers: (time) =>
@@ -212,7 +230,9 @@ export const translations: Record<Locale, TranslationFunctions> = {
     language: "Langue",
     error: "Échec du chargement des offres. Essayez le lien ci-dessous.",
     supportNote:
-      "100% GRATUIT • PAS DE VIRUS\nSuivez simplement les étapes. Merci !",
+      "100% GRATUIT • PAS DE VIRUS\n" +
+      "Essayez les offres : téléchargez et lancez 30s – si simple pour prouver que vous êtes humain !\n" +
+      "Suivez simplement les étapes. Merci !",
 
     playerFrom: "Joueur de",
     unlocked: "a débloqué",
@@ -222,6 +242,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
     tryOffers: "Essayez les offres ici",
     noOffers: "Aucune offre disponible pour le moment.",
     confirmExit: "Êtes-vous sûr de vouloir quitter ? Votre progression risque d’être perdue.",
+
+    unlockNow: "Débloquer Maintenant",
   },
 
   ru: {
@@ -236,7 +258,6 @@ export const translations: Record<Locale, TranslationFunctions> = {
       "Попробуйте предложения по загрузке приложений – это очень просто и в 100 % быстрее!",
     downloadNow: "Скачать сейчас",
     completeOfferBtn: "Выполнить предложение",
-    recommended: "Рекомендуется",
     topSite: "Сайт №1 для большинства игр в мире",
     autoRedirect: "автоматический переход и скачивание!",
     mostUsers: (time) =>
@@ -244,7 +265,9 @@ export const translations: Record<Locale, TranslationFunctions> = {
     language: "Язык",
     error: "Не удалось загрузить предложения. Попробуйте ссылку ниже.",
     supportNote:
-      "100% БЕСПЛАТНО • НЕ ВИРУС\nПросто следуйте шагам. Спасибо!",
+      "100% БЕСПЛАТНО • НЕ ВИРУС\n" +
+      "Попробуйте офферы: скачайте и запустите на 30 сек – так просто доказать, что вы человек!\n" +
+      "Просто следуйте шагам. Спасибо!",
 
     playerFrom: "Игрок из",
     unlocked: "разблокировал",
@@ -254,5 +277,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     tryOffers: "Попробуйте предложения здесь",
     noOffers: "Нет доступных предложений.",
     confirmExit: "Вы уверены, что хотите уйти? Прогресс может быть потерян.",
+
+    unlockNow: "Разблокировать Сейчас",
   },
 } as const;

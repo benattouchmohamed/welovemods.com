@@ -81,7 +81,7 @@ const mapApiOfferToOffer = (api: ApiOffer, idx: number): Offer => {
     title: api.name_short ?? api.name ?? 'Special Offer',
     description: api.adcopy ?? api.description ?? 'Complete this offer',
     difficulty: 'Easy',
-    timeEstimate: '1 min', // ← ALL OFFERS ARE 1 MIN
+    timeEstimate: '1 min', // all offers are short
     icon: getOfferIcon(category),
     url: api.link ?? 'https://areyourealhuman.com/cl/i/g6pqp2',
     image: api.picture,
@@ -100,7 +100,7 @@ export async function fetchOffers(): Promise<Offer[]> {
     const params = new URLSearchParams({
       ip: visitorIP,
       user_agent: userAgent,
-      max: '3',   // Still fetch up to 6 to have good sorting pool
+      max: '4',  // fetch more offers
       min: '2',
       ctype: '7',
     });
@@ -131,14 +131,12 @@ export async function fetchOffers(): Promise<Offer[]> {
       return b.epc - a.epc;
     });
 
-    /* ---- 3. Take ONLY TOP 4 ---- */
-    const top4 = withMeta.slice(0, 4);
+    /* ---- ✅ Return all offers (no top4 filter) ---- */
+    return withMeta.map(m => m.offer);
 
-    /* ---- 4. Return only Offer objects ---- */
-    return top4.map(m => m.offer);
   } catch (err) {
     console.error('fetchOffers error →', err);
-    return []; // UI shows fallback link
+    return [];
   }
 }
 
@@ -146,16 +144,4 @@ export async function fetchOffers(): Promise<Offer[]> {
 export const getTopOffer = async (): Promise<Offer | null> => {
   const list = await fetchOffers();
   return list[0] ?? null;
-};
-
-/* ---------- Optional: pretty console log (dev only) ---------- */
-export const logTopOffer = async () => {
-  const top = await getTopOffer();
-  if (!top) return console.log('No offers');
-  console.log(`Top Offer:
-  Title: ${top.title}
-  Payout: $${top.payout?.toFixed(2) ?? 'N/A'}
-  EPC: $${top.epc?.toFixed(4) ?? 'N/A'}
-  Time: ${top.timeEstimate}
-  URL: ${top.url}`);
 };
