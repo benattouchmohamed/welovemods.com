@@ -100,8 +100,8 @@ export async function fetchOffers(): Promise<Offer[]> {
     const params = new URLSearchParams({
       ip: visitorIP,
       user_agent: userAgent,
-      max: '4',  // fetch more offers
-      min: '2',
+      max: '2',  // fetch more offers
+      min: '1',
       ctype: '7',
     });
 
