@@ -1,267 +1,263 @@
-// src/locales/index.ts
 export type Locale = "en" | "es" | "ko" | "ja" | "ar" | "fr" | "ru";
 
 interface TranslationFunctions {
-  // Core
-  unlock: string;
-  completeOffer: (n: number) => string;
-  oneOffer: string;
-  toGetTheGame: string;
+  // Header & Verification
+  completeOneTask: string;
+  gameReady: string;
+  onceFinishTask: string;
   downloadStarts: string;
   offersCompleted: (done: number, total: number) => string;
   howToGuide: string;
+
+  // Offer & Modal
+  completeOffer: (n: number) => string;
+  oneOffer: string;
+  toGetTheGame: string;
   appDownloadTip: string;
   downloadNow: string;
   completeOfferBtn: string;
-  // recommended: string; → REMOVED
+  completeNow: string;
+
+  // Notifications & UX
   topSite: string;
   autoRedirect: string;
   mostUsers: (time: string) => string;
   language: string;
-  error: string;
-  supportNote: string;
-  // Notifications
   playerFrom: string;
   unlocked: string;
   usersOnline: string;
-  // Fallbacks & UX
+
+  // Errors & Fallbacks
+  error: string;
+  supportNote: string;
   tryServer2?: string;
   tryOffers?: string;
   noOffers?: string;
   confirmExit?: string;
-  // New: Modal
-  unlockNow?: string;
 }
 
 export const translations: Record<Locale, TranslationFunctions> = {
   en: {
-    unlock: "Unlock Game",
-    completeOffer: (n) => `Complete ${n} quick task`,
-    oneOffer: "1 task",
-    toGetTheGame: "to download instantly.",
+    completeOneTask: "Complete one task to prove you are not a bot",
+    gameReady: "{game} is ready to download!",
+    onceFinishTask: "Once you finish 1 task, your download will start automatically!",
     downloadStarts: "Your download will begin automatically.",
     offersCompleted: (done, total) => `${done} / ${total} task completed`,
     howToGuide: "Step-by-Step Guide",
+    completeOffer: (n) => `Complete ${n} quick task`,
+    oneOffer: "1 task",
+    toGetTheGame: "to download instantly.",
     appDownloadTip: "Install & open any app for 30 seconds – fast and secure.",
     downloadNow: "Start Download",
     completeOfferBtn: "Complete Task",
-
+    completeNow: "Complete Now",
     topSite: "Trusted by millions of gamers worldwide",
     autoRedirect: "instant download after task",
     mostUsers: (time) => `Most users download in under ${time}`,
     language: "Language",
+    playerFrom: "Player from",
+    unlocked: "download successfully",
+    usersOnline: "users active",
     error: "Failed to load task. Please try the mirror link below.",
     supportNote:
-      "100% Free • Verified Safe • No Surveys\n" +
-      "Complete 1 quick app install (30s) to prove you're human.\n" +
+      "100% Free • Verified Safe\n" +
+      "Please read the task description to prove you're human successfully and get your game faster!\n" +
       "We keep it fast, simple, and secure.",
-
-    playerFrom: "Player from",
-    unlocked: "unlocked",
-    usersOnline: "users active",
-
     tryServer2: "Try server 2 (if this doesn’t work)",
     tryOffers: "Complete Task Here",
     noOffers: "No tasks available at the moment.",
     confirmExit: "Leave now? Your progress will be lost.",
-    unlockNow: "Unlock Now",
   },
 
   es: {
-    unlock: "Desbloquear Juego",
-    completeOffer: (n) => `Completa ${n} tarea rápida`,
-    oneOffer: "1 tarea",
-    toGetTheGame: "para descargar al instante.",
+    completeOneTask: "Completa una tarea para demostrar que no eres un bot",
+    gameReady: "¡{game} está listo para descargar!",
+    onceFinishTask: "¡Una vez completes 1 tarea, la descarga comenzará automáticamente!",
     downloadStarts: "La descarga comenzará automáticamente.",
     offersCompleted: (done, total) => `${done} / ${total} tarea completada`,
     howToGuide: "Guía paso a paso",
+    completeOffer: (n) => `Completa ${n} tarea rápida`,
+    oneOffer: "1 tarea",
+    toGetTheGame: "para descargar al instante.",
     appDownloadTip: "Instala y abre cualquier app por 30 segundos – rápido y seguro.",
     downloadNow: "Iniciar Descarga",
     completeOfferBtn: "Completar Tarea",
-
+    completeNow: "Completar Ahora",
     topSite: "Confiable para millones de jugadores en todo el mundo",
     autoRedirect: "descarga instantánea tras tarea",
     mostUsers: (time) => `La mayoría descarga en menos de ${time}`,
     language: "Idioma",
+    playerFrom: "Jugador de",
+    unlocked: "descarga exitosa",
+    usersOnline: "usuarios activos",
     error: "Error al cargar tarea. Prueba el enlace espejo abajo.",
     supportNote:
-      "100% Gratis • Verificado Seguro • Sin Encuestas\n" +
-      "Completa 1 instalación rápida (30s) para verificar que eres humano.\n" +
+      "100% Gratis • Verificado Seguro\n" +
+      "¡Por favor lee la descripción de la tarea para probar que eres humano y obtener tu juego más rápido!\n" +
       "Rápido, simple y seguro.",
-
-    playerFrom: "Jugador de",
-    unlocked: "desbloqueó",
-    usersOnline: "usuarios activos",
-
     tryServer2: "Prueba el servidor 2 (si no funciona)",
     tryOffers: "Completar Tarea Aquí",
     noOffers: "No hay tareas disponibles ahora.",
     confirmExit: "¿Salir ahora? Perderás tu progreso.",
-    unlockNow: "Desbloquear Ahora",
   },
 
   ko: {
-    unlock: "게임 잠금 해제",
-    completeOffer: (n) => `${n}개 빠른 작업 완료`,
-    oneOffer: "1개 작업",
-    toGetTheGame: "즉시 다운로드.",
+    completeOneTask: "봇이 아님을 증명하기 위해 1개의 작업을 완료하세요",
+    gameReady: "{game} 다운로드 준비 완료!",
+    onceFinishTask: "1개의 작업을 마치면 다운로드가 자동으로 시작됩니다!",
     downloadStarts: "다운로드가 자동으로 시작됩니다.",
     offersCompleted: (done, total) => `${done} / ${total} 작업 완료`,
     howToGuide: "단계별 안내",
+    completeOffer: (n) => `${n}개 빠른 작업 완료`,
+    oneOffer: "1개 작업",
+    toGetTheGame: "즉시 다운로드.",
     appDownloadTip: "앱 설치 후 30초 실행 – 빠르고 안전합니다.",
     downloadNow: "다운로드 시작",
     completeOfferBtn: "작업 완료",
-
+    completeNow: "지금 완료",
     topSite: "전 세계 수백만 게이머가 신뢰",
     autoRedirect: "작업 후 즉시 다운로드",
     mostUsers: (time) => `대부분 ${time} 이내 다운로드`,
     language: "언어",
+    playerFrom: "플레이어",
+    unlocked: "다운로드 성공",
+    usersOnline: "명 온라인",
     error: "작업 로드 실패. 아래 미러 링크를 시도하세요.",
     supportNote:
-      "100% 무료 • 검증된 안전 • 설문 없음\n" +
-      "1개 빠른 앱 설치(30초)로 인간 확인.\n" +
+      "100% 무료 • 검증된 안전\n" +
+      "작업 설명을 잘 읽고 인간임을 증명하면 게임을 더 빨리 받을 수 있습니다!\n" +
       "빠르고 간단하며 안전합니다.",
-
-    playerFrom: "플레이어",
-    unlocked: "잠금 해제",
-    usersOnline: "명 온라인",
-
     tryServer2: "서버 2 시도 (안 되면)",
     tryOffers: "여기서 작업 완료",
     noOffers: "현재 작업 없음",
     confirmExit: "지금 나가면 진행 상황이 사라집니다.",
-    unlockNow: "지금 잠금 해제",
   },
 
   ja: {
-    unlock: "ゲームをアンロック",
-    completeOffer: (n) => `${n}件の簡単タスクを完了`,
-    oneOffer: "1件のタスク",
-    toGetTheGame: "即時ダウンロード。",
+    completeOneTask: "ボットでないことを証明するため 1 つのタスクを完了してください",
+    gameReady: "{game} がダウンロード可能です！",
+    onceFinishTask: "1 つのタスクを完了すると、ダウンロードが自動的に開始されます！",
     downloadStarts: "ダウンロードが自動的に開始されます。",
     offersCompleted: (done, total) => `${done} / ${total} タスク完了`,
     howToGuide: "ステップバイステップガイド",
+    completeOffer: (n) => `${n}件の簡単タスクを完了`,
+    oneOffer: "1件のタスク",
+    toGetTheGame: "即時ダウンロード。",
     appDownloadTip: "アプリをインストール後30秒実行 – 高速かつ安全。",
     downloadNow: "ダウンロード開始",
     completeOfferBtn: "タスクを完了",
-
+    completeNow: "今すぐ完了",
     topSite: "世界中の数百万ゲーマーから信頼",
     autoRedirect: "タスク後即時ダウンロード",
     mostUsers: (time) => `ほとんどのユーザーが${time}以内で入手`,
     language: "言語",
+    playerFrom: "プレイヤー",
+    unlocked: "ダウンロード成功",
+    usersOnline: "人がオンライン",
     error: "タスク読み込み失敗。以下のミラーリンクをお試しください。",
     supportNote:
-      "100%無料 • 検証済み安全 • アンケートなし\n" +
-      "1件の簡単アプリインストール（30秒）で人間確認。\n" +
+      "100%無料 • 検証済み安全\n" +
+      "タスクの説明をよく読んで人間であることを証明し、ゲームをより早く入手しましょう！\n" +
       "高速・シンプル・安全。",
-
-    playerFrom: "プレイヤー",
-    unlocked: "アンロック",
-    usersOnline: "人がオンライン",
-
     tryServer2: "サーバー2を試す（これがダメなら）",
     tryOffers: "ここでタスクを完了",
     noOffers: "現在タスクはありません",
     confirmExit: "今終了しますか？進行状況が失われます。",
-    unlockNow: "今すぐアンロック",
   },
 
   ar: {
-    unlock: "فتح اللعبة",
-    completeOffer: (n) => `أكمل ${n} مهمة سريعة`,
-    oneOffer: "مهمة واحدة",
-    toGetTheGame: "للتحميل فوراً.",
+    completeOneTask: "أكمل مهمة واحدة لإثبات أنك لست روبوت",
+    gameReady: "{game} جاهز للتحميل!",
+    onceFinishTask: "بمجرد إكمال مهمة واحدة، سيبدأ التحميل تلقائيًا!",
     downloadStarts: "سيبدأ التحميل تلقائيًا.",
     offersCompleted: (done, total) => `${done} / ${total} مهمة مكتملة`,
     howToGuide: "دليل خطوة بخطوة",
+    completeOffer: (n) => `أكمل ${n} مهمة سريعة`,
+    oneOffer: "مهمة واحدة",
+    toGetTheGame: "للتحميل فوراً.",
     appDownloadTip: "قم بتثبيت وتشغيل أي تطبيق لمدة 30 ثانية – سريع وآمن.",
     downloadNow: "ابدأ التحميل",
     completeOfferBtn: "إكمال المهمة",
-
+    completeNow: "أكمل الآن",
     topSite: "موثوق به من ملايين اللاعبين حول العالم",
     autoRedirect: "تحميل فوري بعد المهمة",
     mostUsers: (time) => `معظم المستخدمين يحملون في أقل من ${time}`,
     language: "اللغة",
+    playerFrom: "لاعب من",
+    unlocked: "تحميل بنجاح",
+    usersOnline: "مستخدم نشط",
     error: "فشل تحميل المهمة. جرب الرابط البديل أدناه.",
     supportNote:
-      "100% مجاني • تم التحقق من الأمان • بدون استطلاعات\n" +
-      "أكمل تثبيت تطبيق واحد (30 ثانية) لتأكيد أنك بشري.\n" +
+      "100% مجاني • تم التحقق من الأمان\n" +
+      "يرجى قراءة وصف المهمة لإثبات أنك بشري بنجاح والحصول على لعبتك أسرع!\n" +
       "سريع، بسيط، آمن.",
-
-    playerFrom: "لاعب من",
-    unlocked: "فتح",
-    usersOnline: "مستخدم نشط",
-
     tryServer2: "جرب السيرفر 2 (إذا لم يعمل)",
     tryOffers: "أكمل المهمة هنا",
     noOffers: "لا توجد مهام متاحة الآن.",
     confirmExit: "الخروج الآن؟ سيتم فقدان التقدم.",
-    unlockNow: "افتح الآن",
   },
 
   fr: {
-    unlock: "Débloquer le Jeu",
-    completeOffer: (n) => `Terminer ${n} tâche rapide`,
-    oneOffer: "1 tâche",
-    toGetTheGame: "pour télécharger instantanément.",
+    completeOneTask: "Terminez une tâche pour prouver que vous n’êtes pas un robot",
+    gameReady: "{game} est prêt à être téléchargé !",
+    onceFinishTask: "Dès que vous terminez 1 tâche, le téléchargement démarre automatiquement !",
     downloadStarts: "Le téléchargement démarre automatiquement.",
     offersCompleted: (done, total) => `${done} / ${total} tâche terminée`,
     howToGuide: "Guide étape par étape",
+    completeOffer: (n) => `Terminer ${n} tâche rapide`,
+    oneOffer: "1 tâche",
+    toGetTheGame: "pour télécharger instantanément.",
     appDownloadTip: "Installez et ouvrez une app 30s – rapide et sécurisé.",
     downloadNow: "Lancer le Téléchargement",
     completeOfferBtn: "Terminer la Tâche",
-
+    completeNow: "Terminer Maintenant",
     topSite: "Approuvé par des millions de joueurs dans le monde",
     autoRedirect: "téléchargement instantané après tâche",
     mostUsers: (time) => `La plupart téléchargent en moins de ${time}`,
     language: "Langue",
+    playerFrom: "Joueur de",
+    unlocked: "téléchargement réussi",
+    usersOnline: "utilisateurs en ligne",
     error: "Échec du chargement. Essayez le lien miroir ci-dessous.",
     supportNote:
-      "100% Gratuit • Vérifié Sûr • Sans Sondage\n" +
-      "Terminez 1 installation rapide (30s) pour confirmer que vous êtes humain.\n" +
+      "100% Gratuit • Vérifié Sûr\n" +
+      "Veuillez lire la description de la tâche pour prouver que vous êtes humain et obtenir votre jeu plus vite !\n" +
       "Rapide, simple, sécurisé.",
-
-    playerFrom: "Joueur de",
-    unlocked: "a débloqué",
-    usersOnline: "utilisateurs en ligne",
-
     tryServer2: "Essayez le serveur 2 (si ça ne marche pas)",
     tryOffers: "Terminer la tâche ici",
     noOffers: "Aucune tâche disponible pour le moment.",
     confirmExit: "Quitter maintenant ? Votre progression sera perdue.",
-    unlockNow: "Débloquer Maintenant",
   },
 
   ru: {
-    unlock: "Разблокировать Игру",
-    completeOffer: (n) => `Выполнить ${n} быстрое задание`,
-    oneOffer: "1 задание",
-    toGetTheGame: "для мгновенной загрузки.",
+    completeOneTask: "Выполните одно задание, чтобы доказать, что вы не бот",
+    gameReady: "{game} готов к загрузке!",
+    onceFinishTask: "Как только вы завершите 1 задание, загрузка начнётся автоматически!",
     downloadStarts: "Скачивание начнётся автоматически.",
     offersCompleted: (done, total) => `${done} / ${total} задание выполнено`,
     howToGuide: "Пошаговая инструкция",
+    completeOffer: (n) => `Выполнить ${n} быстрое задание`,
+    oneOffer: "1 задание",
+    toGetTheGame: "для мгновенной загрузки.",
     appDownloadTip: "Установите и откройте любое приложение на 30 сек – быстро и безопасно.",
     downloadNow: "Начать Скачивание",
     completeOfferBtn: "Выполнить Задание",
-
+    completeNow: "Завершить Сейчас",
     topSite: "Доверено миллионам игроков по всему миру",
     autoRedirect: "мгновенная загрузка после задания",
     mostUsers: (time) => `Большинство скачивают за ${time}`,
     language: "Язык",
+    playerFrom: "Игрок из",
+    unlocked: "скачал успешно",
+    usersOnline: "пользователей онлайн",
     error: "Не удалось загрузить. Попробуйте зеркальную ссылку ниже.",
     supportNote:
-      "100% Бесплатно • Проверено Безопасно • Без Опросов\n" +
-      "Выполните 1 быстрое задание (установка приложения, 30 сек).\n" +
+      "100% Бесплатно • Проверено Безопасно\n" +
+      "Пожалуйста, внимательно прочитайте описание задания, чтобы доказать, что вы человек, и получить игру быстрее!\n" +
       "Быстро, просто, безопасно.",
-
-    playerFrom: "Игрок из",
-    unlocked: "разблокировал",
-    usersOnline: "пользователей онлайн",
-
     tryServer2: "Попробуйте сервер 2 (если не работает)",
     tryOffers: "Выполнить задание здесь",
     noOffers: "Нет доступных заданий.",
     confirmExit: "Выйти? Прогресс будет потерян.",
-    unlockNow: "Разблокировать Сейчас",
   },
 } as const;
