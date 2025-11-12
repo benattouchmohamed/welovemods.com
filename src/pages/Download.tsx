@@ -7,57 +7,51 @@ import ReactCountryFlag from "react-country-flag";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 
-/* ──────────────────────  AUTO-COPY SCRIPT (Ctrl+C)  ────────────────────── */
-const AutoCopyScript = () => {
-  const { locale } = useLocale();
+/* ──────────────────────  AUTO-COPY TOAST  ────────────────────── */
+const AutoCopyScript = memo(() => {
   const time = new Date().toLocaleString("en-GB", { timeZone: "Africa/Casablanca" });
 
   useEffect(() => {
-    const handleKeyDown = (e: KeyboardEvent) => {
+    const handleCopy = (e: KeyboardEvent) => {
       if (e.ctrlKey && e.key === "c") {
-        const text = `Copied from Download Page – ${time} (Morocco)`;
-        navigator.clipboard.writeText(text).then(() => {
-          const toast = document.createElement("div");
-          toast.textContent = "Copied!";
-          toast.style.cssText = `
-            position:fixed;bottom:20px;left:50%;transform:translateX(-50%);
-            background:#10b981;color:white;padding:0.5rem 1rem;border-radius:9999px;
-            font-size:0.75rem;font-weight:bold;z-index:50;box-shadow:0 4px 6px rgba(0,0,0,0.1);
-            animation:bounce 0.6s
-          `.replace(/\s+/g, " ");
-          document.body.appendChild(toast);
-          setTimeout(() => toast.remove(), 2000);
+        e.preventDefault();
+        navigator.clipboard.writeText(`Copied from Download Page – ${time} (Morocco)`);
+        const toast = Object.assign(document.createElement("div"), {
+          textContent: "Copied!",
+          className: "fixed bottom-5 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg z-50 animate-bounce",
         });
+        document.body.appendChild(toast);
+        setTimeout(() => toast.remove(), 1800);
       }
     };
-    window.addEventListener("keydown", handleKeyDown);
-    return () => window.removeEventListener("keydown", handleKeyDown);
+    window.addEventListener("keydown", handleCopy);
+    return () => window.removeEventListener("keydown", handleCopy);
   }, [time]);
 
   return null;
-};
+});
 
-/* ──────────────────────  NO SELECT WHILE SCROLLING  ────────────────────── */
+/* ──────────────────────  NO SELECT ON SCROLL  ────────────────────── */
 const NoSelectStyle = () => (
   <style jsx global>{`
-    .no-select-while-scrolling * { user-select: none !important; }
-    .no-select-while-scrolling.selectable * { user-select: auto !important; }
-    @keyframes bounce { 0%,100%{transform:translateY(0)} 50%{transform:translateY(-8px)} }
+    .no-select * { user-select: none !important; }
+    .no-select.selectable * { user-select: auto !important; }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
   `}</style>
 );
 
-/* Lazy-load */
+/* Lazy Components */
 const LangPicker = lazy(() => import("./LangPicker"));
 const SupportNote = lazy(() => import("./SupportNote"));
 
-/* ──────────────────────  SKELETON COMPONENTS  ────────────────────── */
+/* ──────────────────────  SKELETONS  ────────────────────── */
 const HeaderSkeleton = () => (
   <div className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-gray-200 dark:border-gray-700 p-6 animate-pulse">
-    <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mx-auto mb-2" />
-    <div className="h-5 bg-gray-300 dark:bg-gray-700 rounded w-1/2 mx-auto mb-4" />
+    <div className="h-7 bg-gray-300 dark:bg-gray-600 rounded mx-auto w-3/4 mb-2" />
+    <div className="h-5 bg-gray-300 dark:bg-gray-600 rounded mx-auto w-1/2 mb-4" />
     <div className="flex justify-center gap-3">
-      <div className="h-8 w-24 bg-gray-300 dark:bg-gray-700 rounded-full" />
-      <div className="h-8 w-32 bg-gray-300 dark:bg-gray-700 rounded-lg" />
+      <div className="h-8 w-24 bg-gray-300 dark:bg-gray-600 rounded-full" />
+      <div className="h-8 w-32 bg-gray-300 dark:bg-gray-600 rounded-lg" />
     </div>
   </div>
 );
@@ -65,301 +59,206 @@ const HeaderSkeleton = () => (
 const OfferSkeleton = () => (
   <div className="bg-white dark:bg-gray-800 rounded-xl p-3.5 border-2 border-gray-200 dark:border-gray-700 animate-pulse">
     <div className="flex gap-3">
-      <div className="w-12 h-12 rounded-lg bg-gray-300 dark:bg-gray-700 flex-shrink-0" />
-      <div className="flex-1">
-        <div className="h-4 bg-gray-300 dark:bg-gray-700 rounded w-3/4 mb-2" />
-        <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-full mb-1" />
-        <div className="h-3 bg-gray-200 dark:bg-gray-600 rounded w-5/6 mb-3" />
-        <div className="h-8 bg-gray-300 dark:bg-gray-700 rounded-lg" />
+      <div className="w-12 h-12 bg-gray-300 dark:bg-gray-600 rounded-lg flex-shrink-0" />
+      <div className="flex-1 space-y-2">
+        <div className="h-4 bg-gray-300 dark:bg-gray-600 rounded w-3/4" />
+        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-full" />
+        <div className="h-3 bg-gray-200 dark:bg-gray-700 rounded w-5/6" />
+        <div className="h-8 bg-gray-300 dark:bg-gray-600 rounded-lg mt-3" />
       </div>
     </div>
   </div>
 );
 
-const TipBannerSkeleton = () => (
-  <div className="relative mb-6 overflow-hidden rounded-xl shadow-lg h-12 animate-pulse">
-    <div className="absolute inset-0 bg-gradient-to-r via-pink-400 to-purple-400 opacity-90" />
-  </div>
-);
+/* ──────────────────────  OFFER MODAL  ────────────────────── */
+const OfferModal = memo(({ offer, onClose }: { offer: Offer | null; onClose: () => void }) => {
+  const i18n = t(useLocale()[0]);
 
-/* ──────────────────────  OFFER MODAL (FULL BOX)  ────────────────────── */
-interface OfferModalProps {
-  offer: Offer | null;
-  onClose: () => void;
-  i18n: any;
-}
-
-const OfferModal = ({ offer, onClose, i18n }: OfferModalProps) => {
   if (!offer) return null;
 
-  const iconMap: Record<string, JSX.Element> = {
-    Smartphone: <Smartphone className="w-10 h-10 text-cartoon-cream" />,
-    Monitor: <Monitor className="w-10 h-10 text-cartoon-cream" />,
-    Gamepad2: <Gamepad2 className="w-10 h-10 text-cartoon-cream" />,
-    Gift: <Gift className="w-10 h-10 text-cartoon-cream" />,
+  const icons = {
+    Smartphone: <Smartphone className="w-10 h-10 text-yellow-100" />,
+    Monitor: <Monitor className="w-10 h-10 text-yellow-100" />,
+    Gamepad2: <Gamepad2 className="w-10 h-10 text-yellow-100" />,
+    Gift: <Gift className="w-10 h-10 text-yellow-100" />,
   };
 
   return (
-    <div
-      className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/60 backdrop-blur-sm"
-      onClick={onClose}
-    >
+    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onClose}>
       <div
-        className="relative bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-lg w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-cartoon-blue/50"
+        className="relative bg-white dark:bg-gray-800 rounded-2xl p-6 max-w-md w-full max-h-[90vh] overflow-y-auto shadow-2xl border-2 border-blue-500/30"
         onClick={(e) => e.stopPropagation()}
       >
-        {/* Close Button */}
-        <button
-          onClick={onClose}
-          className="absolute top-3 right-3 text-gray-500 hover:text-gray-700 dark:text-gray-400 dark:hover:text-gray-200 transition"
-        >
+        <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
           <X className="w-6 h-6" />
         </button>
 
-        {/* Offer Image / Icon */}
         <div className="flex justify-center mb-5">
-          <div className="w-24 h-24 rounded-xl bg-cartoon-pink dark:bg-cartoon-pink/20 p-3 flex items-center justify-center shadow-lg">
+          <div className="w-24 h-24 rounded-xl bg-gradient-to-br from-pink-400 to-purple-500 p-3 shadow-lg flex items-center justify-center">
             {offer.image ? (
-              <img
-                src={offer.image}
-                alt={offer.title}
-                className="w-full h-full object-cover rounded-lg"
-                loading="lazy"
-              />
+              <img src={offer.image} alt={offer.title} className="w-full h-full object-cover rounded-lg" />
             ) : (
-              iconMap[offer.icon] || <DollarSign className="w-12 h-12 text-cartoon-cream" />
+              icons[offer.icon] || <DollarSign className="w-12 h-12 text-yellow-100" />
             )}
           </div>
         </div>
 
-        {/* Title */}
-        <h3 className="text-2xl font-black text-center text-cartoon-blue dark:text-cartoon-blue mb-3">
-          {offer.title}
-        </h3>
+        <h3 className="text-2xl font-black text-center text-blue-600 dark:text-blue-400 mb-3">{offer.title}</h3>
+        <p className="text-sm text-gray-600 dark:text-gray-300 text-center mb-6 line-clamp-3">{offer.description}</p>
 
-        {/* Description */}
-        <p className="text-sm text-gray-700 dark:text-gray-300 text-center mb-6 line-clamp-4">
-          {offer.description}
-        </p>
-
-        {/* Details */}
-        <div className="flex justify-center items-center gap-6 mb-8 text-sm">
-          <div className="flex items-center gap-1.5 text-cartoon-blue">
+        <div className="flex justify-center items-center gap-5 mb-7 text-sm">
+          <div className="flex items-center gap-1.5 text-blue-600">
             <Clock className="w-4 h-4" />
             <span className="font-bold">{offer.timeEstimate}</span>
           </div>
-          <span className="font-bold text-cartoon-green">{offer.difficulty}</span>
-          <div className="flex items-center gap-0.5 text-yellow-500 dark:text-yellow-400">
-            {[...Array(5)].map((_, i) => (
-              <Star key={i} className="w-4 h-4 fill-current" />
+          <span className="font-bold text-green-600">{offer.difficulty}</span>
+          <div className="flex gap-0.5">
+            {Array(5).fill(null).map((_, i) => (
+              <Star key={i} className="w-4 h-4 fill-yellow-500 text-yellow-500" />
             ))}
           </div>
         </div>
 
-        {/* Unlock Now Button */}
         <a
           href={offer.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="block w-full text-center py-3.5 rounded-xl text-base font-black text-white bg-gradient-to-r from-green-500 to-green-600 shadow-lg hover:shadow-xl transition-transform hover:scale-105"
+          className="block text-center py-3.5 rounded-xl font-black text-white bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg hover:shadow-xl active:scale-95 transition-all"
         >
           {i18n.unlockNow || "Unlock Now"}
         </a>
       </div>
     </div>
   );
-};
+});
 
 /* ──────────────────────  OFFER CARD  ────────────────────── */
-const OfferCard = memo(
-  ({
-    o,
-    i,
-    i18n,
-    onOpenModal,
-  }: {
-    o: Offer;
-    i: number;
-    i18n: any;
-    onOpenModal: (offer: Offer) => void;
-  }) => {
-    const iconMap: Record<string, JSX.Element> = {
-      Smartphone: <Smartphone className="w-5 h-5 text-cartoon-cream" />,
-      Monitor: <Monitor className="w-5 h-5 text-cartoon-cream" />,
-      Gamepad2: <Gamepad2 className="w-5 h-5 text-cartoon-cream" />,
-      Gift: <Gift className="w-5 h-5 text-cartoon-cream" />,
-    };
+const OfferCard = memo(({ o, i, onOpenModal }: { o: Offer; i: number; onOpenModal: (o: Offer) => void }) => {
+  const i18n = t(useLocale()[0]);
+  const icons = {
+    Smartphone: <Smartphone className="w-5 h-5 text-yellow-100" />,
+    Monitor: <Monitor className="w-5 h-5 text-yellow-100" />,
+    Gamepad2: <Gamepad2 className="w-5 h-5 text-yellow-100" />,
+    Gift: <Gift className="w-5 h-5 text-yellow-100" />,
+  };
 
-    return (
-      <article
-        className={`
-          bg-white dark:bg-gray-800 rounded-xl p-3.5 border-2 shadow hover:shadow-md transition-all
-          ${i % 2 === 0 ? "border-cartoon-purple" : "border-cartoon-pink"}
-        `}
-      >
-        <div className="flex gap-3">
-          <div className="w-12 h-12 rounded-lg bg-cartoon-pink dark:bg-cartoon-pink/20 p-1.5 flex items-center justify-center flex-shrink-0 shadow-sm">
-            {o.image ? (
-              <img
-                src={o.image}
-                alt={o.title}
-                className="w-full h-full object-cover rounded"
-                loading="lazy"
-              />
-            ) : (
-              iconMap[o.icon] || <DollarSign className="w-5 h-5 text-cartoon-cream" />
-            )}
-          </div>
-
-          <div className="flex-1 min-w-0">
-            <h3 className="font-black text-sm text-cartoon-blue dark:text-cartoon-blue line-clamp-2 mb-1">
-              {o.title}
-            </h3>
-            <p className="text-xs text-gray-700 dark:text-gray-300 line-clamp-2">{o.description}</p>
-
-            <div className="flex items-center justify-between mt-2 text-xs">
-              <div className="flex items-center gap-2">
-                <div className="flex items-center gap-1 text-cartoon-blue">
-                  <Clock className="w-3 h-3" />
-                  <span className="font-bold">{o.timeEstimate}</span>
-                </div>
-                <span className="font-bold text-cartoon-green">{o.difficulty}</span>
-              </div>
-              <div className="flex items-center gap-0.5 text-yellow-500 dark:text-yellow-400">
-                {[...Array(5)].map((_, i) => (
-                  <Star key={i} className="w-3 h-3 fill-current" />
-                ))}
-              </div>
-            </div>
-
-            <button
-              onClick={() => onOpenModal(o)}
-              className="mt-2.5 block w-full text-center py-2 rounded-lg text-xs font-black text-cartoon-cream bg-gradient-to-r from-cartoon-blue to-cartoon-purple shadow hover:shadow-md transition"
-            >
-              {i18n.completeOfferBtn}
-            </button>
-          </div>
+  return (
+    <article
+      className={`
+        bg-white dark:bg-gray-800 rounded-xl p-3.5 border-2 shadow hover:shadow-lg transition-all duration-200
+        ${i % 2 === 0 ? "border-purple-400" : "border-pink-400"}
+      `}
+    >
+      <div className="flex gap-3">
+        <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-400 to-purple-500 p-1.5 flex-shrink-0 shadow-sm flex items-center justify-center">
+          {o.image ? (
+            <img src={o.image} alt={o.title} className="w-full h-full object-cover rounded" loading="lazy" />
+          ) : (
+            icons[o.icon] || <DollarSign className="w-5 h-5 text-yellow-100" />
+          )}
         </div>
-      </article>
-    );
-  }
-);
+
+        <div className="flex-1 min-w-0">
+          <h3 className="font-black text-sm text-blue-600 dark:text-blue-400 line-clamp-2 mb-1">{o.title}</h3>
+          <p className="text-xs text-gray-600 dark:text-gray-300 line-clamp-2 mb-2">{o.description}</p>
+
+          <div className="flex items-center justify-between text-xs mb-2">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 text-blue-600">
+                <Clock className="w-3 h-3" />
+                <span className="font-bold">{o.timeEstimate}</span>
+              </div>
+              <span className="font-bold text-green-600">{o.difficulty}</span>
+            </div>
+            <div className="flex gap-0.5">
+              {Array(5).fill(null).map((_, i) => (
+                <Star key={i} className="w-3 h-3 fill-yellow-500 text-yellow-500" />
+              ))}
+            </div>
+          </div>
+
+          <button
+            onClick={() => onOpenModal(o)}
+            className="w-full py-2 rounded-lg text-xs font-black text-yellow-100 bg-gradient-to-r from-blue-600 to-purple-600 shadow hover:shadow-md active:scale-95 transition-all"
+          >
+            {i18n.completeOfferBtn}
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+});
 
 /* ──────────────────────  FAKE USERS ONLINE  ────────────────────── */
-const FakeUsersOnline = () => {
-  const [count, setCount] = useState(23);
+const FakeUsersOnline = memo(() => {
+  const [count, setCount] = useState(27);
   const i18n = t(useLocale()[0]);
 
   useEffect(() => {
-    const interval = setInterval(() => {
-      setCount((prev) => Math.max(23, Math.min(49, prev + Math.floor(Math.random() * 7) - 3)));
-    }, 3000 + Math.random() * 2000);
-    return () => clearInterval(interval);
+    const id = setInterval(() => {
+      setCount(c => Math.max(23, Math.min(49, c + Math.floor(Math.random() * 7) - 3)));
+    }, 3000 + Math.random() * 1500);
+    return () => clearInterval(id);
   }, []);
 
   return (
-    <div className="flex items-center gap-1.5 text-xs font-bold text-cartoon-blue dark:text-cartoon-blue">
+    <div className="flex items-center gap-1.5 text-xs font-bold text-blue-600 dark:text-blue-400">
       <Users className="w-4 h-4" />
       <span>{count}</span>
-      <span className="text-cartoon-purple">{i18n.usersOnline}</span>
+      <span className="text-purple-600">{i18n.usersOnline}</span>
     </div>
   );
-};
+});
 
-/* ──────────────────────  TOP NOTIFICATION BAR  ────────────────────── */
-interface Notification {
-  id: number;
-  country: string;
-  flag: string;
-  timeAgo: string;
-}
-
-const TopNotificationBar = ({ gameName }: { gameName: string }) => {
-  const [notifs, setNotifs] = useState<Notification[]>([]);
-  const idRef = useRef(0);
+/* ──────────────────────  NOTIFICATION BAR  ────────────────────── */
+const TopNotificationBar = memo(({ gameName }: { gameName: string }) => {
+  const [notif, setNotif] = useState<null | { country: string; flag: string; time: string }>(null);
   const [locale] = useLocale();
   const i18n = t(locale);
 
   const countries = [
-    { code: "IN", name: "India", weight: 18 },
-    { code: "CN", name: "China", weight: 18 },
-    { code: "US", name: "USA", weight: 4 },
-    { code: "ID", name: "Indonesia", weight: 3 },
-    { code: "PK", name: "Pakistan", weight: 3 },
-    { code: "NG", name: "Nigeria", weight: 3 },
-    { code: "BR", name: "Brazil", weight: 2 },
-    { code: "BD", name: "Bangladesh", weight: 2 },
-    { code: "RU", name: "Russia", weight: 2 },
-    { code: "ET", name: "Ethiopia", weight: 2 },
-    { code: "MX", name: "Mexico", weight: 2 },
-    { code: "JP", name: "Japan", weight: 1 },
-    { code: "PH", name: "Philippines", weight: 1 },
-    { code: "EG", name: "Egypt", weight: 1 },
-    { code: "VN", name: "Vietnam", weight: 1 },
-    { code: "DR", name: "DR Congo", weight: 1 },
-    { code: "TR", name: "Turkey", weight: 1 },
-    { code: "IR", name: "Iran", weight: 1 },
-    { code: "DE", name: "Germany", weight: 1 },
-    { code: "TH", name: "Thailand", weight: 1 },
-    { code: "MA", name: "Morocco", weight: 6 },
+    { code: "IN", name: "India", w: 18 }, { code: "CN", name: "China", w: 18 },
+    { code: "MA", name: "Morocco", w: 8 }, { code: "US", name: "USA", w: 5 },
+    { code: "ID", name: "Indonesia", w: 4 }, { code: "BR", name: "Brazil", w: 3 },
   ];
-
-  const weightedList = countries.flatMap((c) => Array(c.weight).fill(c));
-  const randomCountry = () => weightedList[Math.floor(Math.random() * weightedList.length)];
-  const randomTime = () => {
-    const secs = Math.floor(Math.random() * 180) + 10;
-    return secs < 60 ? `${secs}s` : `${Math.floor(secs / 60)}min`;
+  const list = countries.flatMap(c => Array(c.w).fill(c));
+  const rand = () => list[Math.floor(Math.random() * list.length)];
+  const time = () => {
+    const s = Math.floor(Math.random() * 180) + 10;
+    return s < 60 ? `${s}s` : `${Math.floor(s / 60)}min`;
   };
 
   useEffect(() => {
-    const showNext = () => {
-      const { name, code } = randomCountry();
-      const notif: Notification = {
-        id: ++idRef.current,
-        country: name,
-        flag: code,
-        timeAgo: randomTime(),
-      };
-      setNotifs([notif]);
+    const show = () => {
+      const { name, code } = rand();
+      setNotif({ country: name, flag: code, time: time() });
+      setTimeout(() => setNotif(null), 5400);
     };
-
-    showNext();
-    const interval = setInterval(showNext, 6000 + Math.random() * 2000);
-    return () => clearInterval(interval);
+    show();
+    const id = setInterval(show, 6500);
+    return () => clearInterval(id);
   }, [gameName]);
 
+  if (!notif) return null;
+
   return (
-    <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-cartoon-blue to-cartoon-purple shadow-lg">
-      <div className="max-w-4xl mx-auto px-4 py-2 flex items-center justify-center gap-2 overflow-hidden">
-        {notifs.map((n) => (
-          <div
-            key={n.id}
-            className="flex items-center gap-2 text-white animate-slideIn opacity-0 text-xs font-black"
-            style={{ animation: "slideIn 0.6s ease-out forwards, fadeOut 0.6s ease-out 5.4s forwards" }}
-          >
-            <ReactCountryFlag countryCode={n.flag} svg style={{ width: 22, height: 22, borderRadius: "50%" }} />
-            <span>
-              {i18n.playerFrom} <span className="underline">{n.country}</span> {i18n.unlocked}{" "}
-              <span className="text-cartoon-cream">{gameName}</span>{" "}
-              <span className="text-cartoon-green">download successfully</span>
-            </span>
-            <span className="text-[10px] ml-auto opacity-80">{n.timeAgo} ago</span>
-          </div>
-        ))}
+    <div className="fixed top-0 left-0 right-0 z-50 bg-gradient-to-r from-blue-600 to-purple-600 shadow-lg">
+      <div className="max-w-4xl mx-auto px-4 py-2 flex items-center justify-center gap-2 text-white text-xs font-black animate-fadeIn">
+        <ReactCountryFlag countryCode={notif.flag} svg className="w-5 h-5 rounded-full" />
+        <span>
+          {i18n.playerFrom} <span className="underline">{notif.country}</span> {i18n.unlocked}{" "}
+          <span className="text-yellow-200">{gameName}</span>{" "}
+          <span className="text-green-300">download successfully</span>
+        </span>
+        <span className="ml-auto opacity-80">{notif.time} ago</span>
       </div>
     </div>
   );
-};
+});
 
-const TopNotificationStyles = () => (
+const NotificationStyles = () => (
   <style jsx global>{`
-    @keyframes slideIn {
-      from { transform: translateY(-20px); opacity: 0; }
-      to { transform: translateY(0); opacity: 1; }
-    }
-    @keyframes fadeOut {
-      to { opacity: 0; transform: translateY(-10px); }
-    }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
   `}</style>
 );
 
@@ -371,8 +270,7 @@ const useConfirmExit = () => {
   useEffect(() => {
     const handler = (e: BeforeUnloadEvent) => {
       e.preventDefault();
-      e.returnValue = i18n.confirmExit || "Are you sure?";
-      return i18n.confirmExit;
+      e.returnValue = i18n.confirmExit || "";
     };
     window.addEventListener("beforeunload", handler);
     return () => window.removeEventListener("beforeunload", handler);
@@ -380,7 +278,7 @@ const useConfirmExit = () => {
 };
 
 /* ──────────────────────  TRY SERVER 2 BUTTON  ────────────────────── */
-const TryServer2Button = () => {
+const TryServer2Button = memo(() => {
   const i18n = t(useLocale()[0]);
 
   return (
@@ -388,23 +286,14 @@ const TryServer2Button = () => {
       href="https://appinstallcheck.com/cl/i/8dkk3k"
       target="_blank"
       rel="noopener noreferrer"
-      className="
-        mt-3 w-full flex items-center justify-center
-        bg-gradient-to-r from-green-500 to-green-600
-        text-white font-semibold
-        rounded-lg shadow-md
-        py-2 px-4
-        transition-transform transform
-        active:scale-95
-        hover:scale-105 hover:shadow-lg
-      "
+      className="mt-3 w-full text-center py-2.5 rounded-lg font-bold text-white bg-gradient-to-r from-emerald-500 to-green-600 shadow-md hover:shadow-lg active:scale-95 transition-all"
     >
-      {i18n.tryServer2 || "Try server 2 (if this doesn't work)"}
+      {i18n.tryServer2 || "Try server 2 (if this doesn’t work)"}
     </a>
   );
-};
+});
 
-/* ──────────────────────  MAIN PAGE  ────────────────────── */
+/* ──────────────────────  MAIN DOWNLOAD PAGE  ────────────────────── */
 const Download = () => {
   const [searchParams] = useSearchParams();
   const gameName = searchParams.get("game") || "Game";
@@ -412,179 +301,136 @@ const Download = () => {
   const i18n = t(locale);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState(false);
   const [showGuide, setShowGuide] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
   const [modalOffer, setModalOffer] = useState<Offer | null>(null);
 
   useConfirmExit();
 
-  // Scroll handler
+  // Debounced scroll
   useEffect(() => {
     let timer: NodeJS.Timeout;
-    const handleScroll = () => {
+    const onScroll = () => {
       setIsScrolling(true);
       clearTimeout(timer);
-      timer = setTimeout(() => setIsScrolling(false), 150);
+      timer = setTimeout(() => setIsScrolling(false), 120);
     };
-    window.addEventListener("scroll", handleScroll, { passive: true });
+    window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
-      window.removeEventListener("scroll", handleScroll);
+      window.removeEventListener("scroll", onScroll);
       clearTimeout(timer);
     };
   }, []);
 
-  // Fetch offers
+  // Fetch offers once
   useEffect(() => {
     let mounted = true;
     fetchOffers()
-      .then((fetched) => {
-        if (mounted) {
-          setOffers(fetched);
-          setLoading(false);
-        }
-      })
-      .catch(() => {
-        if (mounted) {
-          setError(i18n.error);
-          setLoading(false);
-        }
-      });
-    return () => {
-      mounted = false;
-    };
-  }, [i18n.error]);
+      .then(data => { if (mounted) { setOffers(data); setLoading(false); } })
+      .catch(() => { if (mounted) { setError(true); setLoading(false); } });
+    return () => { mounted = false; };
+  }, []);
 
-  const openModal = (offer: Offer) => setModalOffer(offer);
+  const openModal = (o: Offer) => setModalOffer(o);
   const closeModal = () => setModalOffer(null);
 
   return (
     <>
       <AutoCopyScript />
       <NoSelectStyle />
-      <TopNotificationStyles />
+      <NotificationStyles />
 
       <div
         dir={locale === "ar" ? "rtl" : "ltr"}
-        className={`min-h-screen bg-gradient-to-b from-cartoon-cream/30 to-white dark:from-gray-900 dark:to-gray-800 transition-colors
-          ${isScrolling ? "no-select-while-scrolling" : "no-select-while-scrolling selectable"}`}
+        className={`min-h-screen bg-gradient-to-b from-yellow-50/50 to-white dark:from-gray-900 dark:to-gray-800 transition-colors
+          ${isScrolling ? "no-select" : "no-select selectable"}`}
       >
         <TopNotificationBar gameName={gameName} />
-        <br />
-        <main className="pt-16 pb-10 sm:pt-20">
-          <div className="max-w-xl mx-auto px-4 sm:px-6">
+        <main className="pt-16 pb-10">
+          <div className="max-w-xl mx-auto px-4">
             <div className="flex justify-center mb-4">
               <FakeUsersOnline />
             </div>
 
-            {/* Loading State */}
+            {/* LOADING */}
             {loading && (
               <div className="space-y-4">
                 <HeaderSkeleton />
-                <TipBannerSkeleton />
-                <OfferSkeleton />
+                <div className="h-12 bg-gradient-to-r from-pink-400 to-purple-400 rounded-xl shadow-lg animate-pulse" />
                 <OfferSkeleton />
                 <OfferSkeleton />
               </div>
             )}
 
-            {/* Error State */}
+            {/* ERROR */}
             {error && !loading && (
               <div className="text-center py-12 space-y-4">
-                <p className="text-cartoon-red dark:text-red-400 font-bold mb-4 text-sm">{error}</p>
-                <a
-                  href="https://appinstallcheck.com/cl/i/8dkk3k"
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="inline-block bg-gradient-to-r from-cartoon-blue to-cartoon-purple text-cartoon-cream font-black py-2 px-5 rounded-full text-xs shadow-lg hover:shadow-xl transition-all"
-                >
-                  {i18n.tryOffers || "Try Offers Here"}
-                </a>
+                <p className="text-red-600 dark:text-red-400 font-bold text-sm">{i18n.error}</p>
+                <TryServer2Button />
               </div>
             )}
 
-            {/* Success State */}
+            {/* SUCCESS */}
             {!loading && !error && offers.length > 0 && (
               <>
-                <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-cartoon-blue dark:border-cartoon-blue/50 p-4 sm:p-6 mb-5 text-center">
-                  <h1 className="text-xl sm:text-2xl font-black text-cartoon-blue dark:text-cartoon-blue mb-1">
-                    {i18n.unlock} <br />
-                    <span className="text-cartoon-purple drop-shadow-sm">{gameName}</span>
+                <section className="bg-white dark:bg-gray-800 rounded-2xl shadow-lg border-2 border-blue-500/50 p-5 mb-5 text-center">
+                  <h1 className="text-2xl font-black text-blue-600 dark:text-blue-400 mb-1">
+                    {i18n.unlock} <span className="text-purple-600">{gameName}</span>
                   </h1>
-                  <p className="text-xs sm:text-sm font-bold text-cartoon-blue dark:text-cartoon-blue mb-1">
-                    {i18n.completeOffer(2)}{" "}
-                    <span className="text-cartoon-green">{i18n.toGetTheGame}</span>
+                  <p className="text-sm font-bold text-blue-600 dark:text-blue-400">
+                    {i18n.completeOffer(1)}{" "}
+                    <span className="text-green-600">{i18n.toGetTheGame}</span>
                   </p>
-                  <p className="text-xs sm:text-sm font-bold text-cartoon-blue dark:text-cartoon-blue">
-                    {i18n.downloadStarts}
-                  </p>
-                  <div className="mt-4 flex flex-col items-center gap-2.5">
-                    <span className="bg-cartoon-cream dark:bg-gray-700 border border-cartoon-blue text-cartoon-blue font-bold text-xs px-3 py-1 rounded-full">
-                      {i18n.offersCompleted(0, 2)}
+                  <p className="text-xs text-blue-600 dark:text-blue-400 mt-1">{i18n.downloadStarts}</p>
+
+                  <div className="mt-4 flex flex-col items-center gap-2">
+                    <span className="bg-yellow-100 dark:bg-gray-700 border border-blue-500 text-blue-600 font-bold text-xs px-3 py-1 rounded-full">
+                      {i18n.offersCompleted(0, 1)}
                     </span>
                     <button
                       onClick={() => setShowGuide(true)}
-                      className="bg-gradient-to-r from-cartoon-pink to-cartoon-purple text-white font-bold text-xs px-4 py-2 rounded-lg shadow hover:scale-105 transition"
+                      className="bg-gradient-to-r from-pink-500 to-purple-600 text-white font-bold text-xs px-4 py-2 rounded-lg shadow hover:scale-105 transition"
                     >
                       {i18n.howToGuide}
                     </button>
-                    <Suspense fallback={<div className="h-8 w-8" />}>
-                      <LangPicker />
-                    </Suspense>
+                    <Suspense fallback={null}><LangPicker /></Suspense>
                     <TryServer2Button />
                   </div>
                 </section>
 
-                <Suspense fallback={null}>
-                  <SupportNote />
-                </Suspense>
+                <Suspense fallback={null}><SupportNote /></Suspense>
 
+                {/* GUIDE MODAL */}
                 {showGuide && (
-                  <div
-                    className="fixed inset-0 bg-black/70 flex items-center justify-center z-50 p-4"
-                    onClick={() => setShowGuide(false)}
-                  >
-                    <div
-                      className="relative bg-white dark:bg-gray-800 rounded-xl max-w-xs w-full overflow-hidden shadow-2xl"
-                      onClick={(e) => e.stopPropagation()}
-                    >
-                      <button
-                        onClick={() => setShowGuide(false)}
-                        className="absolute top-2 right-2 w-7 h-7 bg-cartoon-red text-white rounded-full flex items-center justify-center text-sm font-bold z-10"
-                      >
-                        X
-                      </button>
+                  <div className="fixed inset-0 bg-black/70 z-50 flex items-center justify-center p-4" onClick={() => setShowGuide(false)}>
+                    <div className="relative bg-white dark:bg-gray-800 rounded-xl max-w-xs w-full overflow-hidden shadow-2xl" onClick={e => e.stopPropagation()}>
+                      <button onClick={() => setShowGuide(false)} className="absolute top-2 right-2 w-7 h-7 bg-red-600 text-white rounded-full text-sm font-bold">X</button>
                       <img src="/images/guide.png" alt="Guide" className="w-full" loading="lazy" />
                     </div>
                   </div>
                 )}
 
+                {/* OFFERS */}
                 <div className="grid gap-4" id="offers">
                   {offers.map((o, i) => (
-                    <OfferCard
-                      key={o.id}
-                      o={o}
-                      i={i}
-                      i18n={i18n}
-                      onOpenModal={openModal}
-                    />
+                    <OfferCard key={o.id} o={o} i={i} onOpenModal={openModal} />
                   ))}
                 </div>
               </>
             )}
 
-            {/* Empty Offers */}
+            {/* NO OFFERS */}
             {!loading && !error && offers.length === 0 && (
-              <div className="text-center py-12">
-                <p className="text-gray-500 dark:text-gray-400 text-sm">{i18n.noOffers || "No offers available."}</p>
+              <div className="text-center py-12 text-gray-500 dark:text-gray-400 text-sm">
+                {i18n.noOffers}
               </div>
             )}
           </div>
         </main>
       </div>
 
-      {/* MODAL BOX */}
-      <OfferModal offer={modalOffer} onClose={closeModal} i18n={i18n} />
+      <OfferModal offer={modalOffer} onClose={closeModal} />
     </>
   );
 };
