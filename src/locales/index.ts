@@ -62,7 +62,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
       "100% Free • Verified Safe\n" +
       "Please read the task description to prove you're human successfully and get your game faster!\n" +
       "We keep it fast, simple, and secure.",
-    tryServer2: "Try server 2 (if this doesn’t work)",
+    tryServer2: "server 2 ",
     tryOffers: "Complete Task Here",
     noOffers: "No tasks available at the moment.",
     confirmExit: "Leave now? Your progress will be lost.",
@@ -94,7 +94,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
       "100% Gratis • Verificado Seguro\n" +
       "¡Por favor lee la descripción de la tarea para probar que eres humano y obtener tu juego más rápido!\n" +
       "Rápido, simple y seguro.",
-    tryServer2: "Prueba el servidor 2 (si no funciona)",
+    tryServer2: "servidor 2",
     tryOffers: "Completar Tarea Aquí",
     noOffers: "No hay tareas disponibles ahora.",
     confirmExit: "¿Salir ahora? Perderás tu progreso.",
@@ -126,7 +126,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
       "100% 무료 • 검증된 안전\n" +
       "작업 설명을 잘 읽고 인간임을 증명하면 게임을 더 빨리 받을 수 있습니다!\n" +
       "빠르고 간단하며 안전합니다.",
-    tryServer2: "서버 2 시도 (안 되면)",
+    tryServer2: "서버 2",
     tryOffers: "여기서 작업 완료",
     noOffers: "현재 작업 없음",
     confirmExit: "지금 나가면 진행 상황이 사라집니다.",
@@ -158,7 +158,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
       "100%無料 • 検証済み安全\n" +
       "タスクの説明をよく読んで人間であることを証明し、ゲームをより早く入手しましょう！\n" +
       "高速・シンプル・安全。",
-    tryServer2: "サーバー2を試す（これがダメなら）",
+    tryServer2: "サーバー2",
     tryOffers: "ここでタスクを完了",
     noOffers: "現在タスクはありません",
     confirmExit: "今終了しますか？進行状況が失われます。",
@@ -190,7 +190,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
       "100% مجاني • تم التحقق من الأمان\n" +
       "يرجى قراءة وصف المهمة لإثبات أنك بشري بنجاح والحصول على لعبتك أسرع!\n" +
       "سريع، بسيط، آمن.",
-    tryServer2: "جرب السيرفر 2 (إذا لم يعمل)",
+    tryServer2: " السيرفر 2 ", 
     tryOffers: "أكمل المهمة هنا",
     noOffers: "لا توجد مهام متاحة الآن.",
     confirmExit: "الخروج الآن؟ سيتم فقدان التقدم.",
@@ -222,7 +222,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
       "100% Gratuit • Vérifié Sûr\n" +
       "Veuillez lire la description de la tâche pour prouver que vous êtes humain et obtenir votre jeu plus vite !\n" +
       "Rapide, simple, sécurisé.",
-    tryServer2: "Essayez le serveur 2 (si ça ne marche pas)",
+    tryServer2: "Serveur 2",
     tryOffers: "Terminer la tâche ici",
     noOffers: "Aucune tâche disponible pour le moment.",
     confirmExit: "Quitter maintenant ? Votre progression sera perdue.",
@@ -254,7 +254,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
       "100% Бесплатно • Проверено Безопасно\n" +
       "Пожалуйста, внимательно прочитайте описание задания, чтобы доказать, что вы человек, и получить игру быстрее!\n" +
       "Быстро, просто, безопасно.",
-    tryServer2: "Попробуйте сервер 2 (если не работает)",
+    tryServer2: "сервер 2 ",
     tryOffers: "Выполнить задание здесь",
     noOffers: "Нет доступных заданий.",
     confirmExit: "Выйти? Прогресс будет потерян.",
@@ -286,7 +286,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
       "100% Kostenlos • Verifiziert Sicher\n" +
       "Bitte lies die Aufgabenbeschreibung, um zu beweisen, dass du ein Mensch bist und dein Spiel schneller zu erhalten!\n" +
       "Schnell, einfach und sicher.",
-    tryServer2: "Server 2 ausprobieren (falls es nicht klappt)",
+    tryServer2: "Server 2 ",
     tryOffers: "Aufgabe hier erledigen",
     noOffers: "Momentan keine Aufgaben verfügbar.",
     confirmExit: "Jetzt verlassen? Dein Fortschritt geht verloren.",
