@@ -1,8 +1,13 @@
 import type { Config } from "tailwindcss";
 
 export default {
-  darkMode: ["class"],
-  content: ["./pages/**/*.{ts,tsx}", "./components/**/*.{ts,tsx}", "./app/**/*.{ts,tsx}", "./src/**/*.{ts,tsx}"],
+  darkMode: ["class"], // Dark mode via .dark class
+  content: [
+    "./pages/**/*.{ts,tsx}",
+    "./components/**/*.{ts,tsx}",
+    "./app/**/*.{ts,tsx}",
+    "./src/**/*.{ts,tsx}",
+  ],
   prefix: "",
   theme: {
     container: {
@@ -57,7 +62,6 @@ export default {
         cartoon: {
           sky: "hsl(var(--cartoon-sky))",
           cream: "hsl(var(--cartoon-cream))",
-          orange: "hsl(var(--cartoon-orange))",
           red: "hsl(var(--cartoon-red))",
           blue: "hsl(var(--cartoon-blue))",
           green: "hsl(var(--cartoon-green))",
@@ -71,7 +75,7 @@ export default {
         cartoon: ["Fredoka One", "cursive"],
       },
       boxShadow: {
-        "cartoon": "var(--shadow-cartoon)",
+        cartoon: "var(--shadow-cartoon)",
         "cartoon-sm": "var(--shadow-cartoon-sm)",
         "cartoon-lg": "var(--shadow-cartoon-lg)",
         "cartoon-pink": "var(--shadow-pink)",
@@ -86,28 +90,31 @@ export default {
         "4xl": "2rem",
       },
       keyframes: {
+        // Accordion (shadcn/ui)
         "accordion-down": {
-          from: {
-            height: "0",
-          },
-          to: {
-            height: "var(--radix-accordion-content-height)",
-          },
+          from: { height: "0" },
+          to: { height: "var(--radix-accordion-content-height)" },
         },
         "accordion-up": {
-          from: {
-            height: "var(--radix-accordion-content-height)",
-          },
-          to: {
-            height: "0",
-          },
+          from: { height: "var(--radix-accordion-content-height)" },
+          to: { height: "0" },
+        },
+
+        // Shimmer for beautiful skeleton
+        shimmer: {
+          "0%": { backgroundPosition: "-200% 0" },
+          "100%": { backgroundPosition: "200% 0" },
         },
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
+        shimmer: "shimmer 1.8s infinite",
       },
     },
   },
-  plugins: [require("tailwindcss-animate")],
+  plugins: [
+    require("tailwindcss-animate"),
+    require("tailwind-scrollbar"), // v3
+  ],
 } satisfies Config;

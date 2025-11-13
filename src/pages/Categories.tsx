@@ -79,7 +79,7 @@ const Categories = () => {
                 Back to Home
               </Link>
               
-              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold bg-gradient-to-r from-cartoon-purple via-cartoon-pink to-cartoon-orange bg-clip-text text-transparent animate-pulse drop-shadow-lg tracking-tight flex items-center">
+              <h1 className="text-2xl sm:text-3xl md:text-4xl font-extrabold  bg-gradient-to-r from-cartoon-purple via-cartoon-pink to-cartoon-orange bg-clip-text text-transparent animate-pulse drop-shadow-lg tracking-tight flex items-center">
 
                 Categories
               </h1>
@@ -107,7 +107,7 @@ const Categories = () => {
             {isLoading ? (
               <LoadingSkeleton />
             ) : filteredGames.length > 0 ? (
-              <div className="grid grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
+              <div className="grid  grid-cols-2 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6">
                 {filteredGames.map((game, index) => (
                   <div
                     key={game.id}

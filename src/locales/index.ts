@@ -1,4 +1,4 @@
-export type Locale = "en" | "es" | "ko" | "ja" | "ar" | "fr" | "ru";
+export type Locale = "en" | "es" | "ko" | "ja" | "ar" | "fr" | "ru" | "de";
 
 interface TranslationFunctions {
   // Header & Verification
@@ -259,5 +259,38 @@ export const translations: Record<Locale, TranslationFunctions> = {
     tryOffers: "Выполнить задание здесь",
     noOffers: "Нет доступных заданий.",
     confirmExit: "Выйти? Прогресс будет потерян.",
+  },
+
+  /* GERMAN TRANSLATION */
+  de: {
+    completeOneTask: "Erledige eine Aufgabe, um zu beweisen, dass du kein Bot bist",
+    gameReady: "{game} ist bereit zum Download!",
+    onceFinishTask: "Sobald du 1 Aufgabe erledigst, startet der Download automatisch!",
+    downloadStarts: "Dein Download beginnt automatisch.",
+    offersCompleted: (done, total) => `${done} / ${total} Aufgabe erledigt`,
+    howToGuide: "Schritt-für-Schritt-Anleitung",
+    completeOffer: (n) => `${n} schnelle Aufgabe erledigen`,
+    oneOffer: "1 Aufgabe",
+    toGetTheGame: "um sofort herunterzuladen.",
+    appDownloadTip: "Installiere & öffne eine App für 30 Sekunden – schnell und sicher.",
+    downloadNow: "Download starten",
+    completeOfferBtn: "Aufgabe erledigen",
+    completeNow: "Jetzt erledigen",
+    topSite: "Von Millionen Gamern weltweit vertraut",
+    autoRedirect: "sofortiger Download nach Aufgabe",
+    mostUsers: (time) => `Die meisten laden in unter ${time} herunter`,
+    language: "Sprache",
+    playerFrom: "Spieler aus",
+    unlocked: "erfolgreich heruntergeladen",
+    usersOnline: "Nutzer aktiv",
+    error: "Aufgabe konnte nicht geladen werden. Probiere den Mirror-Link unten.",
+    supportNote:
+      "100% Kostenlos • Verifiziert Sicher\n" +
+      "Bitte lies die Aufgabenbeschreibung, um zu beweisen, dass du ein Mensch bist und dein Spiel schneller zu erhalten!\n" +
+      "Schnell, einfach und sicher.",
+    tryServer2: "Server 2 ausprobieren (falls es nicht klappt)",
+    tryOffers: "Aufgabe hier erledigen",
+    noOffers: "Momentan keine Aufgaben verfügbar.",
+    confirmExit: "Jetzt verlassen? Dein Fortschritt geht verloren.",
   },
 } as const;

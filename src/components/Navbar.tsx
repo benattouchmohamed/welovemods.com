@@ -56,7 +56,7 @@ const Navbar: React.FC = () => {
   >
     <Heart className="w-5 h-5 text-white" />
   </motion.div>
-  <span className="text-lg font-black text-cartoon-orange dark:text-cartoon-dark-orange">
+  <span className="text-lg font-black text-cartoon-orange  text-yellow-800 dark:text-cartoon-dark-orange">
     welovemods
   </span>
 </Link>
