@@ -533,10 +533,13 @@ const Download = () => {
                   <h1 className="text-2xl font-black text-blue-600 mb-2">
                     {i18n.completeOneTask}
                   </h1>
+<p className="text-lg font-bold text-green-600 mb-3">
+  {i18n.gameReady.split("{game}")[0]} <br />
+  <span className="nique-not text-yellow-500 underline">{gameName}</span> <br />
+  {i18n.gameReady.split("{game}")[1]}
+</p>
 
-                  <p className="text-lg font-bold text-green-600 mb-3">
-                    {i18n.gameReady.replace("{game}", gameName)}
-                  </p>
+
 
                   <div className="mt-4 flex flex-col items-center gap-2">
                     <span className="bg-yellow-100 border border-green-500 text-green-700 font-bold text-xs px-3 py-1 rounded-full">

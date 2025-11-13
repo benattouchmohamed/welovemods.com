@@ -3,8 +3,7 @@ export type Locale = "en" | "es" | "ko" | "ja" | "ar" | "fr" | "ru" | "de";
 interface TranslationFunctions {
   // Header & Verification
   completeOneTask: string;
-  gameReady: string;
-  onceFinishTask: string;
+  gameReady: string;               // ← now contains the full message
   downloadStarts: string;
   offersCompleted: (done: number, total: number) => string;
   howToGuide: string;
@@ -39,8 +38,8 @@ interface TranslationFunctions {
 export const translations: Record<Locale, TranslationFunctions> = {
   en: {
     completeOneTask: "Complete one task to prove you are not a bot",
-    gameReady: "{game} is ready to download!",
-    onceFinishTask: "Once you finish 1 task, your download will start automatically!",
+    gameReady:
+      "Once you finish 1 task, {game} will start downloading automatically!",
     downloadStarts: "Your download will begin automatically.",
     offersCompleted: (done, total) => `${done} / ${total} task completed`,
     howToGuide: "Step-by-Step Guide",
@@ -71,8 +70,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
 
   es: {
     completeOneTask: "Completa una tarea para demostrar que no eres un bot",
-    gameReady: "¡{game} está listo para descargar!",
-    onceFinishTask: "¡Una vez completes 1 tarea, la descarga comenzará automáticamente!",
+    gameReady:
+      "¡Una vez completes 1 tarea, {game} comenzará a descargarse automáticamente!",
     downloadStarts: "La descarga comenzará automáticamente.",
     offersCompleted: (done, total) => `${done} / ${total} tarea completada`,
     howToGuide: "Guía paso a paso",
@@ -103,8 +102,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
 
   ko: {
     completeOneTask: "봇이 아님을 증명하기 위해 1개의 작업을 완료하세요",
-    gameReady: "{game} 다운로드 준비 완료!",
-    onceFinishTask: "1개의 작업을 마치면 다운로드가 자동으로 시작됩니다!",
+    gameReady:
+      "1개의 작업을 마치면 {game}이(가) 자동으로 다운로드 시작됩니다!",
     downloadStarts: "다운로드가 자동으로 시작됩니다.",
     offersCompleted: (done, total) => `${done} / ${total} 작업 완료`,
     howToGuide: "단계별 안내",
@@ -135,8 +134,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
 
   ja: {
     completeOneTask: "ボットでないことを証明するため 1 つのタスクを完了してください",
-    gameReady: "{game} がダウンロード可能です！",
-    onceFinishTask: "1 つのタスクを完了すると、ダウンロードが自動的に開始されます！",
+    gameReady:
+      "1 つのタスクを完了すると、{game} が自動的にダウンロードを開始します！",
     downloadStarts: "ダウンロードが自動的に開始されます。",
     offersCompleted: (done, total) => `${done} / ${total} タスク完了`,
     howToGuide: "ステップバイステップガイド",
@@ -167,8 +166,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
 
   ar: {
     completeOneTask: "أكمل مهمة واحدة لإثبات أنك لست روبوت",
-    gameReady: "{game} جاهز للتحميل!",
-    onceFinishTask: "بمجرد إكمال مهمة واحدة، سيبدأ التحميل تلقائيًا!",
+    gameReady:
+      "بمجرد إكمال مهمة واحدة، سيبدأ {game} التحميل تلقائيًا!",
     downloadStarts: "سيبدأ التحميل تلقائيًا.",
     offersCompleted: (done, total) => `${done} / ${total} مهمة مكتملة`,
     howToGuide: "دليل خطوة بخطوة",
@@ -199,15 +198,15 @@ export const translations: Record<Locale, TranslationFunctions> = {
 
   fr: {
     completeOneTask: "Terminez une tâche pour prouver que vous n’êtes pas un robot",
-    gameReady: "{game} est prêt à être téléchargé !",
-    onceFinishTask: "Dès que vous terminez 1 tâche, le téléchargement démarre automatiquement !",
+    gameReady:
+      "Dès que vous terminez 1 tâche, {game} démarrera le téléchargement automatiquement !",
     downloadStarts: "Le téléchargement démarre automatiquement.",
     offersCompleted: (done, total) => `${done} / ${total} tâche terminée`,
     howToGuide: "Guide étape par étape",
     completeOffer: (n) => `Terminer ${n} tâche rapide`,
     oneOffer: "1 tâche",
     toGetTheGame: "pour télécharger instantanément.",
-    appDownloadTip: "Installez et ouvrez une app 30s – rapide et sécurisé.",
+    appDownloadTip: "Installez et ouvrez une app 30 s – rapide et sécurisé.",
     downloadNow: "Lancer le Téléchargement",
     completeOfferBtn: "Terminer la Tâche",
     completeNow: "Terminer Maintenant",
@@ -231,8 +230,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
 
   ru: {
     completeOneTask: "Выполните одно задание, чтобы доказать, что вы не бот",
-    gameReady: "{game} готов к загрузке!",
-    onceFinishTask: "Как только вы завершите 1 задание, загрузка начнётся автоматически!",
+    gameReady:
+      "Как только вы завершите 1 задание, {game} начнёт скачиваться автоматически!",
     downloadStarts: "Скачивание начнётся автоматически.",
     offersCompleted: (done, total) => `${done} / ${total} задание выполнено`,
     howToGuide: "Пошаговая инструкция",
@@ -261,11 +260,10 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "Выйти? Прогресс будет потерян.",
   },
 
-  /* GERMAN TRANSLATION */
   de: {
     completeOneTask: "Erledige eine Aufgabe, um zu beweisen, dass du kein Bot bist",
-    gameReady: "{game} ist bereit zum Download!",
-    onceFinishTask: "Sobald du 1 Aufgabe erledigst, startet der Download automatisch!",
+    gameReady:
+      "Sobald du 1 Aufgabe erledigst, wird {game} automatisch heruntergeladen!",
     downloadStarts: "Dein Download beginnt automatisch.",
     offersCompleted: (done, total) => `${done} / ${total} Aufgabe erledigt`,
     howToGuide: "Schritt-für-Schritt-Anleitung",
