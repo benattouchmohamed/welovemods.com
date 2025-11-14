@@ -1,4 +1,4 @@
-import React, { memo } from 'react';
+import React from 'react';
 import { Link } from 'react-router-dom';
 import { Download } from 'lucide-react';
 import RatingStars from './RatingStars';
@@ -9,13 +9,14 @@ interface GameCardProps {
 }
 
 const GameCard: React.FC<GameCardProps> = ({ game }) => {
-  const createSlug = (title: string) =>
-    title
+  const createSlug = (title: string) => {
+    return title
       .toLowerCase()
       .replace(/[^\w\s-]/g, "")
       .replace(/\s+/g, "-")
       .replace(/-+/g, "-")
       .trim();
+  };
 
   return (
     <Link to={`/game/${createSlug(game.title)}`} className="block">
@@ -26,12 +27,9 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
             src={game.image_url || '/placeholder.svg'}
             alt={game.title}
             className="w-full h-full object-cover"
-            loading="lazy" // <-- lazy-load
-            width={300}    // <-- set width
-            height={300}   // <-- set height
           />
 
-          {/* Badges */}
+          {/* Badges in ONE line */}
           <div className="absolute top-2 left-2 flex flex-wrap gap-1">
             {game.is_new && (
               <span className="bg-cartoon-green text-white text-[10px] font-black px-2 py-0.5 rounded-full shadow">
@@ -73,5 +71,4 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
   );
 };
 
-// Memoize to prevent re-rendering unless props change
-export default memo(GameCard);
+export default GameCard;
