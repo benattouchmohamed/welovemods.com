@@ -10,13 +10,12 @@ export default function SupportNote() {
     <>
       <div className="flex flex-col items-center">
 
-        <button
-          onClick={() => setShowGuide(true)}
-          className="bg-gradient-to-r from-emerald-500 to-green-600 hover:from-emerald-600 hover:to-green-700 text-white font-bold text-sm px-6 py-3 rounded-xl shadow-lg transform transition-all duration-200 hover:scale-105 hover:shadow-xl active:scale-95 flex items-center gap-2"
-        >
-          {i18n.howToGuide}
-        </button>
-
+<button
+  onClick={() => setShowGuide(true)}
+  className="bg-gradient-to-r from-emerald-500 to-green-600 hover:bg-green-700 text-white font-semibold text-sm px-4 py-2 rounded-lg shadow transition"
+>
+  {i18n.howToGuide}
+</button>
         <br />
       </div>
 

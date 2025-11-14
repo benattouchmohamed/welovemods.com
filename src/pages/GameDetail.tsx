@@ -1,7 +1,11 @@
 import React, { useEffect, useState } from "react";
-import { Link, useParams, useNavigate } from "react-router-dom";
+import {
+  useParams,
+  useNavigate,
+} from "react-router-dom";
 import { ArrowLeft, Download, Box } from "lucide-react";
 import { Helmet } from "react-helmet-async";
+
 import Navbar from "@/components/Navbar";
 import Footer from "@/components/Footer";
 import { Button } from "@/components/ui/button";
@@ -15,6 +19,7 @@ const GameDetail = () => {
   const [isDownloading, setIsDownloading] = useState(false);
   const navigate = useNavigate();
 
+  /* ──────────────────────  FETCH GAME  ────────────────────── */
   useEffect(() => {
     const load = async () => {
       if (!slug) return;
@@ -22,7 +27,7 @@ const GameDetail = () => {
         const data = await fetchGameBySlug(slug);
         setGame(data);
       } catch (err) {
-        console.error(err);
+        console.error("Failed to fetch game:", err);
       } finally {
         setLoading(false);
       }
@@ -30,15 +35,59 @@ const GameDetail = () => {
     load();
   }, [slug]);
 
-  const handleDownload = () => {
+  /* ──────────────────────  DOWNLOAD LOGIC (NO img IN URL)  ────────────────────── */
+  const handleDownload = async () => {
     if (!game) return;
     setIsDownloading(true);
+
+    let imgDataUrl = "";
+    if (game.image_url) {
+      try {
+        const resp = await fetch(game.image_url, { mode: "cors" });
+        if (!resp.ok) throw new Error("Image fetch failed");
+        const blob = await resp.blob();
+
+        imgDataUrl = await new Promise<string>((resolve, reject) => {
+          const reader = new FileReader();
+          reader.onload = () => resolve(reader.result as string);
+          reader.onerror = reject;
+          reader.readAsDataURL(blob);
+        });
+      } catch (e) {
+        console.warn("Image → base64 failed, fallback to URL:", e);
+        imgDataUrl = game.image_url; // still works on desktop
+      }
+    }
+
+    // **Store the image in sessionStorage**
+    sessionStorage.setItem("downloadGameImage", imgDataUrl);
+
+    // **Navigate – ONLY the game title**
     setTimeout(() => {
       navigate(`/Download?game=${encodeURIComponent(game.title)}`);
-    }, 800);
+    }, 400);
   };
 
-  /* ──────────────────────  BEAUTIFUL SKELETON  ────────────────────── */
+  /* ──────────────────────  OPTIONAL: SAVE THUMBNAIL  ────────────────────── */
+  const downloadImage = async () => {
+    if (!game?.image_url) return;
+    try {
+      const resp = await fetch(game.image_url, { mode: "cors" });
+      const blob = await resp.blob();
+      const url = window.URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${game.title.replace(/\s+/g, "_")}_thumb.jpg`;
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+      window.URL.revokeObjectURL(url);
+    } catch (e) {
+      console.error("Image download failed", e);
+    }
+  };
+
+  /* ──────────────────────  SKELETON  ────────────────────── */
   const BeautifulSkeleton = () => (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-pink-50 to-yellow-50">
       <Navbar />
@@ -55,7 +104,6 @@ const GameDetail = () => {
 
             {/* Details */}
             <div className="lg:col-span-2 space-y-6">
-              {/* Title & Rating */}
               <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg border-4 border-pink-200/50 animate-pulse">
                 <div className="h-10 bg-gradient-to-r from-red-300 to-pink-300 rounded-lg w-3/4 mb-3 shimmer" />
                 <div className="h-7 bg-gradient-to-r from-purple-300 to-blue-300 rounded-lg w-1/2 mb-4 shimmer" />
@@ -65,7 +113,6 @@ const GameDetail = () => {
                 </div>
               </div>
 
-              {/* Stats */}
               <div className="grid grid-cols-2 gap-4">
                 <div className="bg-yellow-100/80 backdrop-blur-sm rounded-2xl p-4 border-2 border-yellow-400/50 animate-pulse">
                   <div className="h-12 bg-gradient-to-r from-yellow-300 to-orange-300 rounded-xl w-16 mb-2 shimmer" />
@@ -77,7 +124,6 @@ const GameDetail = () => {
                 </div>
               </div>
 
-              {/* Features */}
               <div className="bg-white/80 backdrop-blur-sm rounded-3xl p-6 shadow-lg border-4 border-green-200/50 animate-pulse">
                 <div className="h-8 bg-gradient-to-r from-green-300 to-emerald-300 rounded-lg w-40 mb-4 shimmer" />
                 <div className="space-y-3">
@@ -94,18 +140,18 @@ const GameDetail = () => {
         </div>
       </main>
 
-      {/* Shimmer CSS */}
       <style jsx>{`
         @keyframes shimmer {
-          0% {
-            background-position: -200% 0;
-          }
-          100% {
-            background-position: 200% 0;
-          }
+          0% { background-position: -200% 0; }
+          100% { background-position: 200% 0; }
         }
         .shimmer {
-          background: linear-gradient(90deg, transparent, rgba(255,255,255,0.4), transparent);
+          background: linear-gradient(
+            90deg,
+            transparent,
+            rgba(255,255,255,0.4),
+            transparent
+          );
           background-size: 200% 100%;
           animation: shimmer 1.8s infinite;
         }
@@ -113,8 +159,10 @@ const GameDetail = () => {
     </div>
   );
 
+  /* ──────────────────────  RENDER  ────────────────────── */
   return (
     <div className="min-h-screen overflow-hidden">
+      {/* SEO */}
       <Helmet>
         {loading ? (
           <>
@@ -135,7 +183,7 @@ const GameDetail = () => {
             />
             <meta name="keywords" content={`${game.title} mod, cheats 2025, unlimited coins`} />
             <meta property="og:title" content={`${game.title} Mod APK 2025`} />
-            <meta property="og:image" content={game.image_url} />
+            <meta property="og:image" content={game.image_url || ""} />
             <link rel="canonical" href={`https://welovemods.com/game/${slug}`} />
           </>
         )}
@@ -143,13 +191,15 @@ const GameDetail = () => {
 
       <Navbar />
 
-      {/* Loading */}
+      {/* LOADING */}
       {loading && <BeautifulSkeleton />}
 
-      {/* Not found */}
+      {/* NOT FOUND */}
       {!loading && !game && (
         <main className="pt-20 pb-12 text-center">
-          <h1 className="text-5xl font-black text-red-600 mb-6">Game Not Found!</h1>
+          <h1 className="text-5xl font-black text-red-600 mb-6">
+            Game Not Found!
+          </h1>
           <Button
             onClick={() => navigate("/")}
             className="bg-blue-600 hover:bg-blue-700 text-white font-bold px-8 py-6 rounded-full flex items-center mx-auto"
@@ -160,23 +210,25 @@ const GameDetail = () => {
         </main>
       )}
 
-      {/* Game loaded */}
+      {/* GAME LOADED */}
       {!loading && game && (
         <main className="pt-20 pb-12">
           <div className="container mx-auto px-4 max-w-4xl">
             <div className="grid grid-cols-1 lg:grid-cols-3 gap-8">
-              {/* Image + Download */}
+              {/* IMAGE + DOWNLOAD BUTTON */}
               <div className="lg:col-span-1">
                 <div className="bg-white rounded-3xl p-4 shadow-lg border-4 border-blue-200">
                   <img
                     src={game.image_url || "/placeholder.svg"}
                     alt={`${game.title} thumbnail`}
                     className="w-full aspect-square object-cover rounded-2xl"
+                    loading="lazy"
                   />
+
                   <button
                     onClick={handleDownload}
                     disabled={isDownloading}
-                    className="mt-6 w-full bg-gradient-to-r from-green-500 to-blue-600 text-white font-black text-lg py-4 rounded-2xl flex items-center justify-center gap-2 hover:scale-105 transition"
+                    className="mt-4 w-full bg-gradient-to-r from-green-500 to-blue-600 text-white font-black text-lg py-4 rounded-2xl flex items-center justify-center gap-2 hover:scale-105 transition disabled:opacity-75"
                   >
                     {isDownloading ? (
                       <>
@@ -190,20 +242,34 @@ const GameDetail = () => {
                       </>
                     )}
                   </button>
+
+                  {/* Uncomment to allow manual image save */}
+                  {/* <button
+                    onClick={downloadImage}
+                    className="mt-2 w-full text-sm text-gray-600 underline hover:text-gray-800 transition"
+                  >
+                    Save image
+                  </button> */}
                 </div>
               </div>
 
-              {/* Details */}
+              {/* DETAILS */}
               <div className="lg:col-span-2 space-y-6">
+                {/* Title + Rating */}
                 <div className="bg-white rounded-3xl p-6 shadow-md border-4 border-pink-200">
-                  <h1 className="text-3xl lg:text-4xl font-black text-red-600 mb-3">{game.title}</h1>
+                  <h1 className="text-3xl lg:text-4xl font-black text-red-600 mb-3">
+                    {game.title}
+                  </h1>
                   <div className="flex items-center gap-3">
                     <RatingStars rating={game.rating} />
-                    <span className="text-xl font-bold text-blue-600">{game.rating}/5</span>
+                    <span className="text-xl font-bold text-blue-600">
+                      {game.rating}/5
+                    </span>
                   </div>
                   <p className="mt-4 text-gray-700 text-lg">{game.description}</p>
                 </div>
 
+                {/* Stats */}
                 <div className="grid grid-cols-2 gap-4">
                   <div className="bg-yellow-100 rounded-2xl p-4 border-2 border-yellow-400">
                     <div className="flex items-center gap-3">
@@ -211,8 +277,12 @@ const GameDetail = () => {
                         <Download className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <div className="text-sm font-bold text-yellow-800">Downloads</div>
-                        <div className="text-xl text-yellow-800 font-black">{game.downloads.toLocaleString()}</div>
+                        <div className="text-sm font-bold text-yellow-800">
+                          Downloads
+                        </div>
+                        <div className="text-xl text-yellow-800 font-black">
+                          {game.downloads.toLocaleString()}
+                        </div>
                       </div>
                     </div>
                   </div>
@@ -223,16 +293,23 @@ const GameDetail = () => {
                         <Box className="w-6 h-6 text-white" />
                       </div>
                       <div>
-                        <div className="text-sm font-bold text-pink-800">Version</div>
-                        <div className="text-xl  text-yellow-800 font-black">{game.version}</div>
+                        <div className="text-sm font-bold text-pink-800">
+                          Version
+                        </div>
+                        <div className="text-xl text-pink-800 font-black">
+                          {game.version}
+                        </div>
                       </div>
                     </div>
                   </div>
                 </div>
 
-                {game.features?.length > 0 && (
+                {/* MOD Features */}
+                {game.features && game.features.length > 0 && (
                   <div className="bg-white rounded-3xl p-6 shadow-md border-4 border-green-200">
-                    <h3 className="text-2xl font-black text-green-600 mb-4">MOD Features</h3>
+                    <h3 className="text-2xl font-black text-green-600 mb-4">
+                      MOD Features
+                    </h3>
                     <ul className="space-y-2">
                       {game.features.map((f, i) => (
                         <li key={i} className="flex items-center gap-3 text-gray-700">
@@ -244,15 +321,18 @@ const GameDetail = () => {
                   </div>
                 )}
 
+                {/* Bottom CTA */}
                 <div className="bg-gradient-to-r from-red-500 to-pink-500 rounded-3xl p-6 text-center shadow-lg border-4 border-red-300">
-                  <h3 className="text-2xl font-black text-white mb-2">Ready to Play?</h3>
+                  <h3 className="text-2xl font-black text-white mb-2">
+                    Ready to Play?
+                  </h3>
                   <p className="text-white/90 font-bold mb-4">
                     Join thousands of players!
                   </p>
                   <button
                     onClick={handleDownload}
                     disabled={isDownloading}
-                    className="bg-white text-red-600 font-black px-8 py-3 rounded-full shadow-md hover:shadow-lg transition"
+                    className="bg-white text-red-600 font-black px-8 py-3 rounded-full shadow-md hover:shadow-lg transition disabled:opacity-75"
                   >
                     {isDownloading ? "Preparing..." : "Download & Install Now!"}
                   </button>
@@ -262,6 +342,8 @@ const GameDetail = () => {
           </div>
         </main>
       )}
+<br />
+      {/* <Footer /> */}
     </div>
   );
 };
