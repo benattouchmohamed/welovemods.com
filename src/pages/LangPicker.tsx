@@ -3,6 +3,9 @@ import { Globe, ChevronDown, Check } from "lucide-react";
 import ReactCountryFlag from "react-country-flag";
 import { useLocale } from "@/hooks/useLocale";
 
+// -----------------------------
+// Languages list
+// -----------------------------
 const languages = [
   { code: "en", flag: "US", name: "English" },
   { code: "de", flag: "DE", name: "Deutsch" },
@@ -10,15 +13,20 @@ const languages = [
   { code: "pt", flag: "BR", name: "Português" },
   { code: "fr", flag: "FR", name: "Français" },
   { code: "ar", flag: "SA", name: "العربية" },
+    { code: "tr", flag: "TR", name: "Türkçe" }, 
   { code: "ko", flag: "KR", name: "한국어" },
+    { code: "it", flag: "IT", name: "Italiano" },
   { code: "ja", flag: "JP", name: "日本語" },
   { code: "ru", flag: "RU", name: "Русский" },
   { code: "zh", flag: "CN", name: "中文" },
   { code: "hi", flag: "IN", name: "हिंदी" },
-  { code: "it", flag: "IT", name: "Italiano" },
+
+
 ] as const;
 
-// Global country → language mapping
+// -----------------------------
+// Country → language mapping
+// -----------------------------
 const countryToLang: Record<string, string> = {
   // English
   US: "en", GB: "en", CA: "en", AU: "en", NZ: "en", IE: "en",
@@ -48,8 +56,13 @@ const countryToLang: Record<string, string> = {
   IN: "hi",
   // Italian
   IT: "it", CH_IT: "it",
+  // Turkish
+  TR: "tr", // ← NEW
 };
 
+// -----------------------------
+// Language Picker Component
+// -----------------------------
 export default function LangPicker() {
   const [locale, setLocale] = useLocale();
   const [open, setOpen] = useState(false);
@@ -102,7 +115,6 @@ export default function LangPicker() {
 
   return (
     <div ref={ref} className="relative z-10">
-
       <button
         onClick={() => setOpen((v) => !v)}
         className="

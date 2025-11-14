@@ -7,6 +7,7 @@ export type Locale =
   | "fr"
   | "ru"
   | "de"
+  | "tr"
   | "pt"
   | "zh"
   | "hi"
@@ -79,6 +80,36 @@ export const translations: Record<Locale, TranslationFunctions> = {
     noOffers: "No tasks available at the moment.",
     confirmExit: "Leave now? Your progress will be lost.",
   },
+  tr: {
+  completeOneTask: "Bot olmadığını kanıtlamak için bir görev tamamla",
+  gameReady:
+    "1 görevi tamamladığında, {game} otomatik olarak indirilmeye başlayacaktır!",
+  downloadStarts: "İndirme otomatik olarak başlayacak.",
+  offersCompleted: (d, t) => `${d} / ${t} görev tamamlandı`,
+  howToGuide: "Adım Adım Rehber",
+  completeOffer: (n) => `${n} hızlı görev tamamla`,
+  oneOffer: "1 görev",
+  toGetTheGame: "anında indirmek için.",
+  appDownloadTip: "Herhangi bir uygulamayı 30 saniye kurup aç – hızlı ve güvenli.",
+  downloadNow: "İndirmeyi Başlat",
+  completeOfferBtn: "Görevi Tamamla",
+  completeNow: "Şimdi Tamamla",
+  topSite: "Dünya çapında milyonlarca oyuncu tarafından güveniliyor",
+  autoRedirect: "görevden sonra anında indirme",
+  mostUsers: (t) => `Çoğu kullanıcı ${t} içinde indiriyor`,
+  language: "Dil",
+  playerFrom: "Oyuncu",
+  unlocked: "başarıyla indirildi",
+  usersOnline: "aktif kullanıcı",
+  error: "Görev yüklenemedi. Lütfen aşağıdaki alternatif bağlantıyı deneyin.",
+  supportNote:
+    "100% Ücretsiz • Güvenli Doğrulanmış\nGörevi başarıyla tamamlamak ve oyunu daha hızlı almak için açıklamayı dikkatlice okuyun!\nHızlı, basit ve güvenli.",
+  tryServer2: "sunucu 2",
+  tryOffers: "Görevi Burada Tamamla",
+  noOffers: "Şu anda mevcut görev yok.",
+  confirmExit: "Şimdi çıkılsın mı? İlerleme kaybolacak.",
+},
+
 pt: {
   completeOneTask: "Complete uma tarefa para provar que não é um robô",
   gameReady: "Assim que terminar 1 tarefa, {game} começará a baixar automaticamente!",
