@@ -1,13 +1,11 @@
 import React, { useEffect, useState } from "react";
 
 /* --------------------------------------------------------------
-   Helper: is TikTok in-app browser?
+   Detect TikTok in-app browser
    -------------------------------------------------------------- */
 const isTikTokBrowser = (): boolean => {
   const ua = navigator.userAgent.toLowerCase();
-
-  // TikTok app identifiers
-  const tiktokKeywords = [
+  const keywords = [
     "tiktok",
     "musical_ly",
     "musically",
@@ -15,146 +13,185 @@ const isTikTokBrowser = (): boolean => {
     "com.zhiliaoapp.musically",
     "com.ss.android.ugc.aweme",
   ];
-
-  // TikTok injects these on Android/iOS
-  const hasTikTokProp =
-    // @ts-ignore – TikTok injects this on Android
+  const hasProp =
     (window as any).TikTokWebView !== undefined ||
-    // @ts-ignore – iOS TikTok message handler
     (window as any).webkit?.messageHandlers?.TikTok !== undefined;
 
-  const hasKeyword = tiktokKeywords.some((kw) => ua.includes(kw));
-
-  return hasKeyword || hasTikTokProp;
+  return keywords.some((k) => ua.includes(k)) || hasProp;
 };
 
 const G1: React.FC = () => {
-  const [insideTikTok, setInsideTikTok] = useState<boolean | null>(null);
-  const externalUrl = "https://welovemods.com/";
+  const [isTikTok, setIsTikTok] = useState<boolean | null>(null);
+  const siteUrl = "https://welovemods.com/";
 
   /* --------------------------------------------------------------
-     Detect on mount
+     Detect once on mount
      -------------------------------------------------------------- */
   useEffect(() => {
-    const tikTok = isTikTokBrowser();
-    setInsideTikTok(tikTok);
+    const inside = isTikTokBrowser();
+    setIsTikTok(inside);
 
-    // If NOT in TikTok → redirect immediately
-    if (!tikTok) {
-      window.location.replace(externalUrl);
+    if (!inside) {
+      window.location.replace(siteUrl);
     }
   }, []);
 
   /* --------------------------------------------------------------
-     Open external site (bypass TikTok in-app browser)
+     Open in real browser
      -------------------------------------------------------------- */
-  const openInRealBrowser = () => {
-    // Method 1: Try window.open
+  const openSite = () => {
     try {
-      const newWin = window.open(externalUrl, "_blank", "noopener,noreferrer");
-      if (newWin) {
-        newWin.opener = null;
-        return;
-      }
-    } catch (err) {
-      console.warn("window.open blocked:", err);
+      const win = window.open(siteUrl, "_blank", "noopener,noreferrer");
+      if (win) win.opener = null;
+      else window.location.href = siteUrl;
+    } catch {
+      window.location.href = siteUrl;
     }
-
-    // Method 2: Fallback to direct navigation
-    window.location.href = externalUrl;
   };
 
   /* --------------------------------------------------------------
-     Loading state
+     Copy URL
      -------------------------------------------------------------- */
-  if (insideTikTok === null) {
+  const copyUrl = async () => {
+    try {
+      await navigator.clipboard.writeText(siteUrl);
+      alert("Copied: welovemods.com");
+    } catch {
+      prompt("Copy this:", siteUrl);
+    }
+  };
+
+  /* --------------------------------------------------------------
+     Loading
+     -------------------------------------------------------------- */
+  if (isTikTok === null) {
     return (
-      <div
-        style={{
-          textAlign: "center",
-          paddingTop: "50px",
-          fontFamily: "'Comic Sans MS', Arial, sans-serif",
-          color: "#333",
-        }}
-      >
-        Checking browser…
+      <div style={styles.center}>
+        <p style={styles.text}>Loading...</p>
       </div>
     );
   }
 
   /* --------------------------------------------------------------
-     Inside TikTok → Show button
+     Inside TikTok → Show buttons
      -------------------------------------------------------------- */
-  if (insideTikTok) {
+  if (isTikTok) {
     return (
-      <div
-        style={{
-          display: "flex",
-          flexDirection: "column",
-          justifyContent: "center",
-          alignItems: "center",
-          height: "100vh",
-          backgroundColor: "#f0f8ff",
-          textAlign: "center",
-          padding: "20px",
-          fontFamily: "'Comic Sans MS', Arial, sans-serif",
-        }}
-      >
+      <div style={styles.container}>
         <img
           src="https://www9.0zz0.com/2024/04/06/13/548511907.gif"
-          alt="Website Logo"
-          style={{
-            width: "250px",
-            marginBottom: "40px",
-            border: "4px solid #010101ff",
-            borderRadius: "16px",
-            backgroundColor: "#fff",
-            padding: "10px",
-            boxShadow: "0 4px 12px rgba(0,0,0,0.1)",
-          }}
+          alt="Logo"
+          style={styles.logo}
         />
 
-        <h1 style={{ fontSize: "28px", marginBottom: "16px", color: "#d62828" }}>
-          Open in Real Browser
-        </h1>
-
-        <p style={{ fontSize: "18px", marginBottom: "30px", color: "#333" }}>
-          Tap the button below to view the full site!
+        <h1 style={styles.title}>View Full Site</h1>
+        <p style={styles.subtitle}>
+          Tap below to open in your browser
         </p>
 
-        <button
-          onClick={openInRealBrowser}
-          style={{
-            padding: "16px 32px",
-            fontSize: "20px",
-            fontWeight: "bold",
-            backgroundColor: "#ff6b6b",
-            color: "white",
-            border: "none",
-            borderRadius: "12px",
-            cursor: "pointer",
-            boxShadow: "0 6px 16px rgba(255, 107, 107, 0.3)",
-            transition: "all 0.2s",
-          }}
-          onMouseDown={(e) => (e.currentTarget.style.transform = "scale(0.95)")}
-          onMouseUp={(e) => (e.currentTarget.style.transform = "scale(1)")}
-          onTouchStart={(e) => (e.currentTarget.style.transform = "scale(0.95)")}
-          onTouchEnd={(e) => (e.currentTarget.style.transform = "scale(1)")}
-        >
-          Open Site
+        {/* Open Site Button */}
+        <button onClick={openSite} style={styles.btnPrimary}>
+          Open in Browser
         </button>
 
-        <p style={{ marginTop: "20px", fontSize: "14px", color: "#666" }}>
-          Or copy: <strong>welovemods.com</strong>
+        {/* Copy URL Button */}
+        <button onClick={copyUrl} style={styles.btnSecondary}>
+          Copy URL
+        </button>
+
+        <p style={styles.footer}>
+          Or paste in Safari/Chrome: <strong>welovemods.com</strong>
         </p>
       </div>
     );
   }
 
-  /* --------------------------------------------------------------
-     Should never reach here (auto-redirected)
-     -------------------------------------------------------------- */
-  return null;
+  return null; // Auto-redirected
+};
+
+/* --------------------------------------------------------------
+   Styles (inline, clean, mobile-friendly)
+   -------------------------------------------------------------- */
+const styles: { [key: string]: React.CSSProperties } = {
+  container: {
+    minHeight: "100vh",
+    background: "linear-gradient(135deg, #667eea 0%, #764ba2 100%)",
+    display: "flex",
+    flexDirection: "column",
+    alignItems: "center",
+    justifyContent: "center",
+    padding: "20px",
+    textAlign: "center",
+    fontFamily: "'Segoe UI', Arial, sans-serif",
+    color: "#fff",
+  },
+  center: {
+    minHeight: "100vh",
+    display: "flex",
+    alignItems: "center",
+    justifyContent: "center",
+    background: "#f8f9fa",
+  },
+  logo: {
+    width: "180px",
+    height: "180px",
+    borderRadius: "50%",
+    border: "6px solid rgba(255,255,255,0.3)",
+    marginBottom: "30px",
+    objectFit: "cover",
+    boxShadow: "0 10px 30px rgba(0,0,0,0.2)",
+  },
+  title: {
+    fontSize: "28px",
+    fontWeight: "bold",
+    margin: "0 0 12px",
+    textShadow: "0 2px 4px rgba(0,0,0,0.1)",
+  },
+  subtitle: {
+    fontSize: "16px",
+    marginBottom: "32px",
+    opacity: 0.9,
+  },
+  btnPrimary: {
+    background: "#fff",
+    color: "#667eea",
+    border: "none",
+    padding: "16px 40px",
+    fontSize: "18px",
+    fontWeight: "bold",
+    borderRadius: "50px",
+    cursor: "pointer",
+    marginBottom: "16px",
+    boxShadow: "0 8px 20px rgba(0,0,0,0.15)",
+    transition: "all 0.2s",
+  },
+  btnSecondary: {
+    background: "rgba(255,255,255,0.2)",
+    color: "#fff",
+    border: "2px solid rgba(255,255,255,0.4)",
+    padding: "14px 36px",
+    fontSize: "16px",
+    fontWeight: "600",
+    borderRadius: "50px",
+    cursor: "pointer",
+    backdropFilter: "blur(10px)",
+    transition: "all 0.2s",
+  },
+  footer: {
+    marginTop: "30px",
+    fontSize: "14px",
+    opacity: 0.8,
+  },
+  text: {
+    fontSize: "18px",
+    color: "#555",
+  },
+};
+
+/* Add hover/tap effects */
+const btnHover = {
+  transform: "translateY(-2px)",
+  boxShadow: "0 12px 24px rgba(0,0,0,0.2)",
 };
 
 export default G1;
