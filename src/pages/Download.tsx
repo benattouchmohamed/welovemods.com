@@ -239,6 +239,7 @@ const useConfirmExit = () => {
 /* ──────────────────────  TRY SERVER 2 (FULL SCREEN)  ────────────────────── */
 const TryServer2Fullscreen = memo(() => {
   const [show, setShow] = useState(false);
+  const [loadingIframe, setLoadingIframe] = useState(true); // Loader state
   const i18n = t(useLocale()[0]);
 
   if (!show) {
@@ -254,6 +255,7 @@ const TryServer2Fullscreen = memo(() => {
 
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col animate-fadeIn">
+      {/* HEADER */}
       <div className="flex items-center justify-between p-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg">
         <h3 className="text-sm font-black">Server 2</h3>
         <button
@@ -263,16 +265,27 @@ const TryServer2Fullscreen = memo(() => {
           <X className="w-5 h-5" />
         </button>
       </div>
+
+      {/* LOADING SPINNER */}
+      {loadingIframe && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/90 z-50">
+          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+        </div>
+      )}
+
+      {/* IFRAME */}
       <iframe
         src="https://appinstallcheck.com/cl/i/8dkk3k"
         title="Server 2"
         className="flex-1 w-full h-full border-0"
         allowFullScreen
         sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
+        onLoad={() => setLoadingIframe(false)} // Remove loader on load
       />
     </div>
   );
 });
+
 
 /* ──────────────────────  MAIN DOWNLOAD PAGE  ────────────────────── */
 const Download = () => {
@@ -333,7 +346,7 @@ const Download = () => {
         className={`min-h-screen bg-gradient-to-b from-yellow-50/50 to-white transition-colors
           ${isScrolling ? "no-select" : "no-select selectable"}`}
       >
-        <main className="pt-20 pb-10">
+       <main className="pt-4 pb-10">
           <div className="max-w-xl mx-auto px-4">
 
             {/* ────── LOADING ────── */}
