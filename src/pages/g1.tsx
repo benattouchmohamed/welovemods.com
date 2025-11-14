@@ -62,18 +62,7 @@ const G1: React.FC = () => {
     );
   }
 
-  /* --------------------------------------------------------------
-     Inside TikTok → show button (no auto-redirect)
-     -------------------------------------------------------------- */
-  const openInRealBrowser = () => {
-    try {
-      const newWin = window.open(externalUrl, "_blank", "noopener,noreferrer");
-      if (newWin) newWin.opener = null;
-      else window.location.href = externalUrl;
-    } catch {
-      window.location.href = externalUrl;
-    }
-  };
+
 
   return (
     <div
