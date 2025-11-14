@@ -104,18 +104,34 @@ const G1: React.FC = () => {
 
      <br />
 
-           <h2
-        style={{
-          fontSize: "26px",
-          fontWeight: "bold",
-          marginBottom: "30px",
-          color: "#222",
-        }}
-      >
-        welovemods.com
-      </h2>
+       
 
-     
+     <h2
+  style={{
+    fontSize: "40px",
+    fontWeight: 900,
+    marginBottom: "32px",
+    textAlign: "center",
+    letterSpacing: "-1px",
+    textTransform: "uppercase",
+    fontFamily: "'Poppins', sans-serif",
+
+    /* Text color */
+    color: "#00ff8c",
+
+    /* 3D GREEN EFFECT */
+    textShadow: `
+      0px 1px 0px #00e67a,
+      0px 2px 0px #00cc6c,
+      0px 3px 0px #00b35e,
+      0px 4px 0px #009950,
+      0px 5px 12px rgba(0, 255, 140, 0.35)
+    `,
+  }}
+>
+  welovemods.com
+</h2>
+
 
      
     </div>
