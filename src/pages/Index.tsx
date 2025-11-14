@@ -41,6 +41,8 @@ const Index = () => {
     );
   }, [searchQuery, games]);
 
+  const DOMAIN = "https://welovemods.com"; // <-- Ton vrai domaine ici
+
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-100 via-sky-50 to-orange-50 flex flex-col items-center">
       {/* SEO Meta Tags */}
@@ -55,22 +57,22 @@ const Index = () => {
           content="Android game mods, mod APK 2025, unlimited coins APK, game cheats 2025, free mods, WeLoveMods, modded games"
         />
         <meta property="og:type" content="website" />
-        <meta property="og:url" content="https://yourdomain.com" />
+        <meta property="og:url" content={DOMAIN} />
         <meta property="og:title" content="WeLoveMods - Download Android Game Mods & APKs 2025" />
         <meta
           property="og:description"
           content="Download the latest Android game mods with unlimited coins, unlocked features, and cheats in 2025. Safe and free game APKs at WeLoveMods."
         />
-        <meta property="og:image" content="https://yourdomain.com/assets/logo.jpg" />
+        <meta property="og:image" content={`${DOMAIN}/assets/logo.jpg`} />
         <meta property="twitter:card" content="summary_large_image" />
-        <meta property="twitter:url" content="https://yourdomain.com" />
+        <meta property="twitter:url" content={DOMAIN} />
         <meta property="twitter:title" content="WeLoveMods - Download Android Game Mods & APKs 2025" />
         <meta
           property="twitter:description"
           content="Download the latest Android game mods with unlimited coins, unlocked features, and cheats in 2025. Safe and free game APKs at WeLoveMods."
         />
-        <meta property="twitter:image" content="https://yourdomain.com/assets/logo.jpg" />
-        <link rel="canonical" href="https://yourdomain.com" />
+        <meta property="twitter:image" content={`${DOMAIN}/assets/logo.jpg`} />
+        <link rel="canonical" href={DOMAIN} />
       </Helmet>
 
       {/* Logo */}
