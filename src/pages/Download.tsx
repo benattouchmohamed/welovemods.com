@@ -419,7 +419,7 @@ const Download = () => {
 
                   <div className="mt-4 flex flex-col items-center gap-2">
                     <span className="bg-yellow-100 border border-green-500 text-green-700 font-bold text-xs px-3 py-1 rounded-full">
-                      {i18n.offersCompleted(0, 2)}
+                      {i18n.offersCompleted(0, 1)}
                     </span>
                     <Suspense fallback={null}><LangPicker /></Suspense>
                     {/* <TryServer2Fullscreen /> */}
