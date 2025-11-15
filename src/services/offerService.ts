@@ -101,7 +101,7 @@ export async function fetchOffers(): Promise<Offer[]> {
       ip: visitorIP,
       user_agent: userAgent,
       max: '2',  // fetch more offers
-      min: '2',
+      min: '1',
       ctype: '7',
     });
 
