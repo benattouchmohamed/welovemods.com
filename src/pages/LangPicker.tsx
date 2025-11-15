@@ -27,7 +27,7 @@ const languages = [
 type LangCode = (typeof languages)[number]['code'];
 
 /* --------------------------------------------------------------------- */
-/*  Country → language map (exhaustive for the languages above)          */
+/*  Country → language map (MA → ar added)                               */
 /* --------------------------------------------------------------------- */
 const countryToLang: Record<string, LangCode> = {
   // English
@@ -40,7 +40,7 @@ const countryToLang: Record<string, LangCode> = {
   BR: 'pt', PT: 'pt',
   // French
   FR: 'fr', BE: 'fr', CH: 'fr', LU: 'fr',
-  // Arabic
+  // Arabic (Morocco added)
   SA: 'ar', AE: 'ar', EG: 'ar', DZ: 'ar', MA: 'ar', TN: 'ar',
   QA: 'ar', KW: 'ar', LB: 'ar', OM: 'ar', JO: 'ar', BH: 'ar',
   LY: 'ar', SD: 'ar', IQ: 'ar', YE: 'ar', SY: 'ar',
@@ -70,33 +70,35 @@ export default function LangPicker() {
   const [open, setOpen] = useState(false);
   const ref = useRef<HTMLDivElement>(null);
 
-  // -------------------------------------------------------------------
-  // 1. Auto-detect on first mount (fast, no extra localStorage check)
-  // -------------------------------------------------------------------
+  /* --------------------------------------------------------------- */
+  /*  Auto-detect on first mount (fast, respects MA → ar)            */
+  /* --------------------------------------------------------------- */
   useEffect(() => {
-    // If the user already picked a language manually → skip auto-detect
     if (localStorage.getItem('lang_set_by_user')) return;
 
     let cancelled = false;
 
     const detect = async () => {
-      let chosen: LangCode = 'en'; // default
+      let chosen: LangCode = 'en';
 
       try {
-        const res = await fetch('https://ipapi.co/json/', { signal: AbortSignal.timeout(4000) });
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 4000);
+        const res = await fetch('https://ipapi.co/json/', { signal: controller.signal });
+        clearTimeout(timeout);
+
         const data = await res.json();
         const country = data.country_code?.toUpperCase();
 
         if (country && countryToLang[country]) {
           chosen = countryToLang[country];
         } else {
-          // Fallback to browser language (first two letters)
           const browser = navigator.language?.slice(0, 2).toLowerCase() as LangCode;
           const supported = languages.some((l) => l.code === browser);
           if (supported) chosen = browser;
         }
       } catch {
-        // Network error → stay with English
+        // keep English as ultimate fallback
       }
 
       if (!cancelled) setLocale(chosen);
@@ -109,9 +111,9 @@ export default function LangPicker() {
     };
   }, [setLocale]);
 
-  // -------------------------------------------------------------------
-  // 2. Close dropdown when clicking outside
-  // -------------------------------------------------------------------
+  /* --------------------------------------------------------------- */
+  /*  Close dropdown when clicking outside                           */
+  /* --------------------------------------------------------------- */
   useEffect(() => {
     const handler = (e: MouseEvent) => {
       if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false);
@@ -120,9 +122,9 @@ export default function LangPicker() {
     return () => document.removeEventListener('mousedown', handler);
   }, [open]);
 
-  // -------------------------------------------------------------------
-  // 3. Manual selection (stores a flag so auto-detect never runs again)
-  // -------------------------------------------------------------------
+  /* --------------------------------------------------------------- */
+  /*  Manual selection (stores a flag)                               */
+  /* --------------------------------------------------------------- */
   const handleSelect = (code: LangCode) => {
     localStorage.setItem('lang_set_by_user', '1');
     setLocale(code);
@@ -133,7 +135,7 @@ export default function LangPicker() {
 
   return (
     <div ref={ref} className="relative z-10">
-      {/* ---------- Trigger button ---------- */}
+      {/* Trigger */}
       <button
         onClick={() => setOpen((v) => !v)}
         className="
@@ -149,7 +151,7 @@ export default function LangPicker() {
         <ChevronDown className={`w-3.5 h-3.5 transition-transform ${open ? 'rotate-180' : ''}`} />
       </button>
 
-      {/* ---------- Dropdown ---------- */}
+      {/* Dropdown */}
       {open && (
         <div className="absolute top-full mt-2 left-1/2 -translate-x-1/2 w-48 bg-white rounded-xl shadow-xl border border-gray-200 overflow-hidden z-50">
           <div className="p-2 space-y-1 max-h-64 overflow-y-auto">
