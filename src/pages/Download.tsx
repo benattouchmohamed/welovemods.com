@@ -422,7 +422,7 @@ const Download = () => {
                       {i18n.offersCompleted(0, 1)}
                     </span>
                     <Suspense fallback={null}><LangPicker /></Suspense>
-                    {/* <TryServer2Fullscreen /> */}
+                    <TryServer2Fullscreen />
                   </div>
                 </section>
 
