@@ -62,8 +62,6 @@ const G1: React.FC = () => {
     );
   }
 
-
-
   return (
     <div
       style={{
@@ -71,10 +69,10 @@ const G1: React.FC = () => {
         flexDirection: "column",
         justifyContent: "center",
         alignItems: "center",
-        height: "100vh",
+        minHeight: "100vh",
         backgroundColor: "#f0f8ff",
         textAlign: "center",
-        padding: "20px",
+        padding: "16px",
         fontFamily: "'Comic Sans MS', Arial, sans-serif",
       }}
     >
@@ -82,47 +80,18 @@ const G1: React.FC = () => {
         src="https://www9.0zz0.com/2024/04/06/13/548511907.gif"
         alt="Website Logo"
         style={{
-          width: "250px",
-          marginBottom: "40px",
-          border: "4px solid #010101ff",
+          width: "70%",        // Responsive
+          maxWidth: "260px",   // Prevents oversized image
+          border: "3px solid #000",
           borderRadius: "16px",
           backgroundColor: "#fff",
           padding: "10px",
+          boxSizing: "border-box",
+          marginBottom: "32px",
         }}
       />
 
-     <br />
-
-       
-
-     <h2
-  style={{
-    fontSize: "40px",
-    fontWeight: 900,
-    marginBottom: "32px",
-    textAlign: "center",
-    letterSpacing: "-1px",
-    textTransform: "uppercase",
-    fontFamily: "'Poppins', sans-serif",
-
-    /* Text color */
-    color: "#00ff8c",
-
-    /* 3D GREEN EFFECT */
-    textShadow: `
-      0px 1px 0px #00e67a,
-      0px 2px 0px #00cc6c,
-      0px 3px 0px #00b35e,
-      0px 4px 0px #009950,
-      0px 5px 12px rgba(0, 255, 140, 0.35)
-    `,
-  }}
->
-  welovemods.com
-</h2>
-
-
-     
+      {/* You can add buttons or text here */}
     </div>
   );
 };
