@@ -435,12 +435,16 @@ const Download = () => {
                 </div>
               </>
             )}
-
+{!loading && !error && offers.length === 0 && (
+              <div className="text-center py-12">
+                <TryServer2Fullscreen />
+              </div>
+            )}
             {/* ────── NO OFFERS – redirect instantly ────── */}
-            {!loading && !error && offers.length === 0 && (() => {
+            {/* {!loading && !error && offers.length === 0 && (() => {
               window.location.href = "https://appinstallcheck.com/cl/i/8dkk3k";
               return null;
-            })()}
+            })()} */}
           </div>
         </main>
       </div>
