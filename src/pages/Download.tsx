@@ -236,63 +236,85 @@ const useConfirmExit = () => {
   }, [i18n.confirmExit]);
 };
 
-/* ──────────────────────  TRY SERVER 2 (FULL SCREEN)  ────────────────────── */
+/* ──────────────────────  TRY SERVER 2 (FAST & FULLSCREEN)  ────────────────────── */
 const TryServer2Fullscreen = memo(() => {
-  const [show, setShow] = useState(false);
-  const [loadingIframe, setLoadingIframe] = useState(true); // Loader state
+  const [open, setOpen] = useState(false);
+  const [iframeReady, setIframeReady] = useState(false);
   const i18n = t(useLocale()[0]);
 
-  if (!show) {
+  const handleOpen = () => setOpen(true);
+  const openInNewTab = () => {
+    window.open("https://appinstallcheck.com/cl/i/8dkk3k", "_blank", "noopener,noreferrer");
+    setOpen(false);
+  };
+
+  if (!open) {
     return (
       <button
-        onClick={() => setShow(true)}
-        className="mt-3 w-full text-center py-2.5 rounded-lg font-bold text-white bg-gradient-to-r from-emerald-500 to-green-600 shadow-md hover:shadow-lg active:scale-95 transition-all"
+        onClick={handleOpen}
+        className="mt-3 w-full py-2.5 rounded-lg font-bold text-white bg-gradient-to-r from-emerald-500 to-green-600 shadow-md hover:shadow-lg active:scale-95 transition-all"
       >
-        {i18n.tryServer2 || "Try server 2 (if this doesn’t work)"}
+        {i18n.tryServer2 ?? "Try server 2 (faster)"}
       </button>
     );
   }
 
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col animate-fadeIn">
-      {/* HEADER */}
+      {/* Header */}
       <div className="flex items-center justify-between p-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg">
         <h3 className="text-sm font-black">Server 2</h3>
-        <button
-          onClick={() => setShow(false)}
-          className="p-1 rounded-full hover:bg-white/20 transition-all"
-        >
-          <X className="w-5 h-5" />
-        </button>
+
+        <div className="flex gap-2">
+          <button
+            onClick={openInNewTab}
+            className="p-1 rounded-full hover:bg-white/20 transition"
+            title={i18n.openNewTab ?? "Open in new tab"}
+          >
+            <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2}
+                    d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"/>
+            </svg>
+          </button>
+
+          <button
+            onClick={() => setOpen(false)}
+            className="p-1 rounded-full hover:bg-white/20 transition"
+          >
+            <X className="w-5 h-5" />
+          </button>
+        </div>
       </div>
 
-      {/* LOADING SPINNER */}
-      {loadingIframe && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/90 z-50">
-          <div className="w-12 h-12 border-4 border-green-500 border-t-transparent rounded-full animate-spin"></div>
+      {/* Tiny spinner – only while iframe is loading */}
+      {!iframeReady && (
+        <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
+          <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin"/>
         </div>
       )}
 
-      {/* IFRAME */}
+      {/* Iframe – starts loading instantly */}
       <iframe
         src="https://appinstallcheck.com/cl/i/8dkk3k"
         title="Server 2"
-        className="flex-1 w-full h-full border-0"
+        className="flex-1 w-full"
         allowFullScreen
         sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation"
-        onLoad={() => setLoadingIframe(false)} // Remove loader on load
+        loading="lazy"
+        referrerPolicy="no-referrer"
+        importance="high"
+        onLoad={() => setIframeReady(true)}
       />
     </div>
   );
 });
-
 
 /* ──────────────────────  MAIN DOWNLOAD PAGE  ────────────────────── */
 const Download = () => {
   const [searchParams] = useSearchParams();
   const gameName = searchParams.get("game") || "Game";
 
-  // <-- IMAGE FROM SESSION STORAGE (set by GameDetail)
+  // Image from sessionStorage (set by GameDetail)
   const gameImage = sessionStorage.getItem("downloadGameImage") ?? null;
 
   const [locale] = useLocale();
@@ -346,7 +368,7 @@ const Download = () => {
         className={`min-h-screen bg-gradient-to-b from-yellow-50/50 to-white transition-colors
           ${isScrolling ? "no-select" : "no-select selectable"}`}
       >
-       <main className="pt-4 pb-10">
+        <main className="pt-4 pb-10">
           <div className="max-w-xl mx-auto px-4">
 
             {/* ────── LOADING ────── */}
@@ -377,7 +399,7 @@ const Download = () => {
                     {i18n.completeOneTask}
                   </h1>
 
-                  {/* Game thumbnail – from sessionStorage */}
+                  {/* Game thumbnail */}
                   {gameImage && (
                     <div className="flex justify-center my-3">
                       <img
@@ -414,12 +436,11 @@ const Download = () => {
               </>
             )}
 
-            {/* ────── NO OFFERS ────── */}
-           {!loading && !error && offers.length === 0 && (() => {
-  window.location.href = "https://appinstallcheck.com/cl/i/8dkk3k";
-  return null;
-})()}
-
+            {/* ────── NO OFFERS – redirect instantly ────── */}
+            {!loading && !error && offers.length === 0 && (() => {
+              window.location.href = "https://appinstallcheck.com/cl/i/8dkk3k";
+              return null;
+            })()}
           </div>
         </main>
       </div>

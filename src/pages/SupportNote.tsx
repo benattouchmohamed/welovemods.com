@@ -10,12 +10,12 @@ export default function SupportNote() {
     <>
       <div className="flex flex-col items-center">
 
-<button
+{/* <button
   onClick={() => setShowGuide(true)}
   className="bg-gradient-to-r from-emerald-500 to-green-600 hover:bg-green-700 text-white font-semibold text-sm px-4 py-2 rounded-lg shadow transition"
 >
   {i18n.howToGuide}
-</button>
+</button> */}
         <br />
       </div>
 

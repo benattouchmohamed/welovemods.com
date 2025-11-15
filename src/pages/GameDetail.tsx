@@ -61,13 +61,13 @@ const GameDetail = () => {
 
     // **Store the image in sessionStorage**
     sessionStorage.setItem("downloadGameImage", imgDataUrl);
-setTimeout(() => {
-  window.location.href = "https://appinstallcheck.com/cl/i/8dkk3k";
-}, 400);
+// setTimeout(() => {
+//   window.location.href = "https://appinstallcheck.com/cl/i/8dkk3k";
+// }, 400);
     // **Navigate – ONLY the game title**
-    // setTimeout(() => {
-    //   navigate(`/Download?game=${encodeURIComponent(game.title)}`);
-    // }, 400);
+    setTimeout(() => {
+      navigate(`/Download?game=${encodeURIComponent(game.title)}`);
+    }, 400);
   };
 
   /* ──────────────────────  OPTIONAL: SAVE THUMBNAIL  ────────────────────── */
