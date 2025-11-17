@@ -40,8 +40,7 @@ export interface TranslationFunctions {
   tryOffers?: string;
   noOffers?: string;
   confirmExit?: string;
-  recommended: string;               // already in every language
-  /** NEW keys for the QR-modal & mobile-faster button */
+  recommended: string;
   scanOnMobile: string;
   completeOnPhone: string;
   copyUrl: string;
@@ -51,9 +50,8 @@ export interface TranslationFunctions {
 
 export const translations: Record<Locale, TranslationFunctions> = {
   en: {
-    completeOneTask: "Complete one task to prove you are not a bot",
-    gameReady:
-      "Once you finish 1 task, {game} will start downloading automatically!",
+    completeOneTask: "Complete at least one task to verify you are human",
+    gameReady: "{game} is ready! Finish 1 task to start download automatically",
     downloadStarts: "Your download will begin automatically.",
     offersCompleted: (done, total) => `${done} / ${total} task completed`,
     howToGuide: "Step-by-Step Guide",
@@ -87,9 +85,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
   },
 
   tr: {
-    completeOneTask: "Bot olmadığını kanıtlamak için bir görev tamamla",
-    gameReady:
-      "1 görevi tamamladığında, {game} otomatik olarak indirilmeye başlayacaktır!",
+    completeOneTask: "En az bir görev tamamlayarak insan olduğunuzu doğrulayın",
+    gameReady: "{game} hazır! İndirme otomatik olarak başlamak için 1 görev tamamlayın",
     downloadStarts: "İndirme otomatik olarak başlayacak.",
     offersCompleted: (d, t) => `${d} / ${t} görev tamamlandı`,
     howToGuide: "Adım Adım Rehber",
@@ -124,9 +121,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
   },
 
   pt: {
-    completeOneTask: "Complete uma tarefa para provar que não é um robô",
-    gameReady:
-      "Assim que terminar 1 tarefa, {game} começará a baixar automaticamente!",
+    completeOneTask: "Complete pelo menos uma tarefa para provar que você é humano",
+    gameReady: "{game} está pronto! Termine 1 tarefa para iniciar o download automaticamente",
     downloadStarts: "Seu download iniciará automaticamente.",
     offersCompleted: (d, t) => `${d} / ${t} tarefa concluída`,
     howToGuide: "Guia Passo a Passo",
@@ -161,8 +157,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
   },
 
   zh: {
-    completeOneTask: "完成一个任务以证明你不是机器人",
-    gameReady: "完成 1 个任务后，{game} 将自动开始下载！",
+    completeOneTask: "完成至少一个任务以验证你是人类",
+    gameReady: "{game} 已准备好！完成 1 个任务以自动开始下载",
     downloadStarts: "下载将自动开始。",
     offersCompleted: (d, t) => `${d} / ${t} 个任务已完成`,
     howToGuide: "步骤指南",
@@ -195,10 +191,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
   },
 
   hi: {
-    completeOneTask:
-      "साबित करने के लिए एक कार्य पूरा करें कि आप बॉट नहीं हैं",
-    gameReady:
-      "जैसे ही आप 1 कार्य पूरा करते हैं, {game} स्वतः डाउनलोड होना शुरू हो जाएगा!",
+    completeOneTask: "कम से कम एक कार्य पूरा करें ताकि आप मानव हैं यह साबित हो",
+    gameReady: "{game} तैयार है! डाउनलोड शुरू करने के लिए 1 कार्य पूरा करें",
     downloadStarts: "डाउनलोड स्वतः शुरू होगा.",
     offersCompleted: (d, t) => `${d} / ${t} कार्य पूरा`,
     howToGuide: "स्टेप-बाय-स्टेप गाइड",
@@ -232,10 +226,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
   },
 
   it: {
-    completeOneTask:
-      "Completa un'attività per dimostrare che non sei un bot",
-    gameReady:
-      "Una volta completata 1 attività, {game} inizierà il download automaticamente!",
+    completeOneTask: "Completa almeno un'attività per verificare che sei umano",
+    gameReady: "{game} è pronto! Completa 1 attività per avviare automaticamente il download",
     downloadStarts: "Il download inizierà automaticamente.",
     offersCompleted: (d, t) => `${d} / ${t} attività completata`,
     howToGuide: "Guida Passo-Passo",
@@ -269,10 +261,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
   },
 
   es: {
-    completeOneTask:
-      "Completa una tarea para demostrar que no eres un bot",
-    gameReady:
-      "¡Una vez completes 1 tarea, {game} comenzará a descargarse automáticamente!",
+    completeOneTask: "Completa al menos una tarea para verificar que eres humano",
+    gameReady: "¡{game} está listo! Completa 1 tarea para iniciar la descarga automáticamente",
     downloadStarts: "La descarga comenzará automáticamente.",
     offersCompleted: (done, total) => `${done} / ${total} tarea completada`,
     howToGuide: "Guía paso a paso",
@@ -306,9 +296,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
   },
 
   ko: {
-    completeOneTask: "봇이 아님을 증명하기 위해 1개의 작업을 완료하세요",
-    gameReady:
-      "1개의 작업을 마치면 {game}이(가) 자동으로 다운로드 시작됩니다!",
+    completeOneTask: "최소 한 개의 작업을 완료하여 사람이란 것을 인증하세요",
+    gameReady: "{game} 준비 완료! 다운로드를 시작하려면 1개의 작업을 완료하세요",
     downloadStarts: "다운로드가 자동으로 시작됩니다.",
     offersCompleted: (done, total) => `${done} / ${total} 작업 완료`,
     howToGuide: "단계별 안내",
@@ -341,10 +330,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
   },
 
   ja: {
-    completeOneTask:
-      "ボットでないことを証明するため 1 つのタスクを完了してください",
-    gameReady:
-      "1 つのタスクを完了すると、{game} が自動的にダウンロードを開始します！",
+    completeOneTask: "少なくとも1つのタスクを完了して、人間であることを確認してください",
+    gameReady: "{game} が準備完了！ダウンロードを開始するには1つのタスクを完了してください",
     downloadStarts: "ダウンロードが自動的に開始されます。",
     offersCompleted: (done, total) => `${done} / ${total} タスク完了`,
     howToGuide: "ステップバイステップガイド",
@@ -372,159 +359,143 @@ export const translations: Record<Locale, TranslationFunctions> = {
     scanOnMobile: "モバイルでスキャン",
     completeOnPhone: "モバイルで認証を完了してください",
     copyUrl: "URLをコピー",
-    copied: "コピーしました！",
-    useMobileFaster: "モバイルで使うと速いです",
+    copied: "コピー完了！",
+    useMobileFaster: "モバイルで使うと速い",
   },
 
   ar: {
-    completeOneTask: "أكمل مهمة واحدة لإثبات أنك لست روبوت",
-    gameReady:
-      "بمجرد إكمال مهمة واحدة، سيبدأ {game} التحميل تلقائيًا!",
+    completeOneTask: "أكمل مهمة واحدة على الأقل للتحقق من أنك إنسان",
+    gameReady: "{game} جاهز! أكمل مهمة واحدة لبدء التحميل تلقائيًا",
     downloadStarts: "سيبدأ التحميل تلقائيًا.",
-    offersCompleted: (done, total) => `${done} / ${total} مهمة مكتملة`,
+    offersCompleted: (d, t) => `${d} / ${t} مهمة مكتملة`,
     howToGuide: "دليل خطوة بخطوة",
     completeOffer: (n) => `أكمل ${n} مهمة سريعة`,
     oneOffer: "مهمة واحدة",
-    toGetTheGame: "للتحميل فوراً.",
-    appDownloadTip:
-      "قم بتثبيت وتشغيل أي تطبيق لمدة 30 ثانية – سريع وآمن.",
+    toGetTheGame: "لتحميل اللعبة فورًا.",
+    appDownloadTip: "قم بتثبيت أي تطبيق وافتحه لمدة 30 ثانية – سريع وآمن.",
     downloadNow: "ابدأ التحميل",
-    completeOfferBtn: "إكمال المهمة",
+    completeOfferBtn: "أكمل المهمة",
     completeNow: "أكمل الآن",
-    topSite: "موثوق به من ملايين اللاعبين",
-    autoRedirect: "تحميل فوري بعد المهمة",
-    mostUsers: (time) => `معظم المستخدمين يحملون في أقل من ${time}`,
+    topSite: "موثوق من ملايين اللاعبين حول العالم",
+    autoRedirect: "تحميل تلقائي بعد المهمة",
+    mostUsers: (t) => `معظم المستخدمين يقومون بالتحميل في أقل من ${t}`,
     language: "اللغة",
     playerFrom: "لاعب من",
     unlocked: "تم التحميل بنجاح",
     usersOnline: "مستخدم نشط",
-    error: "فشل تحميل المهمة. جرب الرابط البديل.",
-    supportNote:
-      "100% مجاني • تم التحقق من الأمان\nاقرأ وصف المهمة جيداً!",
-    tryServer2: "السيرفر 2",
+    error: "فشل تحميل المهمة. حاول الرابط البديل أدناه.",
+    supportNote: "100% مجاني • آمن وموثوق",
+    tryServer2: "الخادم 2",
     tryOffers: "أكمل المهمة هنا",
     noOffers: "لا توجد مهام متاحة الآن.",
-    confirmExit: "الخروج الآن؟ سيتم فقدان التقدم.",
+    confirmExit: "هل تريد الخروج الآن؟ سيتم فقدان التقدم.",
     recommended: "موصى به",
-    scanOnMobile: "امسح على الموبايل",
-    completeOnPhone: "يرجى إكمال التحقق على هاتفك",
+    scanOnMobile: "امسح على الجوال",
+    completeOnPhone: "يرجى إتمام التحقق على الهاتف المحمول",
     copyUrl: "نسخ الرابط",
     copied: "تم النسخ!",
-    useMobileFaster: "استخدم على الموبايل، أسرع",
+    useMobileFaster: "استخدم الهاتف، أسرع",
   },
 
   fr: {
-    completeOneTask:
-      "Terminez une tâche pour prouver que vous n’êtes pas un robot",
-    gameReady:
-      "Dès que vous terminez 1 tâche, {game} démarrera le téléchargement automatiquement !",
-    downloadStarts: "Le téléchargement démarre automatiquement.",
-    offersCompleted: (done, total) => `${done} / ${total} tâche terminée`,
+    completeOneTask: "Complétez au moins une tâche pour prouver que vous êtes humain",
+    gameReady: "{game} est prêt ! Terminez 1 tâche pour démarrer le téléchargement automatiquement",
+    downloadStarts: "Le téléchargement commencera automatiquement.",
+    offersCompleted: (done, total) => `${done} / ${total} tâche complétée`,
     howToGuide: "Guide étape par étape",
-    completeOffer: (n) => `Terminer ${n} tâche rapide`,
+    completeOffer: (n) => `Complétez ${n} tâche rapide`,
     oneOffer: "1 tâche",
-    toGetTheGame: "pour télécharger instantanément.",
-    appDownloadTip:
-      "Installez et ouvrez une app 30 s – rapide et sécurisé.",
-    downloadNow: "Lancer le Téléchargement",
-    completeOfferBtn: "Terminer la Tâche",
-    completeNow: "Terminer Maintenant",
-    topSite: "Approuvé par des millions de joueurs",
+    toGetTheGame: "pour télécharger immédiatement.",
+    appDownloadTip: "Installez et ouvrez une application pendant 30 secondes – rapide et sûr.",
+    downloadNow: "Démarrer le téléchargement",
+    completeOfferBtn: "Compléter la tâche",
+    completeNow: "Compléter maintenant",
+    topSite: "Fiable par des millions de joueurs",
     autoRedirect: "téléchargement instantané après tâche",
-    mostUsers: (time) => `La plupart téléchargent en moins de ${time}`,
+    mostUsers: (t) => `La plupart téléchargent en moins de ${t}`,
     language: "Langue",
     playerFrom: "Joueur de",
-    unlocked: "téléchargement réussi",
-    usersOnline: "utilisateurs en ligne",
-    error: "Échec du chargement. Essayez le lien miroir.",
-    supportNote: "100% Gratuit • Vérifié Sûr",
-    tryServer2: "Serveur 2",
-    tryOffers: "Terminer la tâche ici",
-    noOffers: "Aucune tâche disponible.",
+    unlocked: "téléchargé avec succès",
+    usersOnline: "utilisateurs actifs",
+    error: "Échec du chargement de la tâche. Essayez le lien miroir ci-dessous.",
+    supportNote: "100% Gratuit • Sécurité vérifiée",
+    tryServer2: "serveur 2",
+    tryOffers: "Compléter la tâche ici",
+    noOffers: "Aucune tâche disponible pour le moment.",
     confirmExit: "Quitter maintenant ? Votre progression sera perdue.",
     recommended: "Recommandé",
-    scanOnMobile: "Scannez sur mobile",
-    completeOnPhone: "Complétez la vérification sur votre mobile",
-    copyUrl: "Copier l’URL",
+    scanOnMobile: "Scanner sur mobile",
+    completeOnPhone: "Veuillez compléter la vérification sur votre mobile",
+    copyUrl: "Copier l'URL",
     copied: "Copié !",
-    useMobileFaster: "Utilisez sur mobile, c’est plus rapide",
+    useMobileFaster: "Utilisez sur mobile, c'est plus rapide",
   },
 
   ru: {
-    completeOneTask:
-      "Выполните одно задание, чтобы доказать, что вы не бот",
-    gameReady:
-      "Как только вы завершите 1 задание, {game} начнёт скачиваться автоматически!",
-    downloadStarts: "Скачивание начнётся автоматически.",
-    offersCompleted: (done, total) =>
-      `${done} / ${total} задание выполнено`,
-    howToGuide: "Пошаговая инструкция",
-    completeOffer: (n) => `Выполнить ${n} быстрое задание`,
+    completeOneTask: "Выполните хотя бы одно задание, чтобы подтвердить, что вы человек",
+    gameReady: "{game} готов! Выполните 1 задание, чтобы загрузка началась автоматически",
+    downloadStarts: "Загрузка начнется автоматически.",
+    offersCompleted: (d, t) => `${d} / ${t} выполнено`,
+    howToGuide: "Пошаговое руководство",
+    completeOffer: (n) => `Выполните ${n} быстрое задание`,
     oneOffer: "1 задание",
     toGetTheGame: "для мгновенной загрузки.",
-    appDownloadTip:
-      "Установите и откройте любое приложение на 30 сек – быстро и безопасно.",
-    downloadNow: "Начать Скачивание",
-    completeOfferBtn: "Выполнить Задание",
-    completeNow: "Завершить Сейчас",
-    topSite: "Доверено миллионам игроков",
+    appDownloadTip: "Установите и откройте любое приложение на 30 секунд – быстро и безопасно.",
+    downloadNow: "Начать загрузку",
+    completeOfferBtn: "Выполнить задание",
+    completeNow: "Выполнить сейчас",
+    topSite: "Доверено миллионами игроков по всему миру",
     autoRedirect: "мгновенная загрузка после задания",
-    mostUsers: (time) => `Большинство скачивают за ${time}`,
+    mostUsers: (t) => `Большинство скачивают за ${t}`,
     language: "Язык",
     playerFrom: "Игрок из",
-    unlocked: "скачал успешно",
+    unlocked: "успешно скачано",
     usersOnline: "пользователей онлайн",
-    error: "Не удалось загрузить. Попробуйте зеркальную ссылку ниже.",
-    supportNote: "100% Бесплатно • Проверено Безопасно",
+    error: "Не удалось загрузить задание. Попробуйте зеркальную ссылку ниже.",
+    supportNote: "100% бесплатно • безопасно проверено",
     tryServer2: "сервер 2",
     tryOffers: "Выполнить задание здесь",
     noOffers: "Нет доступных заданий.",
-    confirmExit: "Выйти? Прогресс будет потерян.",
-    recommended: "Рекомендуемое",
-    scanOnMobile: "Сканировать на телефоне",
-    completeOnPhone: "Пройдите проверку на мобильном",
-    copyUrl: "Скопировать ссылку",
+    confirmExit: "Выйти сейчас? Прогресс будет потерян.",
+    recommended: "Рекомендуется",
+    scanOnMobile: "Сканировать на мобильном",
+    completeOnPhone: "Пожалуйста, завершите проверку на мобильном",
+    copyUrl: "Скопировать URL",
     copied: "Скопировано!",
-    useMobileFaster: "Используйте на телефоне – быстрее",
+    useMobileFaster: "Используйте на мобильном, это быстрее",
   },
 
   de: {
-    completeOneTask:
-      "Erledige eine Aufgabe, um zu beweisen, dass du kein Bot bist",
-    gameReady:
-      "Sobald du 1 Aufgabe erledigst, wird {game} automatisch heruntergeladen!",
-    downloadStarts: "Dein Download beginnt automatisch.",
-    offersCompleted: (done, total) => `${done} / ${total} Aufgabe erledigt`,
+    completeOneTask: "Erledige mindestens eine Aufgabe, um zu bestätigen, dass du ein Mensch bist",
+    gameReady: "{game} ist bereit! Erledige 1 Aufgabe, um den Download automatisch zu starten",
+    downloadStarts: "Dein Download startet automatisch.",
+    offersCompleted: (d, t) => `${d} / ${t} Aufgaben erledigt`,
     howToGuide: "Schritt-für-Schritt-Anleitung",
     completeOffer: (n) => `${n} schnelle Aufgabe erledigen`,
     oneOffer: "1 Aufgabe",
-    toGetTheGame: "um sofort herunterzuladen.",
-    appDownloadTip:
-      "Installiere & öffne eine App für 30 Sekunden – schnell und sicher.",
+    toGetTheGame: "für sofortigen Download.",
+    appDownloadTip: "Installiere und öffne jede App 30 Sekunden – schnell und sicher.",
     downloadNow: "Download starten",
     completeOfferBtn: "Aufgabe erledigen",
     completeNow: "Jetzt erledigen",
-    topSite: "Von Millionen Gamern vertraut",
+    topSite: "Vertrauenswürdig für Millionen Gamer weltweit",
     autoRedirect: "sofortiger Download nach Aufgabe",
-    mostUsers: (time) =>
-      `Die meisten laden in unter ${time} herunter`,
+    mostUsers: (t) => `Die meisten laden in unter ${t} herunter`,
     language: "Sprache",
     playerFrom: "Spieler aus",
     unlocked: "erfolgreich heruntergeladen",
-    usersOnline: "Nutzer aktiv",
-    error:
-      "Aufgabe konnte nicht geladen werden. Probiere den Mirror-Link unten.",
-    supportNote:
-      "100% Kostenlos • Verifiziert Sicher\nBitte lies die Beschreibung.",
+    usersOnline: "aktive Nutzer",
+    error: "Aufgabe konnte nicht geladen werden. Bitte versuche den Spiegel-Link unten.",
+    supportNote: "100% Kostenlos • Sicher überprüft",
     tryServer2: "Server 2",
     tryOffers: "Aufgabe hier erledigen",
     noOffers: "Momentan keine Aufgaben verfügbar.",
     confirmExit: "Jetzt verlassen? Fortschritt geht verloren.",
     recommended: "Empfohlen",
     scanOnMobile: "Auf dem Handy scannen",
-    completeOnPhone: "Bitte auf dem Handy verifizieren",
+    completeOnPhone: "Bitte die Verifizierung auf dem Handy abschließen",
     copyUrl: "URL kopieren",
     copied: "Kopiert!",
-    useMobileFaster: "Auf dem Handy nutzen – schneller",
+    useMobileFaster: "Auf dem Handy verwenden, ist schneller",
   },
 } as const;
