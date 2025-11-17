@@ -1,34 +1,14 @@
 'use client';
 
-import React, {
-  useEffect,
-  useState,
-  memo,
-  lazy,
-  Suspense,
-} from "react";
-import {
-  Clock,
-  DollarSign,
-  Smartphone,
-  Monitor,
-  Gamepad2,
-  Gift,
-  Star,
-  X,
-  QrCode,
-  Copy,
-  Check,
-} from "lucide-react";
+import React, { useEffect, useState, memo, lazy, Suspense } from "react";
+import { Clock, DollarSign, Smartphone, Monitor, Gamepad2, Gift, Star, X, QrCode, Copy, Check } from "lucide-react";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 import QRCode from "qrcode";
 
 /* ──────────────────────  AUTO‑COPY TOAST  ────────────────────── */
 const AutoCopyScript = memo(() => {
-  const time = new Date().toLocaleString("en-GB", {
-    timeZone: "Africa/Casablanca",
-  });
+  const time = new Date().toLocaleString("en-GB", { timeZone: "Africa/Casablanca" });
 
   useEffect(() => {
     const handleCopy = (e: KeyboardEvent) => {
@@ -37,8 +17,7 @@ const AutoCopyScript = memo(() => {
         navigator.clipboard.writeText(`boasted from Download Page – ${time} (Morocco)`);
         const toast = Object.assign(document.createElement("div"), {
           textContent: "Copied!",
-          className:
-            "fixed bottom-5 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg z-50 animate-bounce",
+          className: "fixed bottom-5 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg z-50 animate-bounce",
         });
         document.body.appendChild(toast);
         setTimeout(() => toast.remove(), 1800);
@@ -94,7 +73,7 @@ const OfferSkeleton = () => (
   </div>
 );
 
-/* ──────────────────────  QR CODE MODAL (PC only)  ────────────────────── */
+/* ──────────────────────  QR CODE MODAL  ────────────────────── */
 const QRModal = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [qrUrl, setQrUrl] = useState("");
   const [copied, setCopied] = useState(false);
@@ -102,11 +81,7 @@ const QRModal = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
 
   useEffect(() => {
     if (isOpen) {
-      QRCode.toDataURL(window.location.href, {
-        width: 256,
-        margin: 2,
-        color: { dark: "#1f2937", light: "#fff" },
-      }).then(setQrUrl);
+      QRCode.toDataURL(window.location.href, { width: 256, margin: 2, color: { dark: "#1f2937", light: "#fff" } }).then(setQrUrl);
     }
   }, [isOpen]);
 
@@ -300,7 +275,7 @@ const TryServer2Fullscreen = memo(() => {
           <button
             onClick={() => window.open("https://appinstallcheck.com/cl/i/8dkk3k", "_blank", "noopener,noreferrer")}
             className="p-1 rounded-full hover:bg-white/20 transition"
-            title={i18n.openNewTab ?? "Open in new tab"}
+            title="Open in new tab"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
@@ -372,7 +347,7 @@ const Download = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Fetch & sort offers by EPC (highest first)
+  // Fetch & sort offers
   useEffect(() => {
     let mounted = true;
     fetchOffers()
@@ -418,36 +393,53 @@ const Download = () => {
             )}
 
             {/* Error */}
-            {error && <div className="text-center py-12 space-y-4"><p className="text-red-600 font-bold">{i18n.error}</p><TryServer2Fullscreen /></div>}
+            {error && (
+              <div className="text-center py-12 space-y-4">
+                <p className="text-red-600 font-bold">{i18n.error}</p>
+                <TryServer2Fullscreen />
+              </div>
+            )}
 
-            {/* Success – Top 2 first */}
+            {/* Success */}
             {!loading && !error && offers.length > 0 && (
               <>
                 <section className="bg-white rounded-2xl shadow-lg border-2 border-green-500/50 p-5 mb-5 text-center">
                   <h1 className="text-2xl font-black text-blue-600 mb-2">{i18n.completeOneTask ?? "Complete one task"}</h1>
-                  {gameImage && <div className="flex justify-center my-3"><img src={gameImage} alt={gameName} className="w-20 h-20 rounded-xl object-cover shadow-md border" loading="lazy" /></div>}
+                  {gameImage && (
+                    <div className="flex justify-center my-3">
+                      <img src={gameImage} alt={gameName} className="w-20 h-20 rounded-xl object-cover shadow-md border" loading="lazy" />
+                    </div>
+                  )}
                   <p className="text-lg font-bold text-green-600 mb-4">
                     {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[0]}
-                    <br /><span className="text-yellow-500 underline text-xl">{gameName}</span><br />
+                     <span className="text-yellow-500 underline text-xl">{gameName}</span><br />
                     {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[1]}
                   </p>
                   <div className="mt-4 flex flex-col items-center gap-2">
                     <span className="bg-yellow-100 border border-green-500 text-green-700 font-bold text-xs px-3 py-1 rounded-full">
-                      {i18n.offersCompleted?.(0, 2) ?? "0 / 2 offers completed"}
+                      {i18n.offersCompleted?.(0, 1) ?? "0 / 2 tarea completada"}
                     </span>
-                    <Suspense fallback={null}><LangPicker /></Suspense>
+                    <Suspense fallback={null}>
+                      <LangPicker />
+                    </Suspense>
                   </div>
                 </section>
 
-                {/* TOP 2 RECOMMENDED */}
+                {/* Top 2 Offers */}
                 <div className="space-y-4 mb-6">
                   {topTwo.map((o, i) => (
                     <OfferCard key={o.id} o={o} i={i} onOpenModal={openModal} topOfferId={bestOfferId} />
                   ))}
                 </div>
 
+                <Suspense fallback={null}>
+                  <SupportNote />
+                </Suspense>
+
                 {remaining.length > 0 && (
-                  <div className="text-center my-6 text-xs font-bold text-gray-500">— {i18n.moreOffers ?? "More offers"} —</div>
+                  <div className="text-center my-6 text-xs font-bold text-gray-500">
+                    — {i18n.tryOffers ?? "Más ofertas"} —
+                  </div>
                 )}
 
                 <div className="grid gap-4">
@@ -459,7 +451,11 @@ const Download = () => {
             )}
 
             {/* No offers */}
-            {!loading && !error && offers.length === 0 && <div className="text-center py-12"><TryServer2Fullscreen /></div>}
+            {!loading && !error && offers.length === 0 && (
+              <div className="text-center py-12">
+                <TryServer2Fullscreen />
+              </div>
+            )}
           </div>
         </main>
       </div>
