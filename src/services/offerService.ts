@@ -2,7 +2,7 @@
 // Smart prioritized + EPC-sorted offers
 // Priority: CPI → VID → PIN → CPA
 // → Request min=2, max=2 per type, in order
-// → Final: up to 2 offers, EPC-sorted (highest first)
+// → Final: up to 2 d offers, EPC-sorted (highest first)
 
 export interface Offer {
   id: string;
