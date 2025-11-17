@@ -1,7 +1,8 @@
 // offers.ts
-// Smart dual-request + EPC-sorted offers
-// → CPI: up to 2 offers (highest EPC first)
-// → Fallback: up to 3 non-CPI offers (CPA + PIN + VID), highest EPC first
+// Smart prioritized + EPC-sorted offers
+// Priority: CPI → VID → PIN → CPA
+// → Request min=2, max=2 per type, in order
+// → Final: up to 2 offers, EPC-sorted (highest first)
 
 export interface Offer {
   id: string;
@@ -40,8 +41,15 @@ interface ApiOfferResponse {
 const API_BASE_URL = 'https://unlockcontent.net/api/v2';
 const API_TOKEN = '32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085';
 const FALLBACK_URL = 'https://areyourealhuman.com/cl/i/g6pqp2';
-
 const CTYPE = { CPI: 1, CPA: 2, PIN: 4, VID: 8 } as const;
+
+// Priority order: CPI → VID → PIN → CPA
+const PRIORITY_ORDER = [
+  { type: 'CPI', ctype: CTYPE.CPI },
+  { type: 'VID', ctype: CTYPE.VID },
+  { type: 'PIN', ctype: CTYPE.PIN },
+  { type: 'CPA', ctype: CTYPE.CPA },
+] as const;
 
 // ────── Helpers ──────
 const getVisitorIP = async (): Promise<string> => {
@@ -90,13 +98,12 @@ export const fetchOffers = async (): Promise<Offer[]> => {
   try {
     const visitorIP = await getVisitorIP();
     const userAgent = navigator.userAgent;
-
     const headers = {
       Authorization: `Bearer ${API_TOKEN}`,
       'Content-Type': 'application/json',
     };
 
-    // Polyfill for older browsers (AbortSignal.timeout not in all envs)
+    // Polyfill for AbortSignal.timeout
     const timeoutSignal = typeof AbortSignal.timeout === 'function'
       ? AbortSignal.timeout(10000)
       : (() => {
@@ -105,62 +112,46 @@ export const fetchOffers = async (): Promise<Offer[]> => {
           return controller.signal;
         })();
 
-    // ── Step 1: Try CPI (up to 2 offers) ──
-    const cpiParams = new URLSearchParams({
-      ip: visitorIP,
-      user_agent: userAgent,
-      ctype: CTYPE.CPI.toString(),
-      max: '2',
-      min: '1',
-    });
+    const allOffers: Offer[] = [];
 
-    const cpiResp = await fetch(`${API_BASE_URL}?${cpiParams}`, {
-      method: 'GET',
-      headers,
-      signal: timeoutSignal,
-    });
+    // Step 1: Sequential priority requests (CPI → VID → PIN → CPA)
+    for (const { type, ctype } of PRIORITY_ORDER) {
+      if (allOffers.length >= 2) break; // Stop early if we already have 2
 
-    if (cpiResp.ok) {
-      const data: ApiOfferResponse = await cpiResp.json();
-      const cpiRaw = data.success ? (data.offers ?? []) : [];
-      if (cpiRaw.length > 0) {
-        const offers = cpiRaw.slice(0, 2).map(mapApiOfferToOffer);
-        return offers
-          .map((o, i) => ({ offer: o, idx: i }))
-          .sort((a, b) => sortByEpc(a.offer, b.offer, a.idx, b.idx))
-          .map(x => x.offer);
+      const params = new URLSearchParams({
+        ip: visitorIP,
+        user_agent: userAgent,
+        ctype: ctype.toString(),
+        min: '2',
+        max: '2',
+      });
+
+      try {
+        const resp = await fetch(`${API_BASE_URL}?${params}`, {
+          method: 'GET',
+          headers,
+          signal: timeoutSignal,
+        });
+
+        if (resp.ok) {
+          const data: ApiOfferResponse = await resp.json();
+          const rawOffers = data.success ? (data.offers ?? []) : [];
+          const mapped = rawOffers.slice(0, 2).map(mapApiOfferToOffer);
+          allOffers.push(...mapped);
+        }
+      } catch (err) {
+        console.warn(`Failed to fetch ${type} offers:`, err);
+        // Continue to next priority
       }
     }
 
-    // ── Step 2: Fallback → non-CPI (CPA + PIN + VID) → up to 3 offers ──
-    const otherParams = new URLSearchParams({
-      ip: visitorIP,
-      user_agent: userAgent,
-      ctype: (CTYPE.CPA + CTYPE.PIN + CTYPE.VID).toString(), // 14
-      max: '2',
-      min: '1',
-    });
+    // Step 2: Sort all collected offers by EPC (highest first)
+    return allOffers
+      .map((o, i) => ({ offer: o, idx: i }))
+      .sort((a, b) => sortByEpc(a.offer, b.offer, a.idx, b.idx))
+      .slice(0, 2) // Final cap: 2 offers
+      .map(x => x.offer);
 
-    const otherResp = await fetch(`${API_BASE_URL}?${otherParams}`, {
-      method: 'GET',
-      headers,
-      signal: timeoutSignal,
-    });
-
-    if (otherResp.ok) {
-      const data: ApiOfferResponse = await otherResp.json();
-      const otherRaw = data.success ? (data.offers ?? []) : [];
-
-      // FIXED: Keep up to 3 offers (not 2)
-      const offers = otherRaw.slice(0, 3).map(mapApiOfferToOffer);
-
-      return offers
-        .map((o, i) => ({ offer: o, idx: i }))
-        .sort((a, b) => sortByEpc(a.offer, b.offer, a.idx, b.idx))
-        .map(x => x.offer);
-    }
-
-    return [];
   } catch (err) {
     console.error('fetchOffers error →', err);
     return [];
