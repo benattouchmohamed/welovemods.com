@@ -585,3 +585,31 @@ const Download = () => {
 };
 
 export default Download;
+
+
+  {/* <div className="relative">
+          {/* Subtle sparkle background when loading */}
+          {isLoading && (
+            <div className="absolute inset-0 -m-2">
+              <div className="absolute inset-0 bg-green-400 rounded-full animate-ping opacity-75" />
+              <div className="absolute inset-0 bg-green-300 rounded-full animate-ping delay-300 opacity-60" />
+            </div>
+          )}
+
+          <span className={`
+            relative inline-block 
+            bg-yellow-100 dark:bg-yellow-900/30
+            border ${isLoading ? 'border-green-400' : 'border-green-500'} 
+            text-green-700 dark:text-green-400 
+            font-bold text-xs tracking-wider
+            px-4 py-1.5 rounded-full 
+            shadow-md 
+            transition-all duration-300
+            ${isLoading ? 'animate-pulse shadow-green-400/50' : 'shadow-green-500/30'}
+          `}>
+            {i18n.offersCompleted?.(completedCount, totalCount) ?? `${completedCount} / ${totalCount} tarea completada`}
+          </span>
+        </div>
+         <span className="bg-yellow-100 border border-green-500 text-green-700 font-bold text-xs px-3 py-1 rounded-full">
+                      {i18n.offersCompleted?.(0, 1) ?? "0 / 2 tarea completada"}
+                    </span>

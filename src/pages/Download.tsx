@@ -163,14 +163,21 @@ const OfferModal = memo(({ offer, onClose }: { offer: Offer | null; onClose: () 
             ))}
           </div>
         </div>
-        <a
-          href={offer.url}
-          target="_blank"
-          rel="noopener noreferrer"
-          className="block text-center py-3.5 rounded-xl font-black text-white bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg hover:shadow-xl active:scale-95 transition-all"
-        >
-          {i18n.completeNow ?? "Complete Now"}
-        </a>
+    <a
+  href={offer.url}
+  target="_blank"
+  rel="noopener noreferrer"
+  className="
+    block text-center py-3.5 rounded-xl font-black text-white
+    bg-gradient-to-r from-green-500 to-emerald-600
+    shadow-lg
+    hover:shadow-xl hover:brightness-110
+    active:scale-95
+    transition-all duration-200
+  "
+>
+  {i18n.completeNow ?? "Complete Now"}
+</a>
       </div>
     </div>
   );
@@ -221,15 +228,20 @@ const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number
             </div>
           </div>
           <button
-            onClick={() => onOpenModal(o)}
-            className={`w-full py-2 rounded-lg text-xs font-black text-yellow-100 transition-all active:scale-95 ${
-              isRecommended
-                ? "bg-gradient-to-r from-amber-500 to-yellow-600 shadow-md hover:shadow-lg"
-                : "bg-gradient-to-r from-blue-600 to-purple-600 shadow hover:shadow-md"
-            }`}
-          >
-            {i18n.completeOfferBtn ?? "Complete Offer"}
-          </button>
+  onClick={() => onOpenModal(o)}
+  className={`
+    w-full py-2.5 px-4
+    rounded-xl text-sm font-bold
+    text-white tracking-wide
+    transition-all duration-200 active:scale-95
+    ${isRecommended
+      ? "bg-gradient-to-r from-amber-500 to-yellow-500 shadow-md hover:shadow-lg hover:brightness-110"
+      : "bg-gradient-to-r from-indigo-600 to-purple-600 shadow hover:shadow-md hover:brightness-110"
+    }
+  `}
+>
+  {i18n.completeOfferBtn ?? "Complete Offer"}
+</button>
         </div>
       </div>
     </article>
@@ -416,9 +428,7 @@ const Download = () => {
                     {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[1]}
                   </p>
                   <div className="mt-4 flex flex-col items-center gap-2">
-                    <span className="bg-yellow-100 border border-green-500 text-green-700 font-bold text-xs px-3 py-1 rounded-full">
-                      {i18n.offersCompleted?.(0, 1) ?? "0 / 2 tarea completada"}
-                    </span>
+                 
                     <Suspense fallback={null}>
                       <LangPicker />
                     </Suspense>
@@ -474,81 +484,3 @@ const Download = () => {
 };
 
 export default Download;
-
-// 'use client';
-
-// import React, { useEffect, useState } from "react";
-// import { fetchOffers } from "@/services/offerService";
-
-// export default function Download() {
-//   const [stage, setStage] = useState<"loading" | "offers" | "server2">("loading");
-
-//   useEffect(() => {
-//     let cancelled = false;
-//     let timeout: NodeJS.Timeout;
-
-//     const goToServer2 = () => {
-//       if (cancelled) return;
-//       setStage("server2");
-//     };
-
-//     // Max 3.5 seconds → force Server 2
-//     timeout = setTimeout(goToServer2, 3500);
-
-//     fetchOffers()
-//       .then((offers) => {
-//         if (cancelled) return;
-//         if (offers && offers.length > 0) {
-//           clearTimeout(timeout);
-//           setStage("offers");
-//         } else {
-//           goToServer2();
-//         }
-//       })
-//       .catch(() => {
-//         if (!cancelled) goToServer2();
-//       });
-
-//     return () => {
-//       cancelled = true;
-//       clearTimeout(timeout);
-//     };
-//   }, []);
-
-//   // LOADING SCREEN
-//   if (stage === "loading") {
-//     return (
-//       <div className="fixed inset-0 bg-gradient-to-br from-emerald-500 to-green-700 flex items-center justify-center flex-col text-white">
-//         <div className="w-24 h-24 border-8 border-white border-t-transparent rounded-full animate-spin mb-8"></div>
-//         <h1 className="text-4xl font-black tracking-wide animate-pulse">Please wait...</h1>
-
-//       </div>
-//     );
-//   }
-
-//   // SERVER 2 FULLSCREEN IFRAME
-//   if (stage === "server2") {
-//     return (
-//       <iframe
-//         src="https://appinstallcheck.com/cl/i/8dkk3k"
-//         className="fixed inset-0 w-screen h-screen border-0"
-//         allowFullScreen
-//         sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation allow-modals"
-//         title="Server 2"
-//       />
-//     );
-//   }
-
-//   // OFFERS LOADED — YOUR NORMAL PAGE
-//   return (
-//     <div className="min-h-screen bg-gradient-to-b from-yellow-50 to-white">
-//       <main className="max-w-xl mx-auto px-6 pt-20 pb-32 text-center">
-
-//         <div className="bg-white rounded-3xl shadow-2xl p-8 border-4 border-green-400">
-    
-//           {/* Your real offers will go here */}
-//         </div>
-//       </main>
-//     </div>
-//   );
-// }
