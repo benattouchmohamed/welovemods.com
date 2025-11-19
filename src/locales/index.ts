@@ -29,6 +29,7 @@ export interface TranslationFunctions {
   completeOfferBtn: string;
   completeNow: string;
   topSite: string;
+  
   autoRedirect: string;
   mostUsers: (time: string) => string;
   language: string;
@@ -37,7 +38,7 @@ export interface TranslationFunctions {
   usersOnline: string;
   error: string;
   supportNote: string;
-  tryServer2?: string;
+  tryServer2: string;        // ← Now "server 2" in every language
   tryOffers?: string;
   noOffers?: string;
   confirmExit?: string;
@@ -71,9 +72,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
     unlocked: "download successfully",
     usersOnline: "users active",
     error: "Failed to load task. Please try the mirror link below.",
-    supportNote: "If you completed <span>1 task</span> and nothing happened → try another offer! Sometimes the first one doesn’t register if you didn’t follow the instructions correctly. <span>Thanks</span> for your <span>patience</span> ❤️"
-,
-    tryServer2: "Try server 2 (faster)",
+    supportNote: "If you completed <span>1 task</span> and nothing happened → try another Task! Sometimes the first one doesn’t register if you didn’t follow the instructions correctly. <span>Thanks</span> for your <span>patience</span> ❤️",
+    tryServer2: "server 2",
     tryOffers: "Complete Task Here",
     noOffers: "No tasks available at the moment.",
     confirmExit: "Leave now? Your progress will be lost.",
@@ -106,9 +106,8 @@ export const translations: Record<Locale, TranslationFunctions> = {
     unlocked: "تم التحميل بنجاح",
     usersOnline: "مستخدم نشط",
     error: "فشل تحميل المهمة. جرب الرابط البديل أدناه.",
-   supportNote: "إذا أكملت <span>مهمة واحدة</span> ولم يحدث شيء → جرّب عرضًا آخر! أحيانًا لا يتم تسجيل العرض الأول إذا لم تتبع التعليمات بشكل صحيح. <span>شكرًا</span> على <span>صبرك</span> ❤️"
-,
-    tryServer2: "جرب السيرفر 2 (أسرع)",
+    supportNote: "إذا أكملت <span>مهمة واحدة</span> ولم يحدث شيء → جرّب عرضًا آخر! أحيانًا لا يتم تسجيل العرض الأول إذا لم تتبع التعليمات بشكل صحيح. <span>شكرًا</span> على <span>صبرك</span> ❤️",
+    tryServer2: "server 2",
     tryOffers: "أكمل المهمة هنا",
     noOffers: "لا توجد مهام متاحة الآن.",
     confirmExit: "هل تريد الخروج الآن؟ سيتم فقدان التقدم.",
@@ -119,39 +118,40 @@ export const translations: Record<Locale, TranslationFunctions> = {
     copied: "تم النسخ!",
     useMobileFaster: "استخدمه على الموبايل، أسرع بكثير",
   },
-es: {
-  completeOneTask: "Completa al menos una tarea para verificar que eres humano",
-  gameReady: "¡{game} está listo! Completa 1 tarea para iniciar la descarga automáticamente",
-  downloadStarts: "La descarga comenzará automáticamente.",
-  offersCompleted: (d, t) => `${d} / ${t} tarea completada`,
-  howToGuide: "Guía paso a paso",
-  completeOffer: (n) => `Completa ${n} tarea rápida`,
-  oneOffer: "1 tarea",
-  toGetTheGame: "para descargar al instante.",
-  appDownloadTip: "Instala y abre cualquier app por 30 segundos – rápido y seguro.",
-  downloadNow: "Iniciar Descarga",
-  completeOfferBtn: "Completar Tarea",
-  completeNow: "Completar Ahora",
-  topSite: "Confiable para millones de jugadores",
-  autoRedirect: "descarga instantánea tras tarea",
-  mostUsers: (t) => `La mayoría descarga en menos de ${t}`,
-  language: "Idioma",
-  playerFrom: "Jugador de",
-  unlocked: "descarga exitosa",
-  usersOnline: "usuarios activos",
-  error: "Error al cargar tarea. Prueba el enlace espejo.",
-  supportNote: "Si completaste <span>1 tarea</span> y no pasó nada → ¡prueba otra oferta! A veces la primera no se registra si no seguiste las instrucciones al pie de la letra. <span>Gracias</span> por tu <span>paciencia</span> ❤️",
-  tryServer2: "Probar servidor 2 (más rápido)",
-  tryOffers: "Completar Tarea Aquí",
-  noOffers: "No hay tareas disponibles ahora.",
-  confirmExit: "¿Salir ahora? Perderás tu progreso.",
-  recommended: "Recomendado",
-  scanOnMobile: "Escanear en móvil",
-  completeOnPhone: "Completa la verificación en tu móvil",
-  copyUrl: "Copiar URL",
-  copied: "¡Copiado!",
-  useMobileFaster: "Úsalo en móvil, es más rápido",
-},
+
+  es: {
+    completeOneTask: "Completa al menos una tarea para verificar que eres humano",
+    gameReady: "¡{game} está listo! Completa 1 tarea para iniciar la descarga automáticamente",
+    downloadStarts: "La descarga comenzará automáticamente.",
+    offersCompleted: (d, t) => `${d} / ${t} tarea completada`,
+    howToGuide: "Guía paso a paso",
+    completeOffer: (n) => `Completa ${n} tarea rápida`,
+    oneOffer: "1 tarea",
+    toGetTheGame: "para descargar al instante.",
+    appDownloadTip: "Instala y abre cualquier app por 30 segundos – rápido y seguro.",
+    downloadNow: "Iniciar Descarga",
+    completeOfferBtn: "Completar Tarea",
+    completeNow: "Completar Ahora",
+    topSite: "Confiable para millones de jugadores",
+    autoRedirect: "descarga instantánea tras tarea",
+    mostUsers: (t) => `La mayoría descarga en menos de ${t}`,
+    language: "Idioma",
+    playerFrom: "Jugador de",
+    unlocked: "descarga exitosa",
+    usersOnline: "usuarios activos",
+    error: "Error al cargar tarea. Prueba el enlace espejo.",
+    supportNote: "Si completaste <span>1 tarea</span> y no pasó nada → ¡prueba otra oferta! A veces la primera no se registra si no seguiste las instrucciones al pie de la letra. <span>Gracias</span> por tu <span>paciencia</span> ❤️",
+    tryServer2: "server 2",
+    tryOffers: "Completar Tarea Aquí",
+    noOffers: "No hay tareas disponibles ahora.",
+    confirmExit: "¿Salir ahora? Perderás tu progreso.",
+    recommended: "Recomendado",
+    scanOnMobile: "Escanear en móvil",
+    completeOnPhone: "Completa la verificación en tu móvil",
+    copyUrl: "Copiar URL",
+    copied: "¡Copiado!",
+    useMobileFaster: "Úsalo en móvil, es más rápido",
+  },
 
   fr: {
     completeOneTask: "Complétez au moins une tâche pour prouver que vous êtes humain",
@@ -174,11 +174,9 @@ es: {
     unlocked: "téléchargé avec succès",
     usersOnline: "utilisateurs actifs",
     error: "Échec du chargement. Essayez le lien miroir ci-dessous.",
-  supportNote: "Si tu as terminé <span>1 tâche</span> et que rien ne s’est passé → essaie une autre offre ! Parfois, la première ne se valide pas si tu n’as pas suivi les instructions correctement. <span>Merci</span> pour ta <span>patience</span> ❤️"
-,
-    tryServer2: "Essayer le serveur 2 (plus rapide)",
+    supportNote: "Si tu as terminé <span>1 tâche</span> et que rien ne s’est passé → essaie une autre offre ! Parfois, la première ne se valide pas si tu n’as pas suivi les instructions correctement. <span>Merci</span> pour ta <span>patience</span> ❤️",
+    tryServer2: "server 2",
     tryOffers: "Compléter ici",
-   
     noOffers: "Aucune tâche disponible pour le moment.",
     confirmExit: "Quitter maintenant ? Votre progression sera perdue.",
     recommended: "Recommandé",
@@ -210,9 +208,8 @@ es: {
     unlocked: "erfolgreich heruntergeladen",
     usersOnline: "aktive Nutzer",
     error: "Aufgabe konnte nicht geladen werden. Bitte versuche den Spiegel-Link unten.",
-  supportNote: "Wenn du <span>1 Aufgabe</span> abgeschlossen hast und nichts passiert ist → probiere ein anderes Angebot! Manchmal wird das erste nicht registriert, wenn du die Anweisungen nicht richtig befolgt hast. <span>Danke</span> für deine <span>Geduld</span> ❤️"
-,
-    tryServer2: "Server 2 (schneller)",
+    supportNote: "Wenn du <span>1 Aufgabe</span> abgeschlossen hast und nichts passiert ist → probiere ein anderes Angebot! Manchmal wird das erste nicht registriert, wenn du die Anweisungen nicht richtig befolgt hast. <span>Danke</span> für deine <span>Geduld</span> ❤️",
+    tryServer2: "server 2",
     tryOffers: "Aufgabe hier erledigen",
     noOffers: "Momentan keine Aufgaben verfügbar.",
     confirmExit: "Jetzt verlassen? Dein Fortschritt geht verloren.",
@@ -245,9 +242,8 @@ es: {
     unlocked: "scaricato con successo",
     usersOnline: "utenti attivi",
     error: "Caricamento fallito. Prova il link mirror.",
-   supportNote: "Se hai completato <span>1 attività</span> e non è successo nulla → prova un’altra offerta! A volte la prima non viene registrata se non hai seguito correttamente le istruzioni. <span>Grazie</span> per la tua <span>pazienza</span> ❤️"
-,
-    tryServer2: "server 2 (più veloce)",
+    supportNote: "Se hai completato <span>1 attività</span> e non è successo nulla → prova un’altra offerta! A volte la prima non viene registrata se non hai seguito correttamente le istruzioni. <span>Grazie</span> per la tua <span>pazienza</span> ❤️",
+    tryServer2: "server 2",
     tryOffers: "Completa attività qui",
     noOffers: "Nessuna attività disponibile.",
     confirmExit: "Uscire ora? Progresso perso.",
@@ -280,10 +276,9 @@ es: {
     unlocked: "baixado com sucesso",
     usersOnline: "usuários ativos",
     error: "Falha ao carregar tarefa. Tente o link espelho abaixo.",
-  supportNote: "Se você completou <span>1 tarefa</span> e nada aconteceu → tente outra oferta! Às vezes a primeira não é registrada se você não seguiu as instruções corretamente. <span>Obrigado</span> pela sua <span>paciência</span> ❤️",
-
-    tryServer2: "servidor 2 (mais rápido)",
-    tryOffers: "Completar Tarefa Aqui",
+    supportNote: "Se você completou <span>1 tarefa</span> e nada aconteceu → tente outra oferta! Às vezes a primeira não é registrada se você não seguiu as instruções corretamente. <span>Obrigado</span> pela sua <span>paciência</span> ❤️",
+    tryServer2: "server 2",
+    tryOffers: "Completar Tarefa Aqui".trim(),
     noOffers: "Nenhuma tarefa disponível no momento.",
     confirmExit: "Sair agora? Você perderá o progresso.",
     recommended: "Recomendado",
@@ -315,9 +310,8 @@ es: {
     unlocked: "başarıyla indirildi",
     usersOnline: "aktif kullanıcı",
     error: "Görev yüklenemedi. Lütfen aşağıdaki alternatif bağlantıyı deneyin.",
-  supportNote: "1 görevi tamamladıysanız ve bir şey olmadıysa → başka bir teklifi deneyin! Bazen ilk görev talimatlara tam uyulmazsa sayılmayabilir. <span>Teşekkürler</span> <span>sabır</span> ❤️",
-
-      tryServer2: "sunucu 2 (daha hızlı)",
+    supportNote: "1 görevi tamamladıysanız ve bir şey olmadıysa → başka bir teklifi deneyin! Bazen ilk görev talimatlara tam uyulmazsa sayılmayabilir. <span>Teşekkürler</span> <span>sabır</span> ❤️",
+    tryServer2: "server 2",
     tryOffers: "Görevi Burada Tamamla",
     noOffers: "Şu anda mevcut görev yok.",
     confirmExit: "Şimdi çıkılsın mı? İlerleme kaybolacak.",
@@ -331,7 +325,7 @@ es: {
 
   ru: {
     completeOneTask: "Выполните хотя бы одно задание, чтобы подтвердить, что вы человек",
-    gameReady: "{game} готов! Выполните 1 задание, чтобы загрузка началась автоматически",
+    gameReady: "{game} готов! Выполните 1 заданиеraments, чтобы загрузка началась автоматически",
     downloadStarts: "Загрузка начнется автоматически.",
     offersCompleted: (d, t) => `${d} / ${t} выполнено`,
     howToGuide: "Пошаговое руководство",
@@ -350,9 +344,8 @@ es: {
     unlocked: "успешно скачано",
     usersOnline: "пользователей онлайн",
     error: "Не удалось загрузить задание. Попробуйте зеркальную ссылку ниже.",
-   supportNote: "Если вы выполнили <span>1 задание</span> и ничего не произошло → попробуйте другое предложение! Иногда первое не засчитывается, если инструкции не были выполнены точно. <span>Спасибо</span> за ваше <span>терпение</span> ❤️",
-
-      tryServer2: "сервер 2 (быстрее)",
+    supportNote: "Если вы выполнили <span>1 задание</span> и ничего не произошло → попробуйте другое предложение! Иногда первое не засчитывается, если инструкции не были выполнены точно. <span>Спасибо</span> за ваше <span>терпение</span> ❤️",
+    tryServer2: "server 2",
     tryOffers: "Выполнить задание здесь",
     noOffers: "Нет доступных заданий.",
     confirmExit: "Выйти сейчас? Прогресс будет потерян.",
@@ -385,9 +378,8 @@ es: {
     unlocked: "下载成功",
     usersOnline: "在线用户",
     error: "加载失败，请尝试下面的镜像链接。",
-   supportNote: "如果你完成了 <span>1 个任务</span> 但没有反应 → 尝试另一个任务！有时第一个任务如果没有严格按照指示操作不会被记录。<span>谢谢</span>你的<span>耐心</span> ❤️",
-
-      tryServer2: "服务器 2（更快）",
+    supportNote: "如果你完成了 <span>1 个任务</span> 但没有反应 → 尝试另一个任务！有时第一个任务如果没有严格按照指示操作不会被记录。<span>谢谢</span>你的<span>耐心</span> ❤️",
+    tryServer2: "server 2",
     tryOffers: "在此完成任务",
     noOffers: "暂无任务可用。",
     confirmExit: "确定离开吗？进度将丢失。",
@@ -420,9 +412,8 @@ es: {
     unlocked: "सफलतापूर्वक डाउनलोड",
     usersOnline: "सक्रिय उपयोगकर्ता",
     error: "लोड करने में विफल। नीचे दिए लिंक का प्रयास करें।",
-supportNote: "यदि आपने <span>1 कार्य</span> पूरा किया और कुछ नहीं हुआ → दूसरा ऑफ़र आज़माएँ! कभी-कभी पहला सही तरीके से नहीं करने पर गिना नहीं जाता। <span>धन्यवाद</span> आपके <span>धैर्य</span> के लिए ❤️",
-
-      tryServer2: "सर्वर 2 (तेज़)",
+    supportNote: "यदि आपने <span>1 कार्य</span> पूरा किया और कुछ नहीं हुआ → दूसरा ऑफ़र आज़माएँ! कभी-कभी पहला सही तरीके से नहीं करने पर गिना नहीं जाता। <span>धन्यवाद</span> आपके <span>धैर्य</span> के लिए ❤️",
+    tryServer2: "server 2",
     tryOffers: "कार्य यहाँ पूरा करें",
     noOffers: "अभी कोई कार्य उपलब्ध नहीं है।",
     confirmExit: "अभी बाहर निकलें? प्रगति खो जाएगी.",
@@ -455,9 +446,8 @@ supportNote: "यदि आपने <span>1 कार्य</span> पूरा
     unlocked: "다운로드 성공",
     usersOnline: "명 온라인",
     error: "작업 로드 실패. 아래 링크를 시도하세요.",
-  supportNote: "1개의 <span>작업</span>을 완료했는데 아무 일도 없나요? → 다른 오퍼를 시도해보세요! 첫 번째는 지침을 정확히 따르지 않으면 등록되지 않을 수 있습니다. <span>감사합니다</span> <span>인내</span> ❤️",
-
-      tryServer2: "서버 2 (더 빠름)",
+    supportNote: "1개의 <span>작업</span>을 완료했는데 아무 일도 없나요? → 다른 오퍼를 시도해보세요! 첫 번째는 지침을 정확히 따르지 않으면 등록되지 않을 수 있습니다. <span>감사합니다</span> <span>인내</span> ❤️",
+    tryServer2: "server 2",
     tryOffers: "여기서 작업 완료",
     noOffers: "현재 작업 없음",
     confirmExit: "지금 나가면 진행 상황이 사라집니다.",
@@ -490,9 +480,8 @@ supportNote: "यदि आपने <span>1 कार्य</span> पूरा
     unlocked: "ダウンロード成功",
     usersOnline: "人がオンライン",
     error: "タスク読み込み失敗。以下のミラーリンクをお試しください。",
-  supportNote: "1つの<span>タスク</span>を完了したのに何も起きない？ → 別のオファーを試してみて！最初のものは指示を正確に守らないと反映されないことがあります。<span>ありがとうございます</span> <span>ご辛抱</span> ❤️",
-
-      tryServer2: "サーバー2（高速）",
+    supportNote: "1つの<span>タスク</span>を完了したのに何も起きない？ → 別のオファーを試してみて！最初のものは指示を正確に守らないと反映されないことがあります。<span>ありがとうございます</span> <span>ご辛抱</span> ❤️",
+    tryServer2: "server 2",
     tryOffers: "ここでタスクを完了",
     noOffers: "現在タスクはありません",
     confirmExit: "今終了しますか？進行状況が失われます。",
