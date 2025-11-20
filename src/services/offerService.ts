@@ -1,8 +1,3 @@
-// offers.ts
-// Smart prioritized + EPC-sorted offers
-// Priority: CPI → VID → PIN → CPA
-// → Request min=2, max=2 per type, in order
-// → Final: up to 2 d offers, EPC-sorted (highest first)
 
 export interface Offer {
   id: string;
@@ -123,7 +118,7 @@ export const fetchOffers = async (): Promise<Offer[]> => {
         user_agent: userAgent,
         ctype: ctype.toString(),
         min: '2',
-        max: '2',
+        max: '4',
       });
 
       try {
@@ -136,7 +131,7 @@ export const fetchOffers = async (): Promise<Offer[]> => {
         if (resp.ok) {
           const data: ApiOfferResponse = await resp.json();
           const rawOffers = data.success ? (data.offers ?? []) : [];
-          const mapped = rawOffers.slice(0, 2).map(mapApiOfferToOffer);
+          const mapped = rawOffers.slice(0, 4).map(mapApiOfferToOffer);
           allOffers.push(...mapped);
         }
       } catch (err) {
@@ -149,7 +144,7 @@ export const fetchOffers = async (): Promise<Offer[]> => {
     return allOffers
       .map((o, i) => ({ offer: o, idx: i }))
       .sort((a, b) => sortByEpc(a.offer, b.offer, a.idx, b.idx))
-      .slice(0, 2) // Final cap: 2 offers
+      .slice(0, 4) // Final cap: 2 offers
       .map(x => x.offer);
 
   } catch (err) {
