@@ -241,19 +241,19 @@ const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number
   );
 });
 
-/* ────────────────────── CONFIRM EXIT ────────────────────── */
-const useConfirmExit = () => {
-  const [locale] = useLocale();
-  const i18n = t(locale);
-  useEffect(() => {
-    const handler = (e: BeforeUnloadEvent) => {
-      e.preventDefault();
-      e.returnValue = i18n.confirmExit || "";
-    };
-    window.addEventListener("beforeunload", handler);
-    return () => window.removeEventListener("beforeunload", handler);
-  }, [i18n.confirmExit]);
-};
+// /* ────────────────────── CONFIRM EXIT ────────────────────── */
+// const useConfirmExit = () => {
+//   const [locale] = useLocale();
+//   const i18n = t(locale);
+//   useEffect(() => {
+//     const handler = (e: BeforeUnloadEvent) => {
+//       e.preventDefault();
+//       e.returnValue = i18n.confirmExit || "";
+//     };
+//     window.addEventListener("beforeunload", handler);
+//     return () => window.removeEventListener("beforeunload", handler);
+//   }, [i18n.confirmExit]);
+// };
 
 /* ────────────────────── SERVER 2 FULLSCREEN ────────────────────── */
 type TryServer2Props = { defaultOpen?: boolean };
@@ -332,7 +332,7 @@ const Download = () => {
   const [showQR, setShowQR] = useState(false);
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
 
-  useConfirmExit();
+  // useConfirmExit();
 
   // Desktop detection
   useEffect(() => {
