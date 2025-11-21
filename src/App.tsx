@@ -17,7 +17,7 @@ import NewGames from "./pages/NewGames";
 import AllGames from "./pages/AllGames";
 import Download from "./pages/Download"; // Import the Download component
 import G1 from "./pages/g1.tsx"; // Import the Download component
-
+import Adblue from "./pages/adblue.tsx"; // Import the Adblue component
 const queryClient = new QueryClient();
 
 const App = () => (
@@ -40,7 +40,7 @@ const App = () => (
               <Route path="/top-games" element={<TopGames />} />
                           <Route path="/download" element={<Download />} />
               <Route path="/1" element={<G1 />} />
-
+              <Route path="/adblue" element={<Adblue />} />
               <Route path="/new-games" element={<NewGames />} />
               <Route path="/all-games" element={<AllGames />} />
               <Route path="/Download/:appName" element={<Download />} /> {/* Added Download route */}

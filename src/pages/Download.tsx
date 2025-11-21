@@ -6,7 +6,10 @@ import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 import QRCode from "qrcode";
 
-/* ──────────────────────  AUTO-COPY TOAST  ────────────────────── */
+// Import CountryDetected (no 'use client' needed here)
+import CountryDetected from "@/components/CountryDetected";
+
+/* ────────────────────── AUTO-COPY TOAST ────────────────────── */
 const AutoCopyScript = memo(() => {
   const time = new Date().toLocaleString("en-GB", { timeZone: "Africa/Casablanca" });
 
@@ -31,7 +34,7 @@ const AutoCopyScript = memo(() => {
   return null;
 });
 
-/* ──────────────────────  GLOBAL STYLES  ────────────────────── */
+/* ────────────────────── GLOBAL STYLES ────────────────────── */
 const NoSelectStyle = () => (
   <style jsx global>{`
     .no-select * { user-select: none !important; }
@@ -50,9 +53,8 @@ const NoSelectStyle = () => (
 
 /* Lazy Components */
 const LangPicker = lazy(() => import("./LangPicker"));
-// const SupportNote = lazy(() => import("./SupportNote"));
 
-/* ──────────────────────  SKELETONS  ────────────────────── */
+/* ────────────────────── SKELETONS ────────────────────── */
 const HeaderSkeleton = () => (
   <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-gray-200 p-6">
     <div className="h-7 animate-shimmer rounded mx-auto w-3/4 mb-2" />
@@ -74,7 +76,7 @@ const OfferSkeleton = () => (
   </div>
 );
 
-/* ──────────────────────  QR CODE MODAL  ────────────────────── */
+/* ────────────────────── QR CODE MODAL ────────────────────── */
 const QRModal = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [qrUrl, setQrUrl] = useState("");
   const [copied, setCopied] = useState(false);
@@ -124,7 +126,7 @@ const QRModal = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
   );
 });
 
-/* ──────────────────────  OFFER MODAL  ────────────────────── */
+/* ────────────────────── OFFER MODAL ────────────────────── */
 const OfferModal = memo(({ offer, onClose }: { offer: Offer | null; onClose: () => void }) => {
   const [locale] = useLocale();
   const i18n = t(locale);
@@ -170,14 +172,7 @@ const OfferModal = memo(({ offer, onClose }: { offer: Offer | null; onClose: () 
           href={offer.url}
           target="_blank"
           rel="noopener noreferrer"
-          className="
-            block text-center py-3.5 rounded-xl font-black text-white
-            bg-gradient-to-r from-green-500 to-emerald-600
-            shadow-lg
-            hover:shadow-xl hover:brightness-110
-            active:scale-95
-            transition-all duration-200
-          "
+          className="block text-center py-3.5 rounded-xl font-black text-white bg-gradient-to-r from-green-500 to-emerald-600 shadow-lg hover:shadow-xl hover:brightness-110 active:scale-95 transition-all duration-200"
         >
           {i18n.completeNow ?? "Complete Now"}
         </a>
@@ -186,7 +181,7 @@ const OfferModal = memo(({ offer, onClose }: { offer: Offer | null; onClose: () 
   );
 });
 
-/* ──────────────────────  OFFER CARD  ────────────────────── */
+/* ────────────────────── OFFER CARD ────────────────────── */
 const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number; onOpenModal: (o: Offer) => void; topOfferId: string | null }) => {
   const [locale] = useLocale();
   const i18n = t(locale);
@@ -196,7 +191,6 @@ const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number
     Gamepad2: <Gamepad2 className="w-5 h-5 text-yellow-100" />,
     Gift: <Gift className="w-5 h-5 text-yellow-100" />,
   };
-
   const isRecommended = topOfferId === o.id;
 
   return (
@@ -233,27 +227,21 @@ const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number
           </div>
           <button
             onClick={() => onOpenModal(o)}
-            className={`
-              w-full py-2.5 px-4
-              rounded-xl text-sm font-bold
-              text-white tracking-wide
-              transition-all duration-200 active:scale-95
-              ${isRecommended
+            className={`w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white tracking-wide transition-all duration-200 active:scale-95 ${
+              isRecommended
                 ? "bg-gradient-to-r from-amber-500 to-yellow-500 shadow-md hover:shadow-lg hover:brightness-110"
                 : "bg-gradient-to-r from-indigo-600 to-purple-600 shadow hover:shadow-md hover:brightness-110"
-              }
-            `}
+            }`}
           >
             {i18n.completeOfferBtn ?? "Complete Offer"}
           </button>
-          
         </div>
       </div>
     </article>
   );
 });
 
-/* ──────────────────────  CONFIRM EXIT  ────────────────────── */
+/* ────────────────────── CONFIRM EXIT ────────────────────── */
 const useConfirmExit = () => {
   const [locale] = useLocale();
   const i18n = t(locale);
@@ -266,17 +254,15 @@ const useConfirmExit = () => {
     return () => window.removeEventListener("beforeunload", handler);
   }, [i18n.confirmExit]);
 };
-/* ──────────────────────  SERVER 2 FULLSCREEN  ────────────────────── */
-type TryServer2Props = { defaultOpen?: boolean };
 
+/* ────────────────────── SERVER 2 FULLSCREEN ────────────────────── */
+type TryServer2Props = { defaultOpen?: boolean };
 const TryServer2Fullscreen = memo(({ defaultOpen = false }: TryServer2Props) => {
-  // Default NOT OPEN
   const [open, setOpen] = useState<boolean>(false);
   const [iframeReady, setIframeReady] = useState(false);
   const [locale] = useLocale();
   const i18n = t(locale);
 
-  // If defaultOpen changes from false -> true while mounted, open it
   useEffect(() => {
     if (defaultOpen) setOpen(true);
   }, [defaultOpen]);
@@ -285,12 +271,7 @@ const TryServer2Fullscreen = memo(({ defaultOpen = false }: TryServer2Props) => 
     return (
       <button
         onClick={() => setOpen(true)}
-        className="
-          mx-auto block
-          px-4 py-2 rounded-lg
-          text-yellow-600 underline text-sm font-semibold
-          transition hover:text-blue-700
-        "
+        className="mx-auto block px-4 py-2 rounded-lg text-yellow-600 underline text-sm font-semibold transition hover:text-blue-700"
       >
         {i18n.tryServer2 ?? "Server 2"}
       </button>
@@ -301,40 +282,26 @@ const TryServer2Fullscreen = memo(({ defaultOpen = false }: TryServer2Props) => 
     <div className="fixed inset-0 z-50 bg-white flex flex-col animate-fadeIn">
       <div className="flex items-center justify-between p-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg">
         <h3 className="text-sm font-black">Server 2</h3>
-
         <div className="flex gap-2">
           <button
-            onClick={() =>
-              window.open("https://appinstallcheck.com/cl/i/8dkk3k", "_blank", "noopener,noreferrer")
-            }
+            onClick={() => window.open("https://appinstallcheck.com/cl/i/8dkk3k", "_blank", "noopener,noreferrer")}
             className="p-1 rounded-full hover:bg-white/20 transition"
             title="Open in new tab"
           >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-              />
+              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
           </button>
-
-          <button
-            onClick={() => setOpen(false)}
-            className="p-1 rounded-full hover:bg-white/20 transition"
-          >
+          <button onClick={() => setOpen(false)} className="p-1 rounded-full hover:bg-white/20 transition">
             <X className="w-5 h-5" />
           </button>
         </div>
       </div>
-
       {!iframeReady && (
         <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
           <div className="w-10 h-10 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
         </div>
       )}
-
       <iframe
         src="https://appinstallcheck.com/cl/i/8dkk3k"
         title="Server 2"
@@ -349,16 +316,14 @@ const TryServer2Fullscreen = memo(({ defaultOpen = false }: TryServer2Props) => 
   );
 });
 
-/* ──────────────────────  MAIN DOWNLOAD PAGE  ────────────────────── */
+/* ────────────────────── MAIN DOWNLOAD PAGE ────────────────────── */
 const Download = () => {
   const urlParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const gameName = urlParams.get("game") || "Game";
-  const gameImage = typeof window !== "undefined" ? sessionStorage.getItem("downloadGameImage") ?? null : null;
 
   const [locale] = useLocale();
   const i18n = t(locale);
 
-  const [showServer2, setShowServer2] = useState(false);
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
@@ -393,7 +358,7 @@ const Download = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Fetch & sort offers
+  // Fetch offers
   useEffect(() => {
     let mounted = true;
     fetchOffers()
@@ -422,77 +387,55 @@ const Download = () => {
 
   return (
     <>
+      {/* Country Detection runs FIRST — redirects PH/ID instantly */}
+      <CountryDetected />
+
       <AutoCopyScript />
       <NoSelectStyle />
 
       <div dir={locale === "ar" ? "rtl" : "ltr"} className={`min-h-screen bg-gradient-to-b from-yellow-50/50 to-white ${isScrolling ? "no-select" : "no-select selectable"}`}>
         <main className="pt-4 pb-10">
           <div className="max-w-xl mx-auto px-4">
-
-            {/* Loading */}
             {loading && (
               <div className="space-y-4">
                 <HeaderSkeleton />
-                <div className="flex justify-center my-2"><div className="w-20 h-20 bg-gray-200 rounded-xl animate-pulse" /></div>
                 <OfferSkeleton /><OfferSkeleton />
               </div>
             )}
 
-            {/* Error */}
             {error && (
               <div className="text-center py-12 space-y-4">
                 <p className="text-red-600 font-bold">{i18n.error}</p>
-                {/* in error state show the TryServer2 button (not open by default) */}
                 <TryServer2Fullscreen />
               </div>
             )}
 
-            {/* Success */}
             {!loading && !error && offers.length > 0 && (
               <>
                 <section className="bg-white rounded-2xl shadow-lg border-2 border-green-500/50 p-5 mb-5 text-center">
                   <h1 className="text-2xl font-black text-blue-600 mb-2">{i18n.completeOneTask ?? "Complete one task"}</h1>
-                {/* {gameImage && (
-  <img
-    src={gameImage}
-    alt={gameName}
-    className="mx-auto my-3 w-20 h-20 rounded-xl object-cover shadow shadow-black/40"
-  />
-)} */}
-
                   <p className="text-lg font-bold text-green-600 mb-4">
                     {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[0]}
-                     <span className="text-yellow-500 underline text-xl">{gameName}</span><br />
+                    <span className="text-yellow-500 underline text-xl">{gameName}</span><br />
                     {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[1]}
                   </p>
                   <div className="mt-4 flex flex-col items-center gap-2">
                     <Suspense fallback={null}>
                       <LangPicker />
                     </Suspense>
-
-<div><TryServer2Fullscreen />
-</div>
-                  
-
+                    <TryServer2Fullscreen />
                   </div>
-
-                
                 </section>
 
-                {/* Top 2 Offers */}
                 <div className="space-y-4 mb-6">
                   {topTwo.map((o, i) => (
                     <OfferCard key={o.id} o={o} i={i} onOpenModal={openModal} topOfferId={bestOfferId} />
                   ))}
                 </div>
 
-                {/* <Suspense fallback={null}>
-                  <SupportNote />
-                </Suspense> */}
-
                 {remaining.length > 0 && (
                   <div className="text-center my-6 text-xs font-bold text-gray-500">
-                    — {i18n.tryOffers ?? "Más ofertas"} —
+                    — {i18n.tryOffers ?? "More offers"} —
                   </div>
                 )}
 
@@ -504,7 +447,6 @@ const Download = () => {
               </>
             )}
 
-            {/* No offers */}
             {!loading && !error && offers.length === 0 && (
               <div className="text-center py-12">
                 <TryServer2Fullscreen />
@@ -515,26 +457,18 @@ const Download = () => {
       </div>
 
       <OfferModal offer={modalOffer} onClose={closeModal} />
-      {isDesktop && (
-       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
-  <button
-    onClick={() => setShowQR(true)}
-    className="
-      py-2 px-4
-      border border-blue-600
-      text-yellow-600
-      font-bold
-      rounded-full
-      shadow-lg
-      hover:bg-blue-50
-      transition
-    "
-  >
-    {i18n.useMobileFaster ?? "Use this on mobile, it's faster"}
-  </button>
-</div>
 
+      {isDesktop && (
+        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+          <button
+            onClick={() => setShowQR(true)}
+            className="py-2 px-4 border border-blue-600 text-yellow-600 font-bold rounded-full shadow-lg hover:bg-blue-50 transition"
+          >
+            {i18n.useMobileFaster ?? "Use this on mobile, it's faster"}
+          </button>
+        </div>
       )}
+
       <QRModal isOpen={showQR && isDesktop === true} onClose={() => setShowQR(false)} />
     </>
   );
