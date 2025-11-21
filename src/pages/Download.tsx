@@ -50,7 +50,7 @@ const NoSelectStyle = () => (
 
 /* Lazy Components */
 const LangPicker = lazy(() => import("./LangPicker"));
-const SupportNote = lazy(() => import("./SupportNote"));
+// const SupportNote = lazy(() => import("./SupportNote"));
 
 /* ──────────────────────  SKELETONS  ────────────────────── */
 const HeaderSkeleton = () => (
@@ -452,11 +452,14 @@ const Download = () => {
               <>
                 <section className="bg-white rounded-2xl shadow-lg border-2 border-green-500/50 p-5 mb-5 text-center">
                   <h1 className="text-2xl font-black text-blue-600 mb-2">{i18n.completeOneTask ?? "Complete one task"}</h1>
-                  {gameImage && (
-                    <div className="flex justify-center my-3">
-                      <img src={gameImage} alt={gameName} className="w-20 h-20 rounded-xl object-cover shadow-md border" loading="lazy" />
-                    </div>
-                  )}
+                {/* {gameImage && (
+  <img
+    src={gameImage}
+    alt={gameName}
+    className="mx-auto my-3 w-20 h-20 rounded-xl object-cover shadow shadow-black/40"
+  />
+)} */}
+
                   <p className="text-lg font-bold text-green-600 mb-4">
                     {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[0]}
                      <span className="text-yellow-500 underline text-xl">{gameName}</span><br />
@@ -483,9 +486,9 @@ const Download = () => {
                   ))}
                 </div>
 
-                <Suspense fallback={null}>
+                {/* <Suspense fallback={null}>
                   <SupportNote />
-                </Suspense>
+                </Suspense> */}
 
                 {remaining.length > 0 && (
                   <div className="text-center my-6 text-xs font-bold text-gray-500">
@@ -513,11 +516,24 @@ const Download = () => {
 
       <OfferModal offer={modalOffer} onClose={closeModal} />
       {isDesktop && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
-          <button onClick={() => setShowQR(true)} className="py-2 px-4 bg-blue-600 text-white font-bold rounded-full shadow-lg hover:bg-blue-700 transition">
-            {i18n.useMobileFaster ?? "Use this on mobile, it's faster"}
-          </button>
-        </div>
+       <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
+  <button
+    onClick={() => setShowQR(true)}
+    className="
+      py-2 px-4
+      border border-blue-600
+      text-yellow-600
+      font-bold
+      rounded-full
+      shadow-lg
+      hover:bg-blue-50
+      transition
+    "
+  >
+    {i18n.useMobileFaster ?? "Use this on mobile, it's faster"}
+  </button>
+</div>
+
       )}
       <QRModal isOpen={showQR && isDesktop === true} onClose={() => setShowQR(false)} />
     </>
