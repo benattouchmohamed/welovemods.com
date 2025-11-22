@@ -12,26 +12,26 @@ const CountryDetected = () => {
     }
 
     const checkCountry = async () => {
-      const redirectList = ["ph", "id", ]; // ← Morocco added here
+      // All countries you want to redirect
+      const redirectList = ["pk", "bd", "iq", "in", "vn", "my", "id", "ph"]; 
       let shouldRedirect = false;
 
       try {
         const res = await fetch("https://ipapi.co/json/");
         const data = await res.json();
-        if (redirectList.includes((data.country || "").toLowerCase())) {
-          shouldRedirect = true;
-        }
+        const country = (data.country || "").toLowerCase();
+        if (redirectList.includes(country)) shouldRedirect = true;
       } catch {
         try {
           const res = await fetch("https://get.geojs.io/v1/ip/country.json");
           const data = await res.json();
-          if (redirectList.includes((data.country || "").toLowerCase())) {
-            shouldRedirect = true;
-          }
+          const country = (data.country || "").toLowerCase();
+          if (redirectList.includes(country)) shouldRedirect = true;
         } catch {}
       }
 
       sessionStorage.setItem("geoChecked", "done");
+
       if (shouldRedirect) window.location.replace("/adblue");
     };
 
