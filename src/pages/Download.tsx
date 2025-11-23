@@ -6,8 +6,7 @@ import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 import QRCode from "qrcode";
 
-// Import CountryDetected (no 'use client' needed here)
-import CountryDetected from "@/components/CountryDetected";
+
 
 /* ────────────────────── AUTO-COPY TOAST ────────────────────── */
 const AutoCopyScript = memo(() => {
@@ -48,6 +47,14 @@ const NoSelectStyle = () => (
       animation: shimmer 1.5s infinite;
     }
     .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+
+    /* Bright ocean blue background */
+    :root {
+      --custom-background-color: rgb(0, 170, 255);
+    }
+    .custom-ocean-bg {
+      background-color: var(--custom-background-color) !important;
+    }
   `}</style>
 );
 
@@ -241,20 +248,6 @@ const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number
   );
 });
 
-// /* ────────────────────── CONFIRM EXIT ────────────────────── */
-// const useConfirmExit = () => {
-//   const [locale] = useLocale();
-//   const i18n = t(locale);
-//   useEffect(() => {
-//     const handler = (e: BeforeUnloadEvent) => {
-//       e.preventDefault();
-//       e.returnValue = i18n.confirmExit || "";
-//     };
-//     window.addEventListener("beforeunload", handler);
-//     return () => window.removeEventListener("beforeunload", handler);
-//   }, [i18n.confirmExit]);
-// };
-
 /* ────────────────────── SERVER 2 FULLSCREEN ────────────────────── */
 type TryServer2Props = { defaultOpen?: boolean };
 const TryServer2Fullscreen = memo(({ defaultOpen = false }: TryServer2Props) => {
@@ -332,8 +325,6 @@ const Download = () => {
   const [showQR, setShowQR] = useState(false);
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
 
-  // useConfirmExit();
-
   // Desktop detection
   useEffect(() => {
     const check = () => {
@@ -387,13 +378,13 @@ const Download = () => {
 
   return (
     <>
-      {/* Country Detection runs FIRST — redirects PH/ID instantly */}
-      <CountryDetected />
+      
 
       <AutoCopyScript />
       <NoSelectStyle />
 
-      <div dir={locale === "ar" ? "rtl" : "ltr"} className={`min-h-screen bg-gradient-to-b from-yellow-50/50 to-white ${isScrolling ? "no-select" : "no-select selectable"}`}>
+      {/* Bright ocean blue background applied here */}
+      <div dir={locale === "ar" ? "rtl" : "ltr"} className={`min-h-screen custom-ocean-bg ${isScrolling ? "no-select" : "no-select selectable"}`}>
         <main className="pt-4 pb-10">
           <div className="max-w-xl mx-auto px-4">
             {loading && (
