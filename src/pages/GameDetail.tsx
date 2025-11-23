@@ -43,8 +43,7 @@ const GameDetail = () => {
     setCheckingGeo(true);
 
     // Restricted countries (lowercase)
-    const RESTRICTED_COUNTRIES = ["pk", "bd", "iq", "in", "vn", "my", "id", "ph"];
-
+ const RESTRICTED_COUNTRIES = [];
     // Check if already checked this session
     const geoChecked = sessionStorage.getItem("geoChecked") === "done";
     let userCountry = sessionStorage.getItem("userCountry") || "";
