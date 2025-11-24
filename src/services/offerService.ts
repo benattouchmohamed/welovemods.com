@@ -36,6 +36,7 @@ const API_BASE_URL = "https://unlockcontent.net/api/v2";
 const API_TOKEN =
   "32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085";
 const FALLBACK_URL = "https://areyourealhuman.com/cl/i/g6pqp2";
+
 const CTYPE = { CPI: 1, CPA: 2, PIN: 4, VID: 8 } as const;
 
 // Priority order: CPI → VID → PIN → CPA
@@ -68,6 +69,7 @@ const parseFloatOrNull = (val?: string): number | null =>
 
 const mapApiOfferToOffer = (api: ApiOffer, idx: number): Offer => {
   const url = api.link && /^https?:\/\//i.test(api.link) ? api.link : FALLBACK_URL;
+
   return {
     id: api.offerid ?? `offer-${idx}`,
     title: api.name_short ?? api.name ?? "Special Offer",
@@ -90,16 +92,13 @@ const sortOffers = (a: Offer, b: Offer, aIdx: number, bIdx: number): number => {
   const epcA = a.epc ?? -Infinity;
   const epcB = b.epc ?? -Infinity;
 
-  // 1) Higher EPC first
   if (epcB !== epcA) return epcB - epcA;
 
   const payoutA = a.payout ?? -Infinity;
   const payoutB = b.payout ?? -Infinity;
 
-  // 2) If EPC same → highest payout first
   if (payoutB !== payoutA) return payoutB - payoutA;
 
-  // 3) Fallback: original order
   return aIdx - bIdx;
 };
 
@@ -114,7 +113,6 @@ export const fetchOffers = async (): Promise<Offer[]> => {
       "Content-Type": "application/json",
     };
 
-    // Polyfill for AbortSignal.timeout
     const timeoutSignal =
       typeof AbortSignal.timeout === "function"
         ? AbortSignal.timeout(10000)
@@ -126,16 +124,15 @@ export const fetchOffers = async (): Promise<Offer[]> => {
 
     const allOffers: Offer[] = [];
 
-    // Step 1: Sequential priority requests (CPI → VID → PIN → CPA)
     for (const { type, ctype } of PRIORITY_ORDER) {
-      if (allOffers.length >= 2) break; // Stop early if we already have 2
+      if (allOffers.length >= 2) break;
 
       const params = new URLSearchParams({
         ip: visitorIP,
         user_agent: userAgent,
         ctype: ctype.toString(),
-     min: "2",
-        max: "3",
+        min: "2",
+        max: "2",
       });
 
       try {
@@ -148,7 +145,7 @@ export const fetchOffers = async (): Promise<Offer[]> => {
         if (resp.ok) {
           const data: ApiOfferResponse = await resp.json();
           const rawOffers = data.success ? data.offers ?? [] : [];
-          const mapped = rawOffers.slice(0, 3).map(mapApiOfferToOffer);
+          const mapped = rawOffers.slice(0, 2).map(mapApiOfferToOffer);
           allOffers.push(...mapped);
         }
       } catch (err) {
@@ -156,11 +153,10 @@ export const fetchOffers = async (): Promise<Offer[]> => {
       }
     }
 
-    // Step 2: Sort all collected offers by EPC → payout
     return allOffers
       .map((o, i) => ({ offer: o, idx: i }))
       .sort((a, b) => sortOffers(a.offer, b.offer, a.idx, b.idx))
-      .slice(0, 3) // final cap: 3 offers
+      .slice(0, 2)
       .map((x) => x.offer);
   } catch (err) {
     console.error("fetchOffers error →", err);
@@ -170,6 +166,14 @@ export const fetchOffers = async (): Promise<Offer[]> => {
 
 // ────── Convenience ──────
 export const getTopOffer = async (): Promise<Offer | null> => {
-  const offers = await fetchOffers();
-  return offers[0] ?? null; // BEST EPC → BEST payout
+  try {
+    const offers = await fetchOffers();
+
+    if (!offers || offers.length === 0) return null;
+
+    return offers[0];
+  } catch (err) {
+    console.error("getTopOffer error →", err);
+    return null;
+  }
 };
