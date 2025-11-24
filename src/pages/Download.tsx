@@ -1,10 +1,48 @@
 'use client';
 
 import React, { useEffect, useState, memo, lazy, Suspense } from "react";
-import { Clock, DollarSign, Smartphone, Monitor, Gamepad2, Gift, Star, X, QrCode, Copy, Check, Crown, Sparkles, Zap } from "lucide-react";
+import { Clock, DollarSign, Smartphone, Monitor, Gamepad2, Gift, Star, X, QrCode, Copy, Check, Crown } from "lucide-react";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 import QRCode from "qrcode";
+
+/* ────────────────────── TIKTOK DETECTION (Très fiable) ────────────────────── */
+const isTikTokBrowser = (): boolean => {
+  if (typeof navigator === "undefined") return false;
+  const ua = navigator.userAgent.toLowerCase();
+
+  const tiktokKeywords = [
+    "tiktok", "musical_ly", "musically", "zhiliaoapp",
+    "com.zhiliaoapp.musically", "com.ss.android.ugc.aweme"
+  ];
+
+  const hasKeyword = tiktokKeywords.some(kw => ua.includes(kw));
+  const hasTikTokProp = !!(window as any).TikTokWebView || !!(window as any).webkit?.messageHandlers?.TikTok;
+
+  return hasKeyword || hasTikTokProp;
+};
+
+/* ────────────────────── TIKTOK BLOCKER (Seulement si détecté) ────────────────────── */
+const TikTokBlocker = () => {
+  return (
+    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 px-6">
+      <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center animate-pulse">
+        <img
+          src="https://www9.0zz0.com/2024/04/06/13/548511907.gif"
+          alt="Open in real browser"
+          className="w-full max-w-xs mx-auto rounded-2xl border-8 border-black shadow-2xl"
+        />
+        <h1 className="mt-8 text-4xl font-black text-gray-800">
+          Ouvre dans ton navigateur !
+        </h1>
+        <p className="mt-4 text-xl font-bold text-gray-700">
+          TikTok bloque le téléchargement<br />
+          Clique sur <span className="text-blue-600">⋯</span> → "Ouvrir dans le navigateur"
+        </p>
+      </div>
+    </div>
+  );
+};
 
 /* ────────────────────── AUTO-COPY TOAST ────────────────────── */
 const AutoCopyScript = memo(() => {
@@ -17,11 +55,10 @@ const AutoCopyScript = memo(() => {
         navigator.clipboard.writeText(`boasted from Download Page – ${time} (Morocco)`);
         const toast = Object.assign(document.createElement("div"), {
           textContent: "Copied!",
-          className:
-            "fixed bottom-5 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg z-50 animate-bounce",
+          className: "fixed bottom-5 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-6 py-3 rounded-full text-sm font-bold shadow-2xl z-50 animate-bounce",
         });
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 1800);
+        setTimeout(() => toast.remove(), 2000);
       }
     };
     window.addEventListener("keydown", handleCopy);
@@ -36,29 +73,15 @@ const NoSelectStyle = () => (
   <style jsx global>{`
     .no-select * { user-select: none !important; }
     .no-select.selectable * { user-select: auto !important; }
-    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-    .animate-shimmer {
-      background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%);
-      background-size: 200% 100%;
-      animation: shimmer 1.5s infinite;
-    }
+    .animate-shimmer { background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
     .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
-
-    /* Crown floating animation */
     @keyframes float { 0% { transform: translateY(0) rotate(-10deg); } 50% { transform: translateY(-12px) rotate(10deg); } 100% { transform: translateY(0) rotate(-10deg); } }
     .crown-float { animation: float 6s ease-in-out infinite; }
-
-    /* Glow for top offer */
-    .top-glow { box-shadow: 0 0 40px rgba(255, 215, 0, 0.7), 0 0 80px rgba(255, 223, 0, 0.5); }
-
-    :root {
-      --custom-background-color: rgb(0, 170, 255);
-    }
-    .custom-ocean-bg {
-      background-color: var(--custom-background-color) !important;
-    }
+    :root { --custom-background-color: rgb(0, 170, 255); }
+    .custom-ocean-bg { background-color: var(--custom-background-color) !important; }
   `}</style>
 );
 
@@ -192,28 +215,19 @@ const OfferModal = memo(({ offer, onClose }: { offer: Offer | null; onClose: () 
   );
 });
 
-/* ────────────────────── SPECIAL TOP OFFER CARD (نفس الحجم + شكل فخم على الموبايل) ────────────────────── */
+/* ────────────────────── TOP OFFER CARD ────────────────────── */
 const TopOfferCard = memo(({ o, onOpenModal }: { o: Offer; onOpenModal: (o: Offer) => void }) => {
   const [locale] = useLocale();
   const i18n = t(locale);
 
   return (
     <article className="relative bg-white rounded-xl p-3.5 border-4 border-yellow-400 shadow-xl overflow-hidden group">
-      {/* خلفية متدرجة خفيفة + لمعان */}
       <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-50 opacity-70 group-hover:opacity-90 transition-opacity" />
-      
-      {/* تاج صغير في الزاوية */}
       <div className="absolute -top-3 -right-3 opacity-40 pointer-events-none">
         <Crown className="w-16 h-16 text-yellow-600 crown-float" />
       </div>
 
-      {/* Badge "BEST OFFER" */}
-      <div className="absolute top-2 left-2 z-10">
-        
-      </div>
-
       <div className="relative flex gap-3">
-        {/* الصورة */}
         <div className="relative w-14 h-14 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 p-1.5 flex-shrink-0 shadow-lg ring-4 ring-yellow-300 ring-opacity-50">
           {o.image ? (
             <img src={o.image} alt={o.title} className="w-full h-full object-cover rounded-md" loading="lazy" />
@@ -224,25 +238,16 @@ const TopOfferCard = memo(({ o, onOpenModal }: { o: Offer; onOpenModal: (o: Offe
           )}
         </div>
 
-        {/* المحتوى */}
         <div className="flex-1 min-w-0">
-          {/* Recommended Badge */}
           <div className="flex items-center gap-1.5 mb-1">
-            
             <span className="text-xs font-bold text-amber-700 bg-yellow-200 px-2.5 py-0.5 rounded-full">
               {i18n.recommended ?? "Recommended"}
             </span>
           </div>
 
-          <h3 className="font-black text-base text-blue-600 line-clamp-2 leading-tight">
-            {o.title}
-          </h3>
+          <h3 className="font-black text-base text-blue-600 line-clamp-2 leading-tight">{o.title}</h3>
+          <p className="text-xs text-gray-600 line-clamp-2 mt-1 mb-2">{o.description}</p>
 
-          <p className="text-xs text-gray-600 line-clamp-2 mt-1 mb-2">
-            {o.description}
-          </p>
-
-          {/* معلومات صغيرة */}
           <div className="flex items-center justify-between text-xs mb-3">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 text-blue-600">
@@ -258,14 +263,10 @@ const TopOfferCard = memo(({ o, onOpenModal }: { o: Offer; onOpenModal: (o: Offe
             </div>
           </div>
 
-          {/* زر الفتح */}
           <button
             onClick={() => onOpenModal(o)}
-           
-                      className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-xl hover:brightness-110 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
-
+            className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-xl hover:brightness-110 active:scale-95 transition-all duration-200"
           >
-            
             {i18n.completeOfferBtn ?? "Complete Offer"}
           </button>
         </div>
@@ -273,8 +274,8 @@ const TopOfferCard = memo(({ o, onOpenModal }: { o: Offer; onOpenModal: (o: Offe
     </article>
   );
 });
-   
-/* ────────────────────── REGULAR OFFER CARD (الباقي كما هو لكن أجمل) ────────────────────── */
+
+/* ────────────────────── REGULAR OFFER CARD ────────────────────── */
 const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number; onOpenModal: (o: Offer) => void; topOfferId: string | null }) => {
   const [locale] = useLocale();
   const i18n = t(locale);
@@ -286,10 +287,7 @@ const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number
   };
   const isRecommended = topOfferId === o.id;
 
-  // إذا كان هو الأفضل → نستخدم الكارت الملكي
-  if (isRecommended) {
-    return <TopOfferCard o={o} onOpenModal={onOpenModal} />;
-  }
+  if (isRecommended) return <TopOfferCard o={o} onOpenModal={onOpenModal} />;
 
   return (
     <article className="relative bg-white rounded-xl p-3.5 border-4 border-orange-400 shadow-xl overflow-hidden group">
@@ -320,8 +318,8 @@ const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number
           </div>
           <button
             onClick={() => onOpenModal(o)}
-                     className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-xl hover:brightness-110 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
-         >
+            className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-xl hover:brightness-110 active:scale-95 transition-all duration-200"
+          >
             {i18n.completeOfferBtn ?? "Complete Offer"}
           </button>
         </div>
@@ -330,24 +328,18 @@ const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number
   );
 });
 
-/* ────────────────────── SERVER 2 FULLSCREEN (لم يتم حذفه) ────────────────────── */
-type TryServer2Props = { defaultOpen?: boolean };
-const TryServer2Fullscreen = memo(({ defaultOpen = false }: TryServer2Props) => {
-  const [open, setOpen] = useState<boolean>(false);
+/* ────────────────────── SERVER 2 FULLSCREEN ────────────────────── */
+const TryServer2Fullscreen = memo(({ defaultOpen = false }: { defaultOpen?: boolean }) => {
+  const [open, setOpen] = useState(defaultOpen);
   const [iframeReady, setIframeReady] = useState(false);
   const [locale] = useLocale();
   const i18n = t(locale);
 
-  useEffect(() => {
-    if (defaultOpen) setOpen(true);
-  }, [defaultOpen]);
+  useEffect(() => { if (defaultOpen) setOpen(true); }, [defaultOpen]);
 
   if (!open) {
     return (
-      <button
-        onClick={() => setOpen(true)}
-        className="mx-auto block px-4 py-2 rounded-lg text-yellow-600 underline text-sm font-semibold transition hover:text-blue-700"
-      >
+      <button onClick={() => setOpen(true)} className="mx-auto block px-4 py-2 rounded-lg text-yellow-600 underline text-sm font-semibold hover:text-blue-700 transition">
         {i18n.tryServer2 ?? "Server 2"}
       </button>
     );
@@ -358,11 +350,7 @@ const TryServer2Fullscreen = memo(({ defaultOpen = false }: TryServer2Props) => 
       <div className="flex items-center justify-between p-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg">
         <h3 className="text-sm font-black">Server 2</h3>
         <div className="flex gap-2">
-          <button
-            onClick={() => window.open("https://appinstallcheck.com/cl/i/8dkk3k", "_blank", "noopener,noreferrer")}
-            className="p-1 rounded-full hover:bg-white/20 transition"
-            title="Open in new tab"
-          >
+          <button onClick={() => window.open("https://appinstallcheck.com/cl/i/8dkk3k", "_blank", "noopener,noreferrer")} className="p-1 rounded-full hover:bg-white/20 transition">
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
@@ -391,7 +379,7 @@ const TryServer2Fullscreen = memo(({ defaultOpen = false }: TryServer2Props) => 
   );
 });
 
-/* ────────────────────── MAIN DOWNLOAD PAGE ────────────────────── */
+/* ────────────────────── MAIN COMPONENT ────────────────────── */
 const Download = () => {
   const urlParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const gameName = urlParams.get("game") || "Game";
@@ -406,8 +394,26 @@ const Download = () => {
   const [modalOffer, setModalOffer] = useState<Offer | null>(null);
   const [showQR, setShowQR] = useState(false);
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
+  const [isTikTok, setIsTikTok] = useState<boolean | null>(null);
+
+// TikTok detection
+  useEffect(() => {
+    setIsTikTok(isTikTokBrowser());
+  }, []);
 
   // Desktop detection
+  useEffect(() => {
+    const check = () => {
+      const desktop = window.innerWidth > 768 && !/Mobi|Android|iPhone/i.test(navigator.userAgent);
+      setIsDesktop(desktop);
+      if (desktop) setShowQR(true);
+    };
+    check();
+    window.addEventListener("resize", check);
+    return () => window.removeEventListener("resize", check);
+  }, []);
+
+  // Sinon → page normale (aucun changement)
   useEffect(() => {
     const check = () => {
       const desktop = !/Mobi|Android|iPhone/i.test(navigator.userAgent) && window.innerWidth > 768;
@@ -419,7 +425,6 @@ const Download = () => {
     return () => window.removeEventListener("resize", check);
   }, []);
 
-  // Scroll no-select
   useEffect(() => {
     let timer: NodeJS.Timeout;
     const onScroll = () => {
@@ -431,13 +436,12 @@ const Download = () => {
     return () => window.removeEventListener("scroll", onScroll);
   }, []);
 
-  // Fetch offers
   useEffect(() => {
     let mounted = true;
     fetchOffers()
       .then((data) => {
         if (mounted) {
-          setOffers(data); // الترتيب يتم داخل fetchOffers بالفعل (CPI → EPC → Payout)
+          setOffers(data);
           setLoading(false);
         }
       })
@@ -451,8 +455,6 @@ const Download = () => {
   }, []);
 
   const openModal = (o: Offer) => setModalOffer(o);
-  const closeModal = () => setModalOffer(null);
-
   const bestOfferId = offers[0]?.id || null;
 
   return (
@@ -479,43 +481,23 @@ const Download = () => {
 
             {!loading && !error && offers.length > 0 && (
               <>
-<section
-  className="
-    bg-white
-    rounded-3xl
-    shadow-xl
-    p-6 mb-6 text-center
-    border-2 border-[#D4AF37]       /* Real Gold Border */
-    hover:border-[#F6E27F]          /* Light Gold Hover */
-    transition-all duration-300
-  "
->
-
-  <h1 className="text-2xl font-extrabold text-gray-600 mb-3">
-    {i18n.completeOneTask ?? "Complete one task"}
-  </h1>
-
-  <p className="text-base font-medium text-green-600 mb-4 leading-relaxed">
-    {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[0]}
-
-    <span className="text-blue-600 underline text-xl font-bold">
-      {gameName}
-    </span>
-
-    <br />
-
-    {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[1]}
-  </p>
-
-  <div className="mt-4 flex flex-col items-center gap-3">
-    <Suspense fallback={null}>
-      <LangPicker />
-    </Suspense>
-
-    <TryServer2Fullscreen />
-  </div>
-</section>
-
+                <section className="bg-white rounded-3xl shadow-xl p-6 mb-6 text-center border-2 border-[#D4AF37] hover:border-[#F6E27F] transition-all duration-300">
+                  <h1 className="text-2xl font-extrabold text-gray-600 mb-3">
+                    {i18n.completeOneTask ?? "Complete one task"}
+                  </h1>
+                  <p className="text-base font-medium text-green-600 mb-4 leading-relaxed">
+                    {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[0]}
+                    <span className="text-blue-600 underline text-xl font-bold"> {gameName} </span>
+                    <br />
+                    {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[1]}
+                  </p>
+                  <div className="mt-4 flex flex-col items-center gap-3">
+                    <Suspense fallback={null}>
+                      <LangPicker />
+                    </Suspense>
+                    <TryServer2Fullscreen />
+                  </div>
+                </section>
 
                 <div className="space-y-5">
                   {offers.slice(0, 3).map((o, i) => (
@@ -534,7 +516,7 @@ const Download = () => {
         </main>
       </div>
 
-      <OfferModal offer={modalOffer} onClose={closeModal} />
+      <OfferModal offer={modalOffer} onClose={() => setModalOffer(null)} />
       <QRModal isOpen={showQR && isDesktop === true} onClose={() => setShowQR(false)} />
     </>
   );

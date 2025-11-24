@@ -90,8 +90,7 @@ const G1: React.FC = () => {
           marginBottom: "32px",
         }}
       />
-
-      {/* You can add buttons or text here */}
+ {/* You can add buttons or text here */}
     </div>
   );
 };
