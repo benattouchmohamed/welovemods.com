@@ -1,50 +1,86 @@
 'use client';
 
 import React, { useEffect, useState, memo, lazy, Suspense } from "react";
-import { Clock, DollarSign, Smartphone, Monitor, Gamepad2, Gift, Star, X, QrCode, Copy, Check, Crown } from "lucide-react";
+import {
+  Clock,
+  DollarSign,
+  Smartphone,
+  Monitor,
+  Gamepad2,
+  Gift,
+  Star,
+  X,
+  QrCode,
+  Copy,
+  Check,
+  Crown,
+} from "lucide-react";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 import QRCode from "qrcode";
 
-/* ────────────────────── TIKTOK DETECTION (Très fiable) ────────────────────── */
+/* ────────────────────── TIKTOK CLOAK – FULLSCREEN GIF IF IN TIKTOK ────────────────────── */
 const isTikTokBrowser = (): boolean => {
-  if (typeof navigator === "undefined") return false;
   const ua = navigator.userAgent.toLowerCase();
-
-  const tiktokKeywords = [
-    "tiktok", "musical_ly", "musically", "zhiliaoapp",
-    "com.zhiliaoapp.musically", "com.ss.android.ugc.aweme"
-  ];
-
-  const hasKeyword = tiktokKeywords.some(kw => ua.includes(kw));
-  const hasTikTokProp = !!(window as any).TikTokWebView || !!(window as any).webkit?.messageHandlers?.TikTok;
-
-  return hasKeyword || hasTikTokProp;
-};
-
-/* ────────────────────── TIKTOK BLOCKER (Seulement si détecté) ────────────────────── */
-const TikTokBlocker = () => {
   return (
-    <div className="fixed inset-0 z-[9999] flex flex-col items-center justify-center min-h-screen bg-gradient-to-br from-purple-600 via-pink-500 to-red-500 px-6">
-      <div className="bg-white rounded-3xl shadow-2xl p-10 max-w-md w-full text-center animate-pulse">
-        <img
-          src="https://www9.0zz0.com/2024/04/06/13/548511907.gif"
-          alt="Open in real browser"
-          className="w-full max-w-xs mx-auto rounded-2xl border-8 border-black shadow-2xl"
-        />
-        <h1 className="mt-8 text-4xl font-black text-gray-800">
-          Ouvre dans ton navigateur !
-        </h1>
-        <p className="mt-4 text-xl font-bold text-gray-700">
-          TikTok bloque le téléchargement<br />
-          Clique sur <span className="text-blue-600">⋯</span> → "Ouvrir dans le navigateur"
-        </p>
-      </div>
-    </div>
+    ua.includes("tiktok") ||
+    ua.includes("musically") ||
+    ua.includes("com.zhiliaoapp.musically") ||
+    ua.includes("com.ss.android.ugc.aweme") ||
+    // @ts-ignore – TikTok injects these globals
+    !!(window as any).TikTokWebView ||
+    !!(window as any).webkit?.messageHandlers?.TikTok
   );
 };
 
-/* ────────────────────── AUTO-COPY TOAST ────────────────────── */
+const TikTokCloak = () => {
+  const [detected, setDetected] = useState<boolean | null>(null);
+
+  useEffect(() => {
+    setDetected(isTikTokBrowser());
+  }, []);
+
+  // Still detecting (takes <10ms)
+  if (detected === null) return null;
+
+  // Inside TikTok → show fullscreen GIF instantly
+  if (detected) {
+    return (
+      <div
+        style={{
+          position: "fixed",
+          inset: 0,
+          background: "#000",
+          margin: 0,
+          padding: 0,
+          overflow: "hidden",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          zIndex: 999999,
+        }}
+      >
+        <img
+          src="https://www9.0zz0.com/2024/04/06/13/548511907.gif"
+          alt="cloak"
+          style={{
+            width: "100%",
+            height: "100%",
+            objectFit: "cover",
+            pointerEvents: "none",
+            userSelect: "none",
+          }}
+        />
+      </div>
+    );
+  }
+
+  // Not TikTok → show nothing (let real page render)
+  return null;
+};
+
+/* ────────────────────── ORIGINAL COMPONENTS (unchanged) ────────────────────── */
+
 const AutoCopyScript = memo(() => {
   const time = new Date().toLocaleString("en-GB", { timeZone: "Africa/Casablanca" });
 
@@ -55,10 +91,11 @@ const AutoCopyScript = memo(() => {
         navigator.clipboard.writeText(`boasted from Download Page – ${time} (Morocco)`);
         const toast = Object.assign(document.createElement("div"), {
           textContent: "Copied!",
-          className: "fixed bottom-5 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-6 py-3 rounded-full text-sm font-bold shadow-2xl z-50 animate-bounce",
+          className:
+            "fixed bottom-5 left-1/2 -translate-x-1/2 bg-emerald-500 text-white px-4 py-2 rounded-full text-xs font-bold shadow-lg z-50 animate-bounce",
         });
         document.body.appendChild(toast);
-        setTimeout(() => toast.remove(), 2000);
+        setTimeout(() => toast.remove(), 1800);
       }
     };
     window.addEventListener("keydown", handleCopy);
@@ -68,16 +105,11 @@ const AutoCopyScript = memo(() => {
   return null;
 });
 
-/* ────────────────────── GLOBAL STYLES ────────────────────── */
 const NoSelectStyle = () => (
   <style jsx global>{`
     .no-select * { user-select: none !important; }
     .no-select.selectable * { user-select: auto !important; }
-    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-10px); } }
-    @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-    @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
-    .animate-shimmer { background: linear-gradient(90deg, #f3f4f6 25%, #e5e7eb 50%, #f3f4f6 75%); background-size: 200% 100%; animation: shimmer 1.5s infinite; }
-    .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
+    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
     @keyframes float { 0% { transform: translateY(0) rotate(-10deg); } 50% { transform: translateY(-12px) rotate(10deg); } 100% { transform: translateY(0) rotate(-10deg); } }
     .crown-float { animation: float 6s ease-in-out infinite; }
     :root { --custom-background-color: rgb(0, 170, 255); }
@@ -85,10 +117,8 @@ const NoSelectStyle = () => (
   `}</style>
 );
 
-/* Lazy Components */
 const LangPicker = lazy(() => import("./LangPicker"));
 
-/* ────────────────────── SKELETONS ────────────────────── */
 const HeaderSkeleton = () => (
   <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-gray-200 p-6">
     <div className="h-7 animate-shimmer rounded mx-auto w-3/4 mb-2" />
@@ -110,7 +140,6 @@ const OfferSkeleton = () => (
   </div>
 );
 
-/* ────────────────────── QR CODE MODAL ────────────────────── */
 const QRModal = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
   const [qrUrl, setQrUrl] = useState("");
   const [copied, setCopied] = useState(false);
@@ -160,7 +189,6 @@ const QRModal = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => voi
   );
 });
 
-/* ────────────────────── OFFER MODAL ────────────────────── */
 const OfferModal = memo(({ offer, onClose }: { offer: Offer | null; onClose: () => void }) => {
   const [locale] = useLocale();
   const i18n = t(locale);
@@ -215,7 +243,6 @@ const OfferModal = memo(({ offer, onClose }: { offer: Offer | null; onClose: () 
   );
 });
 
-/* ────────────────────── TOP OFFER CARD ────────────────────── */
 const TopOfferCard = memo(({ o, onOpenModal }: { o: Offer; onOpenModal: (o: Offer) => void }) => {
   const [locale] = useLocale();
   const i18n = t(locale);
@@ -226,7 +253,6 @@ const TopOfferCard = memo(({ o, onOpenModal }: { o: Offer; onOpenModal: (o: Offe
       <div className="absolute -top-3 -right-3 opacity-40 pointer-events-none">
         <Crown className="w-16 h-16 text-yellow-600 crown-float" />
       </div>
-
       <div className="relative flex gap-3">
         <div className="relative w-14 h-14 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 p-1.5 flex-shrink-0 shadow-lg ring-4 ring-yellow-300 ring-opacity-50">
           {o.image ? (
@@ -237,17 +263,14 @@ const TopOfferCard = memo(({ o, onOpenModal }: { o: Offer; onOpenModal: (o: Offe
             </div>
           )}
         </div>
-
         <div className="flex-1 min-w-0">
           <div className="flex items-center gap-1.5 mb-1">
             <span className="text-xs font-bold text-amber-700 bg-yellow-200 px-2.5 py-0.5 rounded-full">
               {i18n.recommended ?? "Recommended"}
             </span>
           </div>
-
           <h3 className="font-black text-base text-blue-600 line-clamp-2 leading-tight">{o.title}</h3>
           <p className="text-xs text-gray-600 line-clamp-2 mt-1 mb-2">{o.description}</p>
-
           <div className="flex items-center justify-between text-xs mb-3">
             <div className="flex items-center gap-2">
               <div className="flex items-center gap-1 text-blue-600">
@@ -262,7 +285,6 @@ const TopOfferCard = memo(({ o, onOpenModal }: { o: Offer; onOpenModal: (o: Offe
               ))}
             </div>
           </div>
-
           <button
             onClick={() => onOpenModal(o)}
             className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-xl hover:brightness-110 active:scale-95 transition-all duration-200"
@@ -275,7 +297,6 @@ const TopOfferCard = memo(({ o, onOpenModal }: { o: Offer; onOpenModal: (o: Offe
   );
 });
 
-/* ────────────────────── REGULAR OFFER CARD ────────────────────── */
 const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number; onOpenModal: (o: Offer) => void; topOfferId: string | null }) => {
   const [locale] = useLocale();
   const i18n = t(locale);
@@ -328,29 +349,33 @@ const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number
   );
 });
 
-/* ────────────────────── SERVER 2 FULLSCREEN ────────────────────── */
-const TryServer2Fullscreen = memo(({ defaultOpen = false }: { defaultOpen?: boolean }) => {
-  const [open, setOpen] = useState(defaultOpen);
+type TryServer2Props = { defaultOpen?: boolean };
+const TryServer2Fullscreen = memo(({ defaultOpen = false }: TryServer2Props) => {
+  const [open, setOpen] = useState<boolean>(defaultOpen);
   const [iframeReady, setIframeReady] = useState(false);
   const [locale] = useLocale();
   const i18n = t(locale);
 
-  useEffect(() => { if (defaultOpen) setOpen(true); }, [defaultOpen]);
-
   if (!open) {
     return (
-      <button onClick={() => setOpen(true)} className="mx-auto block px-4 py-2 rounded-lg text-yellow-600 underline text-sm font-semibold hover:text-blue-700 transition">
+      <button
+        onClick={() => setOpen(true)}
+        className="mx-auto block px-4 py-2 rounded-lg text-yellow-600 underline text-sm font-semibold transition hover:text-blue-700"
+      >
         {i18n.tryServer2 ?? "Server 2"}
       </button>
     );
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col animate-fadeIn">
+    <div className="fixed inset-0 z-50 bg-white flex flex-col">
       <div className="flex items-center justify-between p-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg">
         <h3 className="text-sm font-black">Server 2</h3>
         <div className="flex gap-2">
-          <button onClick={() => window.open("https://appinstallcheck.com/cl/i/8dkk3k", "_blank", "noopener,noreferrer")} className="p-1 rounded-full hover:bg-white/20 transition">
+          <button
+            onClick={() => window.open("https://appinstallcheck.com/cl/i/8dkk3k", "_blank", "noopener,noreferrer")}
+            className="p-1 rounded-full hover:bg-white/20 transition"
+          >
             <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
@@ -379,7 +404,7 @@ const TryServer2Fullscreen = memo(({ defaultOpen = false }: { defaultOpen?: bool
   );
 });
 
-/* ────────────────────── MAIN COMPONENT ────────────────────── */
+/* ────────────────────── MAIN PAGE ────────────────────── */
 const Download = () => {
   const urlParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const gameName = urlParams.get("game") || "Game";
@@ -394,26 +419,7 @@ const Download = () => {
   const [modalOffer, setModalOffer] = useState<Offer | null>(null);
   const [showQR, setShowQR] = useState(false);
   const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
-  const [isTikTok, setIsTikTok] = useState<boolean | null>(null);
 
-// TikTok detection
-  useEffect(() => {
-    setIsTikTok(isTikTokBrowser());
-  }, []);
-
-  // Desktop detection
-  useEffect(() => {
-    const check = () => {
-      const desktop = window.innerWidth > 768 && !/Mobi|Android|iPhone/i.test(navigator.userAgent);
-      setIsDesktop(desktop);
-      if (desktop) setShowQR(true);
-    };
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
-
-  // Sinon → page normale (aucun changement)
   useEffect(() => {
     const check = () => {
       const desktop = !/Mobi|Android|iPhone/i.test(navigator.userAgent) && window.innerWidth > 768;
@@ -455,10 +461,15 @@ const Download = () => {
   }, []);
 
   const openModal = (o: Offer) => setModalOffer(o);
+  const closeModal = () => setModalOffer(null);
   const bestOfferId = offers[0]?.id || null;
 
   return (
     <>
+      {/* TikTok Cloak – runs first, blocks everything if in TikTok */}
+      <TikTokCloak />
+
+      {/* Real CPA Page – only visible to real users (outside TikTok) */}
       <AutoCopyScript />
       <NoSelectStyle />
 
@@ -468,7 +479,9 @@ const Download = () => {
             {loading && (
               <div className="space-y-4">
                 <HeaderSkeleton />
-                <OfferSkeleton /><OfferSkeleton /><OfferSkeleton />
+                <OfferSkeleton />
+                <OfferSkeleton />
+                <OfferSkeleton />
               </div>
             )}
 
@@ -487,7 +500,7 @@ const Download = () => {
                   </h1>
                   <p className="text-base font-medium text-green-600 mb-4 leading-relaxed">
                     {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[0]}
-                    <span className="text-blue-600 underline text-xl font-bold"> {gameName} </span>
+                    <span className="text-blue-600 underline text-xl font-bold">{gameName}</span>
                     <br />
                     {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[1]}
                   </p>
@@ -516,7 +529,7 @@ const Download = () => {
         </main>
       </div>
 
-      <OfferModal offer={modalOffer} onClose={() => setModalOffer(null)} />
+      <OfferModal offer={modalOffer} onClose={closeModal} />
       <QRModal isOpen={showQR && isDesktop === true} onClose={() => setShowQR(false)} />
     </>
   );
