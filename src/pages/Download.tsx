@@ -1,12 +1,10 @@
 'use client';
 
 import React, { useEffect, useState, memo, lazy, Suspense } from "react";
-import { Clock, DollarSign, Smartphone, Monitor, Gamepad2, Gift, Star, X, QrCode, Copy, Check } from "lucide-react";
+import { Clock, DollarSign, Smartphone, Monitor, Gamepad2, Gift, Star, X, QrCode, Copy, Check, Crown, Sparkles, Zap } from "lucide-react";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 import QRCode from "qrcode";
-
-
 
 /* ────────────────────── AUTO-COPY TOAST ────────────────────── */
 const AutoCopyScript = memo(() => {
@@ -48,7 +46,13 @@ const NoSelectStyle = () => (
     }
     .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
 
-    /* Bright ocean blue background */
+    /* Crown floating animation */
+    @keyframes float { 0% { transform: translateY(0) rotate(-10deg); } 50% { transform: translateY(-12px) rotate(10deg); } 100% { transform: translateY(0) rotate(-10deg); } }
+    .crown-float { animation: float 6s ease-in-out infinite; }
+
+    /* Glow for top offer */
+    .top-glow { box-shadow: 0 0 40px rgba(255, 215, 0, 0.7), 0 0 80px rgba(255, 223, 0, 0.5); }
+
     :root {
       --custom-background-color: rgb(0, 170, 255);
     }
@@ -188,7 +192,89 @@ const OfferModal = memo(({ offer, onClose }: { offer: Offer | null; onClose: () 
   );
 });
 
-/* ────────────────────── OFFER CARD ────────────────────── */
+/* ────────────────────── SPECIAL TOP OFFER CARD (نفس الحجم + شكل فخم على الموبايل) ────────────────────── */
+const TopOfferCard = memo(({ o, onOpenModal }: { o: Offer; onOpenModal: (o: Offer) => void }) => {
+  const [locale] = useLocale();
+  const i18n = t(locale);
+
+  return (
+    <article className="relative bg-white rounded-xl p-3.5 border-4 border-yellow-400 shadow-xl overflow-hidden group">
+      {/* خلفية متدرجة خفيفة + لمعان */}
+      <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-50 opacity-70 group-hover:opacity-90 transition-opacity" />
+      
+      {/* تاج صغير في الزاوية */}
+      <div className="absolute -top-3 -right-3 opacity-40 pointer-events-none">
+        <Crown className="w-16 h-16 text-yellow-600 crown-float" />
+      </div>
+
+      {/* Badge "BEST OFFER" */}
+      <div className="absolute top-2 left-2 z-10">
+        
+      </div>
+
+      <div className="relative flex gap-3">
+        {/* الصورة */}
+        <div className="relative w-14 h-14 rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 p-1.5 flex-shrink-0 shadow-lg ring-4 ring-yellow-300 ring-opacity-50">
+          {o.image ? (
+            <img src={o.image} alt={o.title} className="w-full h-full object-cover rounded-md" loading="lazy" />
+          ) : (
+            <div className="w-full h-full bg-white/30 rounded-md flex items-center justify-center">
+              <Gift className="w-8 h-8 text-white" />
+            </div>
+          )}
+        </div>
+
+        {/* المحتوى */}
+        <div className="flex-1 min-w-0">
+          {/* Recommended Badge */}
+          <div className="flex items-center gap-1.5 mb-1">
+            
+            <span className="text-xs font-bold text-amber-700 bg-yellow-200 px-2.5 py-0.5 rounded-full">
+              {i18n.recommended ?? "Recommended"}
+            </span>
+          </div>
+
+          <h3 className="font-black text-base text-blue-600 line-clamp-2 leading-tight">
+            {o.title}
+          </h3>
+
+          <p className="text-xs text-gray-600 line-clamp-2 mt-1 mb-2">
+            {o.description}
+          </p>
+
+          {/* معلومات صغيرة */}
+          <div className="flex items-center justify-between text-xs mb-3">
+            <div className="flex items-center gap-2">
+              <div className="flex items-center gap-1 text-blue-600">
+                <Clock className="w-3.5 h-3.5" />
+                <span className="font-bold">{o.timeEstimate}</span>
+              </div>
+              <span className="font-bold text-green-600">{o.difficulty}</span>
+            </div>
+            <div className="flex gap-0.5">
+              {Array(5).fill(null).map((_, i) => (
+                <Star key={i} className="w-3.5 h-3.5 fill-yellow-500 text-yellow-500" />
+              ))}
+            </div>
+          </div>
+
+          {/* زر الفتح */}
+          <button
+            onClick={() => onOpenModal(o)}
+           
+                      className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-xl hover:brightness-110 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
+
+          >
+            
+            {i18n.completeOfferBtn ?? "Complete Offer"}
+          </button>
+        </div>
+      </div>
+    </article>
+  );
+});
+   
+/* ────────────────────── REGULAR OFFER CARD (الباقي كما هو لكن أجمل) ────────────────────── */
 const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number; onOpenModal: (o: Offer) => void; topOfferId: string | null }) => {
   const [locale] = useLocale();
   const i18n = t(locale);
@@ -200,8 +286,13 @@ const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number
   };
   const isRecommended = topOfferId === o.id;
 
+  // إذا كان هو الأفضل → نستخدم الكارت الملكي
+  if (isRecommended) {
+    return <TopOfferCard o={o} onOpenModal={onOpenModal} />;
+  }
+
   return (
-    <article className={`bg-white rounded-xl p-3.5 border-2 shadow hover:shadow-lg transition-all duration-200 ${i % 2 === 0 ? "border-purple-400" : "border-pink-400"} ${isRecommended ? "ring-4 ring-yellow-400 ring-offset-2" : ""}`}>
+    <article className="relative bg-white rounded-xl p-3.5 border-4 border-orange-400 shadow-xl overflow-hidden group">
       <div className="flex gap-3">
         <div className="w-12 h-12 rounded-lg bg-gradient-to-br from-pink-400 to-purple-500 p-1.5 flex-shrink-0 shadow-sm flex items-center justify-center">
           {o.image ? (
@@ -211,12 +302,7 @@ const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className={`font-black text-sm text-blue-600 line-clamp-2 mb-1 ${isRecommended ? "text-lg" : ""}`}>{o.title}</h3>
-          {isRecommended && (
-            <span className="inline-block text-xs font-bold text-yellow-700 bg-yellow-200 px-2 py-0.5 rounded-full animate-pulse mb-1">
-              {i18n.recommended ?? "Recommended"}
-            </span>
-          )}
+          <h3 className="font-black text-sm text-blue-600 line-clamp-2 mb-1">{o.title}</h3>
           <p className="text-xs text-gray-600 line-clamp-2 mb-2">{o.description}</p>
           <div className="flex items-center justify-between text-xs mb-2">
             <div className="flex items-center gap-2">
@@ -234,12 +320,8 @@ const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number
           </div>
           <button
             onClick={() => onOpenModal(o)}
-            className={`w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white tracking-wide transition-all duration-200 active:scale-95 ${
-              isRecommended
-                ? "bg-gradient-to-r from-amber-500 to-yellow-500 shadow-md hover:shadow-lg hover:brightness-110"
-                : "bg-gradient-to-r from-indigo-600 to-purple-600 shadow hover:shadow-md hover:brightness-110"
-            }`}
-          >
+                     className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-xl hover:brightness-110 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
+         >
             {i18n.completeOfferBtn ?? "Complete Offer"}
           </button>
         </div>
@@ -248,7 +330,7 @@ const OfferCard = memo(({ o, i, onOpenModal, topOfferId }: { o: Offer; i: number
   );
 });
 
-/* ────────────────────── SERVER 2 FULLSCREEN ────────────────────── */
+/* ────────────────────── SERVER 2 FULLSCREEN (لم يتم حذفه) ────────────────────── */
 type TryServer2Props = { defaultOpen?: boolean };
 const TryServer2Fullscreen = memo(({ defaultOpen = false }: TryServer2Props) => {
   const [open, setOpen] = useState<boolean>(false);
@@ -355,8 +437,7 @@ const Download = () => {
     fetchOffers()
       .then((data) => {
         if (mounted) {
-          const sorted = [...data].sort((a, b) => (b.epc ?? 0) - (a.epc ?? 0));
-          setOffers(sorted);
+          setOffers(data); // الترتيب يتم داخل fetchOffers بالفعل (CPI → EPC → Payout)
           setLoading(false);
         }
       })
@@ -372,25 +453,20 @@ const Download = () => {
   const openModal = (o: Offer) => setModalOffer(o);
   const closeModal = () => setModalOffer(null);
 
-  const topTwo = offers.slice(0, 2);
-  const remaining = offers.slice(2);
   const bestOfferId = offers[0]?.id || null;
 
   return (
     <>
-      
-
       <AutoCopyScript />
       <NoSelectStyle />
 
-      {/* Bright ocean blue background applied here */}
       <div dir={locale === "ar" ? "rtl" : "ltr"} className={`min-h-screen custom-ocean-bg ${isScrolling ? "no-select" : "no-select selectable"}`}>
         <main className="pt-4 pb-10">
           <div className="max-w-xl mx-auto px-4">
             {loading && (
               <div className="space-y-4">
                 <HeaderSkeleton />
-                <OfferSkeleton /><OfferSkeleton />
+                <OfferSkeleton /><OfferSkeleton /><OfferSkeleton />
               </div>
             )}
 
@@ -403,36 +479,47 @@ const Download = () => {
 
             {!loading && !error && offers.length > 0 && (
               <>
-                <section className="bg-white rounded-2xl shadow-lg border-2 border-green-500/50 p-5 mb-5 text-center">
-                  <h1 className="text-2xl font-black text-blue-600 mb-2">{i18n.completeOneTask ?? "Complete one task"}</h1>
-                  <p className="text-lg font-bold text-green-600 mb-4">
-                    {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[0]}
-                    <span className="text-yellow-500 underline text-xl">{gameName}</span><br />
-                    {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[1]}
-                  </p>
-                  <div className="mt-4 flex flex-col items-center gap-2">
-                    <Suspense fallback={null}>
-                      <LangPicker />
-                    </Suspense>
-                    <TryServer2Fullscreen />
-                  </div>
-                </section>
+<section
+  className="
+    bg-white
+    rounded-3xl
+    shadow-xl
+    p-6 mb-6 text-center
+    border-2 border-[#D4AF37]       /* Real Gold Border */
+    hover:border-[#F6E27F]          /* Light Gold Hover */
+    transition-all duration-300
+  "
+>
 
-                <div className="space-y-4 mb-6">
-                  {topTwo.map((o, i) => (
+  <h1 className="text-2xl font-extrabold text-gray-600 mb-3">
+    {i18n.completeOneTask ?? "Complete one task"}
+  </h1>
+
+  <p className="text-base font-medium text-green-600 mb-4 leading-relaxed">
+    {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[0]}
+
+    <span className="text-blue-600 underline text-xl font-bold">
+      {gameName}
+    </span>
+
+    <br />
+
+    {(i18n.gameReady ?? "Game {game} is ready").split("{game}")[1]}
+  </p>
+
+  <div className="mt-4 flex flex-col items-center gap-3">
+    <Suspense fallback={null}>
+      <LangPicker />
+    </Suspense>
+
+    <TryServer2Fullscreen />
+  </div>
+</section>
+
+
+                <div className="space-y-5">
+                  {offers.slice(0, 3).map((o, i) => (
                     <OfferCard key={o.id} o={o} i={i} onOpenModal={openModal} topOfferId={bestOfferId} />
-                  ))}
-                </div>
-
-                {remaining.length > 0 && (
-                  <div className="text-center my-6 text-xs font-bold text-gray-500">
-                    — {i18n.tryOffers ?? "More offers"} —
-                  </div>
-                )}
-
-                <div className="grid gap-4">
-                  {remaining.map((o, i) => (
-                    <OfferCard key={o.id} o={o} i={i + 2} onOpenModal={openModal} topOfferId={bestOfferId} />
                   ))}
                 </div>
               </>
@@ -448,18 +535,6 @@ const Download = () => {
       </div>
 
       <OfferModal offer={modalOffer} onClose={closeModal} />
-
-      {isDesktop && (
-        <div className="fixed bottom-4 left-1/2 -translate-x-1/2 z-40">
-          <button
-            onClick={() => setShowQR(true)}
-            className="py-2 px-4 border border-blue-600 text-yellow-600 font-bold rounded-full shadow-lg hover:bg-blue-50 transition"
-          >
-            {i18n.useMobileFaster ?? "Use this on mobile, it's faster"}
-          </button>
-        </div>
-      )}
-
       <QRModal isOpen={showQR && isDesktop === true} onClose={() => setShowQR(false)} />
     </>
   );
