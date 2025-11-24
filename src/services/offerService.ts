@@ -134,8 +134,8 @@ export const fetchOffers = async (): Promise<Offer[]> => {
         ip: visitorIP,
         user_agent: userAgent,
         ctype: ctype.toString(),
-        min: "2",
-        max: "2",
+     min: "2",
+        max: "3",
       });
 
       try {
@@ -148,7 +148,7 @@ export const fetchOffers = async (): Promise<Offer[]> => {
         if (resp.ok) {
           const data: ApiOfferResponse = await resp.json();
           const rawOffers = data.success ? data.offers ?? [] : [];
-          const mapped = rawOffers.slice(0, 2).map(mapApiOfferToOffer);
+          const mapped = rawOffers.slice(0, 3).map(mapApiOfferToOffer);
           allOffers.push(...mapped);
         }
       } catch (err) {
@@ -160,7 +160,7 @@ export const fetchOffers = async (): Promise<Offer[]> => {
     return allOffers
       .map((o, i) => ({ offer: o, idx: i }))
       .sort((a, b) => sortOffers(a.offer, b.offer, a.idx, b.idx))
-      .slice(0, 2) // final cap: 2 offers
+      .slice(0, 3) // final cap: 3 offers
       .map((x) => x.offer);
   } catch (err) {
     console.error("fetchOffers error →", err);
@@ -173,151 +173,3 @@ export const getTopOffer = async (): Promise<Offer | null> => {
   const offers = await fetchOffers();
   return offers[0] ?? null; // BEST EPC → BEST payout
 };
-
-// export interface Offer {
-//   id: string;
-//   title: string;
-//   description: string;
-//   difficulty: "Easy";
-//   timeEstimate: string;
-//   icon: string;
-//   url: string;
-//   image?: string;
-//   type?: string;
-//   epc?: number;
-//   payout?: number;
-// }
-
-// interface ApiOffer {
-//   offerid?: string;
-//   name?: string;
-//   name_short?: string;
-//   description?: string;
-//   adcopy?: string;
-//   picture?: string;
-//   payout?: string;
-//   link?: string;
-//   epc?: string;
-//   category?: string;
-// }
-
-// interface ApiOfferResponse {
-//   success?: boolean;
-//   error?: string | null;
-//   offers?: ApiOffer[];
-// }
-
-// // ────── Config ──────
-// const API_BASE_URL = "https://unlockcontent.net/api/v2";
-// const API_TOKEN = "32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085";
-// const FALLBACK_URL = "https://areyourealhuman.com/cl/i/g6pqp2";
-// const CTYPE_CPI = 1; // CPI + CPE
-
-// // ────── Helpers ──────
-// const getVisitorIP = async (): Promise<string> => {
-//   try {
-//     const r = await fetch("https://api.ipify.org?format=json", { signal: AbortSignal.timeout?.(5000) });
-//     const d = await r.json();
-//     return d.ip ?? "127.0.0.1";
-//   } catch {
-//     return "127.0.0.1";
-//   }
-// };
-
-// const parseFloatOrNull = (val?: string): number | null =>
-//   val && !isNaN(parseFloat(val)) ? parseFloat(val) : null;
-
-// const mapApiOfferToOffer = (api: ApiOffer, idx: number): Offer => {
-//   const url = api.link && /^https?:\/\//i.test(api.link) ? api.link : FALLBACK_URL;
-//   return {
-//     id: api.offerid ?? `offer-${idx}`,
-//     title: api.name_short ?? api.name ?? "Special Offer",
-//     description: api.adcopy ?? api.description ?? "Complete this quick offer",
-//     difficulty: "Easy",
-//     timeEstimate: "1 mins",
-//     icon: "Gift",
-//     url,
-//     image: api.picture,
-//     type: api.category,
-//     epc: parseFloatOrNull(api.epc),
-//     payout: parseFloatOrNull(api.payout),
-//   };
-// };
-
-// // ترتيب ذكي: CPI أولًا → EPC → Payout
-// const sortBestOffers = (
-//   a: { offer: Offer; idx: number },
-//   b: { offer: Offer; idx: number }
-// ): number => {
-//   const typeA = (a.offer.type || "").toUpperCase();
-//   const typeB = (b.offer.type || "").toUpperCase();
-
-//   const isCPI_A = typeA.includes("CPI");
-//   const isCPI_B = typeB.includes("CPI");
-
-//   if (isCPI_A && !isCPI_B) return -1;
-//   if (!isCPI_A && isCPI_B) return 1;
-
-//   const epcA = a.offer.epc ?? -Infinity;
-//   const epcB = b.offer.epc ?? -Infinity;
-//   if (epcA !== epcB) return epcB - epcA; // أعلى EPC أولًا
-
-//   const payoutA = a.offer.payout ?? -Infinity;
-//   const payoutB = b.offer.payout ?? -Infinity;
-//   if (payoutA !== payoutB) return payoutB - payoutA; // أعلى payout أولًا
-
-//   return a.idx - b.idx; // الترتيب الأصلي كـ tiebreaker
-// };
-
-// // ────── Main: نرجع أفضل 3 عروض فقط ──────
-// export const fetchOffers = async (): Promise<Offer[]> => {
-//   try {
-//     const visitorIP = await getVisitorIP();
-//     const userAgent = navigator.userAgent;
-
-//     const params = new URLSearchParams({
-//       ip: visitorIP,
-//       user_agent: userAgent,
-//       ctype: CTYPE_CPI.toString(),
-//       min: "2",  // كما طلبت
-//       max: "3",  // كما طلبت
-//     });
-
-//     const response = await fetch(`${API_BASE_URL}?${params}`, {
-//       method: "GET",
-//       headers: {
-//         Authorization: `Bearer ${API_TOKEN}`,
-//         "Content-Type": "application/json",
-//       },
-//       signal: AbortSignal.timeout?.(10000) ?? AbortSignal.timeout(10000),
-//     });
-
-//     if (!response.ok || !response.headers.get("content-type")?.includes("json")) {
-//       return [];
-//     }
-
-//     const data: ApiOfferResponse = await response.json();
-
-//     if (!data.success || !data.offers || data.offers.length === 0) {
-//       return [];
-//     }
-
-//     // نأخذ أفضل 3 بعد الترتيب الذكي
-//     const top3Offers = data.offers
-//       .map((api, idx) => ({ offer: mapApiOfferToOffer(api, idx), idx }))
-//       .sort(sortBestOffers)
-//       .slice(0, 3)
-//       .map(x => x.offer);
-
-//     return top3Offers;
-//   } catch (error) {
-//     console.error("fetchOffers error:", error);
-//     return [];
-//   }
-// };
-
-// // ────── أفضل عرض واحد (اختياري) ──────
-// export const getTopOffer = async (): Promise<Offer | null> => {
-//   const offers = await fetchOffers();
-//   return offers[0] ?? null;
-// };
