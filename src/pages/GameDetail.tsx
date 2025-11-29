@@ -3,7 +3,7 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, Box } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
-import Footer from "@/components/Footer";
+
 import { Button } from "@/components/ui/button";
 import { fetchGameBySlug, Game } from "@/services/gameService";
 import RatingStars from "@/components/RatingStars";

