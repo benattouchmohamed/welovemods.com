@@ -209,28 +209,54 @@ const RESTRICTED_COUNTRIES = [];
                     className="w-full aspect-square object-cover rounded-2xl"
                     loading="lazy"
                   />
-                  <button
-                    onClick={handleDownload}
-                    disabled={isDownloading || checkingGeo}
-                    className="mt-4 w-full bg-gradient-to-r from-green-500 to-blue-600 text-white font-black text-lg py-4 rounded-2xl flex items-center justify-center gap-2 hover:scale-105 transition disabled:opacity-70 disabled:cursor-not-allowed"
-                  >
-                    {checkingGeo ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Checking region...
-                      </>
-                    ) : isDownloading ? (
-                      <>
-                        <div className="w-5 h-5 border-2 border-white border-t-transparent rounded-full animate-spin" />
-                        Preparing...
-                      </>
-                    ) : (
-                      <>
-                        <Download className="w-6 h-6" />
-                        DOWNLOAD NOW!
-                      </>
-                    )}
-                  </button>
+                 <button
+  onClick={handleDownload}
+  disabled={isDownloading || checkingGeo}
+  className="
+    mt-4 w-full relative overflow-hidden
+    bg-gradient-to-r from-green-500 to-blue-600
+    text-white font-black text-lg py-4 rounded-2xl 
+    flex items-center justify-center gap-2
+
+    animate-pulse
+    hover:scale-105 active:scale-95
+    transition-all duration-300
+
+    disabled:opacity-70 disabled:cursor-not-allowed
+  "
+>
+  {/* لمعان متحرك */}
+  <span className="absolute inset-0 w-full h-full pointer-events-none shine"></span>
+
+  <Download className="w-6 h-6" />
+  DOWNLOAD NOW!
+</button>
+
+<style jsx>{`
+  .shine {
+    background: linear-gradient(
+      120deg,
+      transparent,
+      rgba(255, 255, 255, 0.4),
+      transparent
+    );
+    transform: translateX(-100%);
+    animation: shineMove 2s infinite;
+  }
+
+  @keyframes shineMove {
+    0% {
+      transform: translateX(-100%);
+    }
+    50% {
+      transform: translateX(100%);
+    }
+    100% {
+      transform: translateX(100%);
+    }
+  }
+`}</style>
+
                 </div>
               </div>
 
