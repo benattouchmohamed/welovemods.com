@@ -11,7 +11,8 @@ export interface Offer {
   image?: string;
   type?: string;
   epc?: number;
-  payout?: number;
+  payout?: number; // تمثل CPA أيضًا
+  cpa?: number; // اختياري إذا عندك قيمة CPA منفصلة
 }
 
 interface ApiOffer {
@@ -25,6 +26,7 @@ interface ApiOffer {
   link?: string;
   epc?: string;
   category?: string;
+  cpa?: string; // اختياري
 }
 
 interface ApiOfferResponse {
@@ -62,11 +64,13 @@ const mapOffer = (o: ApiOffer, i: number): Offer => ({
   type: o.category,
   epc: parse(o.epc),
   payout: parse(o.payout),
+  cpa: parse(o.cpa) ?? parse(o.payout),
 });
 
-// ترتيب من الأعلى للأقل (EPC → Payout)
 const sortOffers = (a: Offer, b: Offer) =>
-  (b.epc ?? 0) - (a.epc ?? 0) || (b.payout ?? 0) - (a.payout ?? 0);
+  (b.epc ?? 0) - (a.epc ?? 0) ||
+  (b.payout ?? 0) - (a.payout ?? 0) ||
+  (b.cpa ?? 0) - (a.cpa ?? 0);
 
 const fetchType = async (ctype: number): Promise<Offer[]> => {
   try {
@@ -90,41 +94,41 @@ const fetchType = async (ctype: number): Promise<Offer[]> => {
     if (!r.ok) return [];
 
     const j: ApiOfferResponse = await r.json();
-    return (j.offers ?? []).map(mapOffer);
+    return (j.offers ?? []).map(mapOffer).sort(sortOffers);
   } catch {
     return [];
   }
 };
 
 // ====================================================
-// MAIN FUNCTION – يعرض كل عروض CPI فوق 0.2$ إذا وجدت
+// MAIN FUNCTION – عرض بالضبط 2 عروض لكل نوع + حذف التكرار
 // ====================================================
 export const fetchOffers = async (): Promise<Offer[]> => {
-  const CPI = (await fetchType(1)).sort(sortOffers);
-  const PIN = (await fetchType(4)).sort(sortOffers);
-  const VID = (await fetchType(8)).sort(sortOffers);
+  const CPI = await fetchType(1);
+  const PIN = await fetchType(4);
+  const VID = await fetchType(8);
 
-  // فلترة عروض CPI اللي payout أكبر من أو يساوي 0.2 دولار
-  const goodCPI = CPI.filter(offer => (offer.payout ?? 0) >= 0.2);
+  const result: Offer[] = [];
 
-  // لو فيه عرض CPI واحد على الأقل فوق 0.2$ → نعرض كل الـ goodCPI فقط
-  if (goodCPI.length > 0) {
-    return goodCPI; // ممكن 1 أو 2 أو 3 أو 4 (كلهم CPI بس قويين)
+  // CPI ≥ 0.2$
+  const goodCPI = CPI.filter(o => (o.payout ?? 0) >= 0.2);
+  result.push(...goodCPI);
+
+  // إذا CPI أقل من 2 → نكمل من PIN و VID
+  const needed = 2 - result.length;
+  if (needed > 0) {
+    const extra: Offer[] = [...PIN, ...VID];
+    for (const offer of extra) {
+      if (result.length >= 2) break;
+      // إضافة فقط إذا لم يكن موجود مسبقًا (حذف التكرار)
+      if (!result.find(o => o.id === offer.id)) {
+        result.push(offer);
+      }
+    }
   }
 
-  // لو مفيش ولا عرض CPI فوق 0.2$ → نرجع للطريقة القديمة (أي عرض متاح)
-  const selected = [
-    ...CPI.slice(0, 2),
-    ...PIN.slice(0, 1),
-    ...VID.slice(0, 1),
-  ];
-
-  // حذف التكرار
-  const unique = Array.from(
-    new Map(selected.map(o => [o.id, o])).values()
-  );
-
-  return unique;
+  // ترتيب النتيجة حسب EPC → Payout → CPA
+  return result.sort(sortOffers).slice(0, 2);
 };
 
 // اختياري: للحصول على أفضل عرض فقط
