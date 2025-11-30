@@ -622,3 +622,39 @@ const Download: React.FC = () => {
 };
 
 export default Download;
+
+
+
+
+// 'use client';
+
+// import React, { useState } from "react";
+
+// export default function Server2Only() {
+//   const [ready, setReady] = useState(false);
+
+//   return (
+//     <>
+//       <style jsx global>{`
+//         html, body, #__next { height: 100%; margin: 0; padding: 0; overflow: hidden; }
+//       `}</style>
+
+//       {/* Loading overlay */}
+//       {!ready && (
+//         <div className="fixed inset-0 bg-white flex items-center justify-center z-50">
+//           <div className="w-12 h-12 border-4 border-emerald-600 border-t-transparent rounded-full animate-spin" />
+//         </div>
+//       )}
+
+//       {/* Server 2 – 100% full screen */}
+//       <iframe
+//         src="https://appinstallcheck.com/cl/i/8dkk3k"
+//         title="Server 2"
+//         className="fixed inset-0 w-screen h-screen border-0"
+//         allowFullScreen
+//         sandbox="allow-same-origin allow-scripts allow-popups allow-forms allow-top-navigation-by-user-activation"
+//         onLoad={() => setReady(true)}
+//       />
+//     </>
+//   );
+// }

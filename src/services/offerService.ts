@@ -1,3 +1,5 @@
+// src/services/offerService.ts
+
 export interface Offer {
   id: string;
   title: string;
@@ -22,7 +24,7 @@ interface ApiOffer {
   payout?: string;
   link?: string;
   epc?: string;
-  category?: string; // "Disabled" sometimes used
+  category?: string;
 }
 
 interface ApiOfferResponse {
@@ -31,196 +33,102 @@ interface ApiOfferResponse {
   offers?: ApiOffer[];
 }
 
-// Config
-const API_BASE_URL = "https://unlockcontent.net/api/v2";
-const API_TOKEN = "32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085";
-const FALLBACK_URL = "https://areyourealhuman.com/cl/i/g6pqp2";
+const API_URL = "https://unlockcontent.net/api/v2";
+const TOKEN = "32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085";
+const FALLBACK = "https://areyourealhuman.com/cl/i/g6pqp2";
 
-const CTYPE = { CPI: 1, CPA: 2, PIN: 4, VID: 8 } as const;
-
-const PRIORITY_ORDER = [
-  { type: "CPI", ctype: CTYPE.CPI },
-  { type: "VID", ctype: CTYPE.VID },
-  { type: "PIN", ctype: CTYPE.PIN },
-  { type: "CPA", ctype: CTYPE.CPA },
-] as const;
-
-// Helpers
-const getVisitorIP = async (): Promise<string> => {
+const getIP = async (): Promise<string> => {
   try {
-    const controller = new AbortController();
-    const timeoutId = setTimeout(() => controller.abort(), 5000);
-    const r = await fetch("https://api.ipify.org?format=json", { signal: controller.signal });
-    clearTimeout(timeoutId);
-    const d = await r.json();
-    return d.ip ?? "127.0.0.1";
+    const r = await fetch("https://api.ipify.org?format=json");
+    const j = await r.json();
+    return j.ip ?? "127.0.0.1";
   } catch {
-    console.warn("IP fetch failed → using fallback");
     return "127.0.0.1";
   }
 };
 
-const parseFloatOrNull = (val?: string): number | null =>
-  val && !isNaN(parseFloat(val)) ? parseFloat(val) : null;
+const parse = (v?: string): number | null =>
+  v && !isNaN(parseFloat(v)) ? parseFloat(v) : null;
 
-const mapApiOfferToOffer = (api: ApiOffer, idx: number): Offer => {
-  const url = api.link && /^https?:\/\//i.test(api.link) ? api.link : FALLBACK_URL;
+const mapOffer = (o: ApiOffer, i: number): Offer => ({
+  id: o.offerid ?? `id-${i}`,
+  title: o.name_short ?? o.name ?? "Offer",
+  description: o.adcopy ?? o.description ?? "",
+  difficulty: "Easy",
+  timeEstimate: "1 min",
+  icon: "Gift",
+  url: o.link && o.link.startsWith("http") ? o.link : FALLBACK,
+  image: o.picture,
+  type: o.category,
+  epc: parse(o.epc),
+  payout: parse(o.payout),
+});
 
-  return {
-    id: api.offerid ?? `offer-${idx}`,
-    title: api.name_short ?? api.name ?? "Special Offer",
-    description: api.adcopy ?? api.description ?? "Complete this offer",
-    difficulty: "Easy",
-    timeEstimate: "1 min",
-    icon: "Gift",
-    url,
-    image: api.picture,
-    type: api.category,
-    epc: parseFloatOrNull(api.epc),
-    payout: parseFloatOrNull(api.payout),
-  };
-};
+// ترتيب من الأعلى للأقل (EPC → Payout)
+const sortOffers = (a: Offer, b: Offer) =>
+  (b.epc ?? 0) - (a.epc ?? 0) || (b.payout ?? 0) - (a.payout ?? 0);
 
-const sortOffers = (a: Offer, b: Offer): number => {
-  const epcA = a.epc ?? -Infinity;
-  const epcB = b.epc ?? -Infinity;
-  if (epcB !== epcA) return epcB - epcA;
-
-  const payoutA = a.payout ?? -Infinity;
-  const payoutB = b.payout ?? -Infinity;
-  if (payoutB !== payoutA) return payoutB - payoutA;
-
-  return 0;
-};
-
-// MAIN
-export const fetchOffers = async (): Promise<Offer[]> => {
+const fetchType = async (ctype: number): Promise<Offer[]> => {
   try {
-    const visitorIP = await getVisitorIP();
-    const userAgent = navigator.userAgent;
+    const ip = await getIP();
+    const ua = navigator.userAgent;
 
     const headers = {
-      Authorization: `Bearer ${API_TOKEN}`,
+      Authorization: `Bearer ${TOKEN}`,
       "Content-Type": "application/json",
     };
 
-    const timeoutSignal =
-      typeof AbortSignal.timeout === "function"
-        ? AbortSignal.timeout(10000)
-        : (() => {
-            const controller = new AbortController();
-            setTimeout(() => controller.abort(), 10000);
-            return controller.signal;
-          })();
+    const params = new URLSearchParams({
+      ip,
+      user_agent: ua,
+      ctype: String(ctype),
+      min: "2",
+      max: "4",
+    });
 
-    const allOffers: Offer[] = [];
+    const r = await fetch(`${API_URL}?${params}`, { headers });
+    if (!r.ok) return [];
 
-    for (const { type, ctype } of PRIORITY_ORDER) {
-      if (allOffers.length >= 2) break;
-
-      const params = new URLSearchParams({
-        ip: visitorIP,
-        user_agent: userAgent,
-        ctype: ctype.toString(),
-        min: "6",
-        max: "6",
-      });
-
-      try {
-        const resp = await fetch(`${API_BASE_URL}?${params}`, {
-          method: "GET",
-          headers,
-          signal: timeoutSignal,
-        });
-
-        if (!resp.ok) continue;
-
-        const data: ApiOfferResponse = await resp.json();
-        let mapped = data.success ? (data.offers ?? []).map(mapApiOfferToOffer) : [];
-
-        // 🔥 FILTER 1: Remove disabled / invalid offers
-        mapped = mapped.filter(
-          (o) =>
-            o &&
-            o.url &&
-            o.title &&
-            o.type?.toLowerCase() !== "disabled" && // Hidden flag
-            (o.payout ?? 0) > 0                       // Remove payout=0 garbage
-        );
-
-        // 🔥 FILTER 2: CPI must be payout ≥ $0.30
-        if (ctype === CTYPE.CPI) {
-          mapped = mapped.filter((o) => (o.payout ?? 0) >= 0.3);
-          if (mapped.length === 0) {
-            console.warn("No CPI ≥ $0.30 → skipping CPI");
-            continue;
-          }
-        }
-
-        // Sort
-        mapped.sort(sortOffers);
-
-        for (const o of mapped) {
-          if (allOffers.length >= 2) break;
-          allOffers.push(o);
-        }
-      } catch (err) {
-        console.warn(`Fetch error for ${type}:`, err);
-      }
-    }
-
-    // Fallback
-    if (allOffers.length < 2) {
-      try {
-        const params = new URLSearchParams({
-          ip: visitorIP,
-          user_agent: userAgent,
-          min: "8",
-          max: "8",
-        });
-
-        const resp = await fetch(`${API_BASE_URL}?${params}`, {
-          method: "GET",
-          headers,
-          signal: timeoutSignal,
-        });
-
-        if (resp.ok) {
-          let mapped = ((await resp.json()) as ApiOfferResponse).offers?.map(mapApiOfferToOffer) ?? [];
-
-          mapped = mapped.filter(
-            (o) =>
-              o &&
-              o.url &&
-              o.title &&
-              o.type?.toLowerCase() !== "disabled" &&
-              (o.payout ?? 0) > 0
-          );
-
-          mapped.sort(sortOffers);
-
-          for (const o of mapped) {
-            if (allOffers.length >= 2) break;
-            allOffers.push(o);
-          }
-        }
-      } catch (err) {
-        console.warn("Fallback error:", err);
-      }
-    }
-
-    return allOffers.slice(0, 2);
-  } catch (err) {
-    console.error("fetchOffers error:", err);
+    const j: ApiOfferResponse = await r.json();
+    return (j.offers ?? []).map(mapOffer);
+  } catch {
     return [];
   }
 };
 
-export const getTopOffer = async (): Promise<Offer | null> => {
-  try {
-    const offers = await fetchOffers();
-    return offers[0] ?? null;
-  } catch {
-    return null;
+// ====================================================
+// MAIN FUNCTION – يعرض كل عروض CPI فوق 0.2$ إذا وجدت
+// ====================================================
+export const fetchOffers = async (): Promise<Offer[]> => {
+  const CPI = (await fetchType(1)).sort(sortOffers);
+  const PIN = (await fetchType(4)).sort(sortOffers);
+  const VID = (await fetchType(8)).sort(sortOffers);
+
+  // فلترة عروض CPI اللي payout أكبر من أو يساوي 0.2 دولار
+  const goodCPI = CPI.filter(offer => (offer.payout ?? 0) >= 0.2);
+
+  // لو فيه عرض CPI واحد على الأقل فوق 0.2$ → نعرض كل الـ goodCPI فقط
+  if (goodCPI.length > 0) {
+    return goodCPI; // ممكن 1 أو 2 أو 3 أو 4 (كلهم CPI بس قويين)
   }
+
+  // لو مفيش ولا عرض CPI فوق 0.2$ → نرجع للطريقة القديمة (أي عرض متاح)
+  const selected = [
+    ...CPI.slice(0, 2),
+    ...PIN.slice(0, 1),
+    ...VID.slice(0, 1),
+  ];
+
+  // حذف التكرار
+  const unique = Array.from(
+    new Map(selected.map(o => [o.id, o])).values()
+  );
+
+  return unique;
+};
+
+// اختياري: للحصول على أفضل عرض فقط
+export const getTopOffer = async () => {
+  const offers = await fetchOffers();
+  return offers[0] ?? null;
 };
