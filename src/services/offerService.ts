@@ -82,7 +82,7 @@ const fetchType = async (ctype: number): Promise<Offer[]> => {
       ip,
       user_agent: ua,
       ctype: String(ctype),
-      min: "2",
+      min: "4",
       max: "4",
     });
 
