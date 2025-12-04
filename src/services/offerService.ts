@@ -11,8 +11,8 @@ export interface Offer {
   image?: string;
   type?: string;
   epc?: number;
-  payout?: number; // تمثل CPA أيضًا
-  cpa?: number; // اختياري إذا عندك قيمة CPA منفصلة
+  payout?: number;
+  cpa?: number;
 }
 
 interface ApiOffer {
@@ -26,7 +26,7 @@ interface ApiOffer {
   link?: string;
   epc?: string;
   category?: string;
-  cpa?: string; // اختياري
+  cpa?: string;
 }
 
 interface ApiOfferResponse {
@@ -86,8 +86,6 @@ const fetchType = async (ctype: number): Promise<Offer[]> => {
       ip,
       user_agent: ua,
       ctype: String(ctype),
-      min: "4",
-      max: "4",
     });
 
     const r = await fetch(`${API_URL}?${params}`, { headers });
@@ -101,37 +99,32 @@ const fetchType = async (ctype: number): Promise<Offer[]> => {
 };
 
 // ====================================================
-// MAIN FUNCTION – عرض بالضبط 2 عروض لكل نوع + حذف التكرار
+// ALWAYS SHOW → Top EPC + Top Payout (minimum 2 offers)
+// Always prioritize CPI
 // ====================================================
 export const fetchOffers = async (): Promise<Offer[]> => {
-  const CPI = await fetchType(1);
+  const CPI = await fetchType(1);  // CPI always first
   const PIN = await fetchType(4);
   const VID = await fetchType(8);
 
-  const result: Offer[] = [];
+  const all = [...CPI, ...PIN, ...VID];
 
-  // CPI ≥ 0.2$
-  const goodCPI = CPI.filter(o => (o.payout ?? 0) >= 0.2);
-  result.push(...goodCPI);
-
-  // إذا CPI أقل من 2 → نكمل من PIN و VID
-  const needed = 2 - result.length;
-  if (needed > 0) {
-    const extra: Offer[] = [...PIN, ...VID];
-    for (const offer of extra) {
-      if (result.length >= 2) break;
-      // إضافة فقط إذا لم يكن موجود مسبقًا (حذف التكرار)
-      if (!result.find(o => o.id === offer.id)) {
-        result.push(offer);
-      }
+  const unique: Offer[] = [];
+  for (const offer of all) {
+    if (!unique.find(o => o.id === offer.id)) {
+      unique.push(offer);
     }
   }
 
-  // ترتيب النتيجة حسب EPC → Payout → CPA
-  return result.sort(sortOffers).slice(0, 2);
+  unique.sort(sortOffers);
+
+  // Minimum 2 offers
+  if (unique.length >= 2) return unique.slice(0, 2);
+
+  return unique; // in rare cases
 };
 
-// اختياري: للحصول على أفضل عرض فقط
+// Get ONLY the top offer
 export const getTopOffer = async () => {
   const offers = await fetchOffers();
   return offers[0] ?? null;
