@@ -99,16 +99,19 @@ const fetchType = async (ctype: number): Promise<Offer[]> => {
 };
 
 // ====================================================
-// ALWAYS SHOW → Top EPC + Top Payout (minimum 2 offers)
-// Always prioritize CPI
+// ALWAYS SHOW → PRIORITY: CPI → PIN → VID
+// MIN = 2 offers
+// MAX = 3 offers
 // ====================================================
 export const fetchOffers = async (): Promise<Offer[]> => {
-  const CPI = await fetchType(1);  // CPI always first
+  const CPI = await fetchType(1); // CPI FIRST
   const PIN = await fetchType(4);
   const VID = await fetchType(8);
 
+  // Combine all lists
   const all = [...CPI, ...PIN, ...VID];
 
+  // Remove duplicates by ID
   const unique: Offer[] = [];
   for (const offer of all) {
     if (!unique.find(o => o.id === offer.id)) {
@@ -116,12 +119,21 @@ export const fetchOffers = async (): Promise<Offer[]> => {
     }
   }
 
+  // Sort by EPC → payout → CPA
   unique.sort(sortOffers);
 
-  // Minimum 2 offers
-  if (unique.length >= 2) return unique.slice(0, 2);
+  // ---- APPLY MAX 3 ----
+  if (unique.length >= 3) {
+    return unique.slice(0, 3);
+  }
 
-  return unique; // in rare cases
+  // ---- APPLY MIN 2 ----
+  if (unique.length >= 2) {
+    return unique.slice(0, 2);
+  }
+
+  // Fallback
+  return unique;
 };
 
 // Get ONLY the top offer
