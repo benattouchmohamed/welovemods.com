@@ -72,7 +72,7 @@ const sortOffers = (a: Offer, b: Offer) =>
   (b.payout ?? 0) - (a.payout ?? 0) ||
   (b.cpa ?? 0) - (a.cpa ?? 0);
 
-const fetchType = async (ctype: number): Promise<Offer[]> => {
+const fetchAllOffers = async (): Promise<Offer[]> => {
   try {
     const ip = await getIP();
     const ua = navigator.userAgent;
@@ -85,36 +85,28 @@ const fetchType = async (ctype: number): Promise<Offer[]> => {
     const params = new URLSearchParams({
       ip,
       user_agent: ua,
-      ctype: String(ctype),
+      ctype: "15", // 1 (CPI) + 4 (PIN) + 8 (VID) = all types
     });
 
     const r = await fetch(`${API_URL}?${params}`, { headers });
     if (!r.ok) return [];
 
     const j: ApiOfferResponse = await r.json();
-    return (j.offers ?? []).map(mapOffer).sort(sortOffers);
+    return (j.offers ?? []).map(mapOffer);
   } catch {
     return [];
   }
 };
 
-// ====================================================
-// ALWAYS SHOW → PRIORITY: CPI → PIN → VID
-// MIN = 2 offers
-// MAX = 3 offers
-// ====================================================
 export const fetchOffers = async (): Promise<Offer[]> => {
-  const CPI = await fetchType(1); // CPI FIRST
-  const PIN = await fetchType(4);
-  const VID = await fetchType(8);
-
-  // Combine all lists
-  const all = [...CPI, ...PIN, ...VID];
+  const all = await fetchAllOffers();
 
   // Remove duplicates by ID
   const unique: Offer[] = [];
+  const seen = new Set<string>();
   for (const offer of all) {
-    if (!unique.find(o => o.id === offer.id)) {
+    if (!seen.has(offer.id)) {
+      seen.add(offer.id);
       unique.push(offer);
     }
   }
@@ -122,18 +114,8 @@ export const fetchOffers = async (): Promise<Offer[]> => {
   // Sort by EPC → payout → CPA
   unique.sort(sortOffers);
 
-  // ---- APPLY MAX 3 ----
-  if (unique.length >= 3) {
-    return unique.slice(0, 3);
-  }
-
-  // ---- APPLY MIN 2 ----
-  if (unique.length >= 2) {
-    return unique.slice(0, 2);
-  }
-
-  // Fallback
-  return unique;
+  // Return up to 3 offers
+  return unique.slice(0, 3);
 };
 
 // Get ONLY the top offer
