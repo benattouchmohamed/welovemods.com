@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from "react";
+import React, { useEffect, useState, useRef, useCallback } from "react";
 import { Search } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
@@ -6,19 +6,30 @@ import GameCard from "@/components/GameCard";
 import { fetchGames } from "@/services/gameService";
 import type { Game } from "@/services/gameService";
 
+const INITIAL_LOAD = 10;
+const LOAD_MORE = 10;
+
 const Index = () => {
   const [games, setGames] = useState<Game[]>([]);
+  const [displayedGames, setDisplayedGames] = useState<Game[]>([]);
   const [isLoading, setIsLoading] = useState(true);
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [hasMore, setHasMore] = useState(true);
   const [searchQuery, setSearchQuery] = useState("");
   const [filteredGames, setFilteredGames] = useState<Game[]>([]);
+  const observerRef = useRef<IntersectionObserver | null>(null);
+  const sentinelRef = useRef<HTMLDivElement>(null);
 
+  // Load all games once (but we'll display in chunks)
   useEffect(() => {
     window.scrollTo(0, 0);
     const load = async () => {
       try {
-        const g = await fetchGames();
-        setGames(g);
-        setFilteredGames(g);
+        const allGames = await fetchGames();
+        setGames(allGames);
+        setFilteredGames(allGames);
+        setDisplayedGames(allGames.slice(0, INITIAL_LOAD));
+        setHasMore(allGames.length > INITIAL_LOAD);
       } catch (e) {
         console.error(e);
       } finally {
@@ -28,20 +39,65 @@ const Index = () => {
     load();
   }, []);
 
+  // Filter based on search
   useEffect(() => {
     const q = searchQuery.trim().toLowerCase();
-    setFilteredGames(
-      q
-        ? games.filter(
-            (g) =>
-              g.title.toLowerCase().includes(q) ||
-              g.description.toLowerCase().includes(q)
-          )
-        : games
-    );
+    const newFiltered = q
+      ? games.filter(
+          (g) =>
+            g.title.toLowerCase().includes(q) ||
+            g.description.toLowerCase().includes(q)
+        )
+      : games;
+
+    setFilteredGames(newFiltered);
+    setDisplayedGames(newFiltered.slice(0, INITIAL_LOAD));
+    setHasMore(newFiltered.length > INITIAL_LOAD);
   }, [searchQuery, games]);
 
-  const DOMAIN = "https://welovemods.com"; // <-- Ton vrai domaine ici
+  // Load more handler
+  const loadMoreGames = useCallback(() => {
+    if (isLoadingMore || !hasMore) return;
+    setIsLoadingMore(true);
+
+    setTimeout(() => {
+      // Simulate appending next chunk (in real case it's instant)
+      setDisplayedGames((prev) => {
+        const nextStart = prev.length;
+        const nextGames = filteredGames.slice(nextStart, nextStart + LOAD_MORE);
+        const newDisplayed = [...prev, ...nextGames];
+        if (nextStart + LOAD_MORE >= filteredGames.length) {
+          setHasMore(false);
+        }
+        return newDisplayed;
+      });
+      setIsLoadingMore(false);
+    }, 300); // Small delay for smooth feel, remove if not needed
+  }, [filteredGames, isLoadingMore, hasMore]);
+
+  // Intersection Observer for infinite scroll
+  useEffect(() => {
+    if (!sentinelRef.current) return;
+
+    observerRef.current = new IntersectionObserver(
+      (entries) => {
+        if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
+          loadMoreGames();
+        }
+      },
+      { rootMargin: "200px" } // Load a bit early
+    );
+
+    observerRef.current.observe(sentinelRef.current);
+
+    return () => {
+      if (observerRef.current) {
+        observerRef.current.disconnect();
+      }
+    };
+  }, [loadMoreGames, hasMore, isLoadingMore]);
+
+  const DOMAIN = "https://welovemods.com";
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-100 via-sky-50 to-orange-50 flex flex-col items-center">
@@ -95,10 +151,10 @@ const Index = () => {
         </div>
       </div>
 
-      {/* Games Grid */}
-      <div className="grid grid-cols-2 gap-4 w-full max-w-md px-6">
+      {/* Games Grid - Responsive: 2 cols mobile, 4 cols on md+ */}
+      <div className="grid grid-cols-2 md:grid-cols-4 gap-4 w-full max-w-md md:max-w-4xl px-6">
         {isLoading ? (
-          [...Array(4)].map((_, i) => (
+          [...Array(INITIAL_LOAD)].map((_, i) => (
             <div
               key={i}
               className="bg-white border border-sky-200 rounded-2xl p-3 shadow-sm animate-pulse"
@@ -108,14 +164,27 @@ const Index = () => {
               <div className="h-3 bg-orange-200 rounded-full w-2/3"></div>
             </div>
           ))
-        ) : filteredGames.length > 0 ? (
-          filteredGames.map((game) => <GameCard key={game.id} game={game} />)
+        ) : displayedGames.length > 0 ? (
+          displayedGames.map((game) => <GameCard key={game.id} game={game} />)
         ) : (
-          <p className="col-span-2 text-center text-sky-700 font-bold">
+          <p className="col-span-2 md:col-span-4 text-center text-sky-700 font-bold">
             No games found.
           </p>
         )}
+
+        {/* Loading more indicator */}
+        {isLoadingMore && (
+          <div className="col-span-2 md:col-span-4 text-center py-8">
+            <div className="inline-block animate-spin rounded-full h-8 w-8 border-t-2 border-b-2 border-sky-500"></div>
+          </div>
+        )}
+
+        {/* Sentinel for infinite scroll */}
+        {hasMore && !isLoading && (
+          <div ref={sentinelRef} className="col-span-2 md:col-span-4 h-10" />
+        )}
       </div>
+
       <br />
       <br />
       <br />

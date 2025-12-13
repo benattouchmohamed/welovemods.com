@@ -345,11 +345,18 @@ const TryServer2Fullscreen = memo(({ defaultOpen = false }: TryServer2Props) => 
   if (!open) {
     return (
       <button
-        onClick={() => setOpen(true)}
-        className="mx-auto block px-4 py-2 rounded-lg text-yellow-600 underline text-sm font-semibold transition hover:text-blue-700"
-      >
-        {i18n.tryServer2 ?? "Server 2"}
-      </button>
+  onClick={() => setOpen(true)}
+  className="
+    mx-auto block px-4 py-2 rounded-lg text-yellow-600 underline text-sm font-semibold
+    transition duration-300 ease-in-out
+    hover:text-blue-700 hover:scale-105 hover:rotate-1
+    active:scale-95 active:rotate-0
+    motion-reduce:transform-none
+  "
+>
+  {i18n.tryServer2 ?? "Server 2"}
+</button>
+
     );
   }
 

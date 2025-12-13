@@ -3,7 +3,6 @@ import { useParams, useNavigate } from "react-router-dom";
 import { ArrowLeft, Download, Box } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
-
 import { Button } from "@/components/ui/button";
 import { fetchGameBySlug, Game } from "@/services/gameService";
 import RatingStars from "@/components/RatingStars";
@@ -13,7 +12,6 @@ const GameDetail = () => {
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
-  const [checkingGeo, setCheckingGeo] = useState(false);
   const navigate = useNavigate();
 
   /* ────────────────────── FETCH GAME ────────────────────── */
@@ -35,81 +33,39 @@ const GameDetail = () => {
     load();
   }, [slug]);
 
-  /* ────────────────────── COUNTRY DETECTION + DOWNLOAD ────────────────────── */
+  /* ────────────────────── SIMPLE DOWNLOAD HANDLER ────────────────────── */
   const handleDownload = async () => {
     if (!game || isDownloading) return;
 
     setIsDownloading(true);
-    setCheckingGeo(true);
 
-    // Restricted countries (lowercase)
-    // const RESTRICTED_COUNTRIES = ["pk", "bd", "iq", "in", "vn", "my", "id", "ph"];
-const RESTRICTED_COUNTRIES = [];
-    // Check if already checked this session
-    const geoChecked = sessionStorage.getItem("geoChecked") === "done";
-    let userCountry = sessionStorage.getItem("userCountry") || "";
-
-    if (!geoChecked) {
-      try {
-        // Primary: ipapi.co (reliable + fast)
-        const res = await fetch("https://ipapi.co/json/", {
-          signal: AbortSignal.timeout(6000),
-        });
-        if (res.ok) {
-          const data = await res.json();
-          userCountry = (data.country_code || "").toLowerCase();
-        }
-      } catch (e) {
-        // Fallback: geojs.io
-        try {
-          const res = await fetch("https://get.geojs.io/v1/ip/country.json");
-          if (res.ok) {
-            const data = await res.json();
-            userCountry = (data.country || "").toLowerCase();
-          }
-        } catch {}
-      }
-
-      // Save for this session
-      sessionStorage.setItem("geoChecked", "done");
-      sessionStorage.setItem("userCountry", userCountry);
-    }
-
-    // BLOCKED COUNTRY → Redirect to /adblue
-    if (RESTRICTED_COUNTRIES.includes(userCountry)) {
-      window.location.replace("/adblue");
-      return; // Stop execution
-    }
-
-    setCheckingGeo(false);
-
-    // === ALLOWED COUNTRY → Continue Download ===
-    let imgDataUrl = "";
+    // Convert image to base64 for download page (optional, keeps your old behavior)
+    let imgDataUrl = game.image_url || "";
     if (game.image_url) {
       try {
         const resp = await fetch(game.image_url, { mode: "cors" });
-        if (!resp.ok) throw new Error("Image fetch failed");
-        const blob = await resp.blob();
-        imgDataUrl = await new Promise<string>((resolve, reject) => {
-          const reader = new FileReader();
-          reader.onload = () => resolve(reader.result as string);
-          reader.onerror = reject;
-          reader.readAsDataURL(blob);
-        });
+        if (resp.ok) {
+          const blob = await resp.blob();
+          imgDataUrl = await new Promise<string>((resolve) => {
+            const reader = new FileReader();
+            reader.onload = () => resolve(reader.result as string);
+            reader.readAsDataURL(blob);
+          });
+        }
       } catch (e) {
-        console.warn("Image → base64 failed, using direct URL:", e);
-        imgDataUrl = game.image_url;
+        console.warn("Image → base64 failed, using direct URL");
       }
     }
 
     sessionStorage.setItem("downloadGameImage", imgDataUrl);
 
+    // Short smooth delay with button animation, then navigate
     setTimeout(() => {
       navigate(`/Download?game=${encodeURIComponent(game.title)}`);
     }, 400);
   };
 
-  /* ────────────────────── SKELETON LOADER ────────────────────── */
+  /* ────────────────────── SKELETON LOADER (Your Original Beautiful One) ────────────────────── */
   const BeautifulSkeleton = () => (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-pink-50 to-yellow-50">
       <Navbar />
@@ -131,7 +87,6 @@ const RESTRICTED_COUNTRIES = [];
                   <div className="h-5 bg-gradient-to-r from-gray-200 to-gray-300 rounded w-5/6 shimmer" />
                 </div>
               </div>
-              {/* More skeleton blocks... */}
             </div>
           </div>
         </div>
@@ -156,17 +111,17 @@ const RESTRICTED_COUNTRIES = [];
       <Helmet>
         {loading ? (
           <>
-            <title>Loading... | AppsMod</title>
+            <title>Loading... | WeLoveMods</title>
             <meta name="description" content="Loading game details..." />
           </>
         ) : !game ? (
           <>
-            <title>Game Not Found | AppsMod</title>
+            <title>Game Not Found | WeLoveMods</title>
             <meta name="description" content="Game not found." />
           </>
         ) : (
           <>
-            <title>{game.title} Mod APK 2025 - Unlimited Coins | AppsMod</title>
+            <title>{game.title} Mod APK 2025 - Unlimited Coins | WeLoveMods</title>
             <meta
               name="description"
               content={`Download ${game.title} Mod APK latest version with unlimited money, gems, and all features unlocked.`}
@@ -209,54 +164,47 @@ const RESTRICTED_COUNTRIES = [];
                     className="w-full aspect-square object-cover rounded-2xl"
                     loading="lazy"
                   />
-                 <button
-  onClick={handleDownload}
-  disabled={isDownloading || checkingGeo}
-  className="
-    mt-4 w-full relative overflow-hidden
-    bg-gradient-to-r from-green-500 to-blue-600
-    text-white font-black text-lg py-4 rounded-2xl 
-    flex items-center justify-center gap-2
 
-    animate-pulse
-    hover:scale-105 active:scale-95
-    transition-all duration-300
+                  {/* Beautiful animated download button */}
+                  <button
+                    onClick={handleDownload}
+                    disabled={isDownloading}
+                    className="
+                      mt-4 w-full relative overflow-hidden
+                      bg-gradient-to-r from-green-500 to-blue-600
+                      text-white font-black text-lg py-4 rounded-2xl 
+                      flex items-center justify-center gap-2
+                      animate-pulse
+                      hover:scale-105 active:scale-95
+                      transition-all duration-300
+                      disabled:opacity-70 disabled:cursor-not-allowed
+                    "
+                  >
+                    {/* Moving shine effect */}
+                    <span className="absolute inset-0 w-full h-full pointer-events-none shine"></span>
 
-    disabled:opacity-70 disabled:cursor-not-allowed
-  "
->
-  {/* لمعان متحرك */}
-  <span className="absolute inset-0 w-full h-full pointer-events-none shine"></span>
+                    <Download className="w-6 h-6" />
+                    {isDownloading ? "Preparing..." : "DOWNLOAD NOW!"}
+                  </button>
 
-  <Download className="w-6 h-6" />
-  DOWNLOAD NOW!
-</button>
+                  <style jsx>{`
+                    .shine {
+                      background: linear-gradient(
+                        120deg,
+                        transparent,
+                        rgba(255, 255, 255, 0.4),
+                        transparent
+                      );
+                      transform: translateX(-100%);
+                      animation: shineMove 2s infinite;
+                    }
 
-<style jsx>{`
-  .shine {
-    background: linear-gradient(
-      120deg,
-      transparent,
-      rgba(255, 255, 255, 0.4),
-      transparent
-    );
-    transform: translateX(-100%);
-    animation: shineMove 2s infinite;
-  }
-
-  @keyframes shineMove {
-    0% {
-      transform: translateX(-100%);
-    }
-    50% {
-      transform: translateX(100%);
-    }
-    100% {
-      transform: translateX(100%);
-    }
-  }
-`}</style>
-
+                    @keyframes shineMove {
+                      0% { transform: translateX(-100%); }
+                      50% { transform: translateX(100%); }
+                      100% { transform: translateX(100%); }
+                    }
+                  `}</style>
                 </div>
               </div>
 
@@ -319,19 +267,17 @@ const RESTRICTED_COUNTRIES = [];
                   <p className="text-white/90 font-bold mb-4">Join millions of happy players!</p>
                   <button
                     onClick={handleDownload}
-                    disabled={isDownloading || checkingGeo}
+                    disabled={isDownloading}
                     className="bg-white text-red-600 font-black px-8 py-3 rounded-full shadow-md hover:shadow-lg transition disabled:opacity-70"
                   >
-                    {checkingGeo ? "Checking..." : "Download & Install Now!"}
+                    {isDownloading ? "Preparing..." : "Download & Install Now!"}
                   </button>
                 </div>
               </div>
             </div>
           </div>
         </main>
-      )} <br />
-
-      {/* <Footer /> */}
+      )}
     </div>
   );
 };
