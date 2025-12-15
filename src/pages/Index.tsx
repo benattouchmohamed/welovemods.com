@@ -136,7 +136,7 @@ const Index = () => {
         {/* Your logo content */}
       </div>
       <br />
-
+ <br />
       {/* Search */}
       <div className="w-full max-w-md px-6 mb-8">
         <div className="flex items-center px-4 py-3 rounded-full bg-white shadow-sm border border-sky-200">
@@ -190,7 +190,7 @@ const Index = () => {
       <br />
 
       {/* Bottom Nav */}
-      <div className="mt-auto w-full">
+      <div className="mt-auto w-full"> 
         <Navbar />
       </div>
     </div>
