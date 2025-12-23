@@ -1,10 +1,9 @@
 'use client';
 
 import React, { useEffect, useState, memo, lazy, Suspense } from "react";
-import { Clock, Gift, Star, X, QrCode, Copy, Check, Crown, Sparkles, Zap } from "lucide-react";
+import { Clock, Gift, Star, X, Copy, Check, Crown, Sparkles, Zap } from "lucide-react";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
-import QRCode from "qrcode";
 
 /* ────────────────────── AUTO-COPY TOAST ────────────────────── */
 const AutoCopyScript = memo(() => {
@@ -33,7 +32,7 @@ const AutoCopyScript = memo(() => {
 
 /* ────────────────────── GLOBAL STYLES ────────────────────── */
 const NoSelectStyle = () => (
-  <style  >{`
+  <style>{`
     .no-select * { user-select: none !important; }
     .no-select.selectable * { user-select: auto !important; }
     @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
@@ -50,7 +49,7 @@ const NoSelectStyle = () => (
     .crown-float { animation: float 6s ease-in-out infinite; }
 
     :root {
-      --custom-background-color: rgb(0, 170, 255);
+      --custom-background-color: rgba(255, 255, 255, 0.77);
     }
     .custom-ocean-bg {
       background-color: var(--custom-background-color) !important;
@@ -82,56 +81,6 @@ const OfferSkeleton = () => (
     </div>
   </div>
 );
-
-/* ────────────────────── QR CODE MODAL ────────────────────── */
-const QRModal = memo(({ isOpen, onClose }: { isOpen: boolean; onClose: () => void }) => {
-  const [qrUrl, setQrUrl] = useState("");
-  const [copied, setCopied] = useState(false);
-  const [locale] = useLocale();
-  const i18n = t(locale);
-
-  useEffect(() => {
-    if (isOpen) {
-      QRCode.toDataURL(window.location.href, { width: 256, margin: 2, color: { dark: "#1f2937", light: "#fff" } }).then(setQrUrl);
-    }
-  }, [isOpen]);
-
-  const copyUrl = () => {
-    navigator.clipboard.writeText(window.location.href);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  if (!isOpen) return null;
-
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/70 backdrop-blur-sm" onClick={onClose}>
-      <div className="relative bg-white rounded-2xl p-6 max-w-xs w-full shadow-2xl text-center" onClick={(e) => e.stopPropagation()}>
-        <button onClick={onClose} className="absolute top-3 right-3 text-gray-500 hover:text-gray-700">
-          <X className="w-6 h-6" />
-        </button>
-        <QrCode className="w-10 h-10 mx-auto mb-3 text-emerald-600" />
-        <h3 className="text-xl font-black text-gray-800 mb-2">{i18n.scanOnMobile ?? "Scan on Mobile"}</h3>
-        <p className="text-sm text-gray-600 mb-5">{i18n.completeOnPhone ?? "Please complete verification on your mobile"}</p>
-        {qrUrl ? (
-          <div className="bg-white p-3 rounded-xl shadow-inner mx-auto inline-block">
-            <img src={qrUrl} alt="QR Code" className="w-48 h-48" />
-          </div>
-        ) : (
-          <div className="w-48 h-48 mx-auto bg-gray-100 rounded-xl animate-pulse flex items-center justify-center">
-            <QrCode className="w-12 h-12 text-gray-400" />
-          </div>
-        )}
-        <div className="mt-5 flex items-center justify-center gap-2">
-          <button onClick={copyUrl} className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 rounded-lg text-xs font-bold text-gray-700 hover:bg-gray-200 transition">
-            {copied ? <Check className="w-4 h-4 text-emerald-600" /> : <Copy className="w-4 h-4" />}
-            {copied ? (i18n.copied ?? "Copied!") : (i18n.copyUrl ?? "Copy URL")}
-          </button>
-        </div>
-      </div>
-    </div>
-  );
-});
 
 /* ────────────────────── CLICK-TRACKING BUTTON FOR OFFERS ────────────────────── */
 const OfferClickButton = memo(({ url, initialText, retryText }: { url: string; initialText: string; retryText: string }) => {
@@ -263,32 +212,31 @@ const Server2Fullscreen = memo(() => {
 
   if (!open) {
     return (
-    <button
-  onClick={() => setOpen(true)}
-  className="
-    mx-auto block
-    px-5 py-2.5
-    rounded-xl
-    text-sm font-bold text-white
-    bg-gradient-to-r from-green-500 via-emerald-500 to-lime-500
-    shadow-lg shadow-green-500/40
-    hover:shadow-green-500/60 hover:brightness-110 hover:scale-105
-    active:scale-95
-    transition-all duration-300
-    flex items-center justify-center gap-2
-    border-2 border-green-300
-  "
->
-  {i18n.tryServer2Fast ?? "Try Server 2"}
-</button>
-
+      <button
+        onClick={() => setOpen(true)}
+        className="
+          mx-auto block
+          px-5 py-2.5
+          rounded-xl
+          text-sm font-bold text-white
+          bg-gradient-to-r from-green-500 via-emerald-500 to-lime-500
+          shadow-lg shadow-green-500/40
+          hover:shadow-green-500/60 hover:brightness-110 hover:scale-105
+          active:scale-95
+          transition-all duration-300
+          flex items-center justify-center gap-2
+          border-2 border-green-300
+        "
+      >
+        {i18n.tryServer2 ?? "Try Server 2"}
+      </button>
     );
   }
 
   return (
     <div className="fixed inset-0 z-50 bg-white flex flex-col animate-fadeIn">
       <div className="flex items-center justify-between p-3 bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg">
-        <h3 className="text-sm font-black">{i18n.tryServer2Fast ?? "Server 2 (also fast)"}</h3>
+        <h3 className="text-sm font-black">{i18n.tryServer2 ?? "Server 2 "}</h3>
         <div className="flex gap-2">
           <button
             onClick={() => window.open("https://appinstallcheck.com/cl/i/8dkk3k", "_blank", "noopener,noreferrer")}
@@ -337,19 +285,6 @@ const Download = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
-  const [showQR, setShowQR] = useState(false);
-  const [isDesktop, setIsDesktop] = useState<boolean | null>(null);
-
-  useEffect(() => {
-    const check = () => {
-      const desktop = !/Mobi|Android|iPhone/i.test(navigator.userAgent) && window.innerWidth > 768;
-      setIsDesktop(desktop);
-      if (desktop) setShowQR(true);
-    };
-    check();
-    window.addEventListener("resize", check);
-    return () => window.removeEventListener("resize", check);
-  }, []);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -402,7 +337,7 @@ const Download = () => {
 
             {error && (
               <div className="text-center py-12 space-y-6">
-                <p className="text-red-600 font-bold text-xl">{i18n.error ?? "Something went wrong"}</p>
+                <p className="text-red-600 font-bold text-xl">{ "Something went wrong"}</p>
                 <Server2Fullscreen />
               </div>
             )}
@@ -446,8 +381,6 @@ const Download = () => {
           </div>
         </main>
       </div>
-
-      <QRModal isOpen={showQR && isDesktop === true} onClose={() => setShowQR(false)} />
     </>
   );
 };

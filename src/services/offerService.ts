@@ -25,7 +25,7 @@ interface ApiOffer {
   payout?: string;
   link?: string;
   epc?: string;
-  category?: string;
+  category?: string; // CPI / CPA / PIN / VID
   cpa?: string;
 }
 
@@ -34,7 +34,6 @@ interface ApiOfferResponse {
   error?: string | null;
   offers?: ApiOffer[];
 }
-
 const API_URL = "https://unlockcontent.net/api/v2";
 const TOKEN = "32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085";
 const FALLBACK = "https://areyourealhuman.com/cl/i/g6pqp2";
@@ -49,17 +48,17 @@ const getIP = async (): Promise<string> => {
   }
 };
 
-const parse = (v?: string): number | null =>
-  v && !isNaN(parseFloat(v)) ? parseFloat(v) : null;
+const parse = (v?: string): number | undefined =>
+  v && !isNaN(Number(v)) ? Number(v) : undefined;
 
 const mapOffer = (o: ApiOffer, i: number): Offer => ({
-  id: o.offerid ?? `id-${i}`,
+  id: o.offerid ?? `offer-${i}`,
   title: o.name_short ?? o.name ?? "Offer",
   description: o.adcopy ?? o.description ?? "",
   difficulty: "Easy",
   timeEstimate: "1 min",
   icon: "Gift",
-  url: o.link && o.link.startsWith("http") ? o.link : FALLBACK,
+  url: o.link?.startsWith("http") ? o.link : FALLBACK,
   image: o.picture,
   type: o.category,
   epc: parse(o.epc),
@@ -67,28 +66,24 @@ const mapOffer = (o: ApiOffer, i: number): Offer => ({
   cpa: parse(o.cpa) ?? parse(o.payout),
 });
 
-const sortOffers = (a: Offer, b: Offer) =>
-  (b.epc ?? 0) - (a.epc ?? 0) ||
-  (b.payout ?? 0) - (a.payout ?? 0) ||
-  (b.cpa ?? 0) - (a.cpa ?? 0);
-
 const fetchAllOffers = async (): Promise<Offer[]> => {
   try {
     const ip = await getIP();
     const ua = navigator.userAgent;
 
-    const headers = {
-      Authorization: `Bearer ${TOKEN}`,
-      "Content-Type": "application/json",
-    };
-
     const params = new URLSearchParams({
       ip,
       user_agent: ua,
-      ctype: "15", // 1 (CPI) + 4 (PIN) + 8 (VID) = all types
+      ctype: "15", // CPI + CPA + PIN + VID
+      min: "3",
     });
 
-    const r = await fetch(`${API_URL}?${params}`, { headers });
+    const r = await fetch(`${API_URL}?${params}`, {
+      headers: {
+        Authorization: `Bearer ${TOKEN}`,
+      },
+    });
+
     if (!r.ok) return [];
 
     const j: ApiOfferResponse = await r.json();
@@ -101,25 +96,26 @@ const fetchAllOffers = async (): Promise<Offer[]> => {
 export const fetchOffers = async (): Promise<Offer[]> => {
   const all = await fetchAllOffers();
 
-  // Remove duplicates by ID
-  const unique: Offer[] = [];
-  const seen = new Set<string>();
-  for (const offer of all) {
-    if (!seen.has(offer.id)) {
-      seen.add(offer.id);
-      unique.push(offer);
-    }
-  }
+  // Remove duplicates
+  const unique = Array.from(
+    new Map(all.map(o => [o.id, o])).values()
+  );
 
-  // Sort by EPC → payout → CPA
-  unique.sort(sortOffers);
+  // Group: CPI first
+  const cpi = unique.filter(o => o.type === "CPI");
+  const others = unique.filter(o => o.type !== "CPI");
 
-  // Return up to 3 offers
-  return unique.slice(0, 3);
+  // Sort each group by EPC
+  const byEpc = (a: Offer, b: Offer) => (b.epc ?? 0) - (a.epc ?? 0);
+
+  cpi.sort(byEpc);
+  others.sort(byEpc);
+
+  return [...cpi, ...others];
 };
 
 // Get ONLY the top offer
-export const getTopOffer = async () => {
+export const getTopOffer = async (): Promise<Offer | null> => {
   const offers = await fetchOffers();
   return offers[0] ?? null;
 };
