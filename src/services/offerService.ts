@@ -34,6 +34,7 @@ interface ApiOfferResponse {
   error?: string | null;
   offers?: ApiOffer[];
 }
+
 const API_URL = "https://unlockcontent.net/api/v2";
 const TOKEN = "32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085";
 const FALLBACK = "https://areyourealhuman.com/cl/i/g6pqp2";
@@ -105,16 +106,18 @@ export const fetchOffers = async (): Promise<Offer[]> => {
   const cpi = unique.filter(o => o.type === "CPI");
   const others = unique.filter(o => o.type !== "CPI");
 
-  // Sort each group by EPC
+  // Sort each group by EPC descending
   const byEpc = (a: Offer, b: Offer) => (b.epc ?? 0) - (a.epc ?? 0);
 
   cpi.sort(byEpc);
   others.sort(byEpc);
 
-  return [...cpi, ...others];
+  // Combine and limit to maximum 5 offers
+  const combined = [...cpi, ...others];
+  return combined.slice(0, 5);
 };
 
-// Get ONLY the top offer
+// Get ONLY the top offer (still the highest ranked one)
 export const getTopOffer = async (): Promise<Offer | null> => {
   const offers = await fetchOffers();
   return offers[0] ?? null;
