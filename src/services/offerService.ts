@@ -1,5 +1,4 @@
 // src/services/offerService.ts
-
 export interface Offer {
   id: string;
   title: string;
@@ -71,22 +70,18 @@ const fetchAllOffers = async (): Promise<Offer[]> => {
   try {
     const ip = await getIP();
     const ua = navigator.userAgent;
-
     const params = new URLSearchParams({
       ip,
       user_agent: ua,
       ctype: "15", // CPI + CPA + PIN + VID
       min: "3",
     });
-
     const r = await fetch(`${API_URL}?${params}`, {
       headers: {
         Authorization: `Bearer ${TOKEN}`,
       },
     });
-
     if (!r.ok) return [];
-
     const j: ApiOfferResponse = await r.json();
     return (j.offers ?? []).map(mapOffer);
   } catch {
@@ -97,27 +92,47 @@ const fetchAllOffers = async (): Promise<Offer[]> => {
 export const fetchOffers = async (): Promise<Offer[]> => {
   const all = await fetchAllOffers();
 
-  // Remove duplicates
+  // Remove duplicates by id
   const unique = Array.from(
     new Map(all.map(o => [o.id, o])).values()
   );
 
-  // Group: CPI first
+  // Sort by EPC descending (highest first), fallback to 0
+  const byEpcDesc = (a: Offer, b: Offer) =>
+    (b.epc ?? 0) - (a.epc ?? 0);
+
+  // Group by type
   const cpi = unique.filter(o => o.type === "CPI");
-  const others = unique.filter(o => o.type !== "CPI");
+  const pin = unique.filter(o => o.type === "PIN");
+  const others = unique.filter(o => o.type !== "CPI" && o.type !== "PIN");
 
-  // Sort each group by EPC descending
-  const byEpc = (a: Offer, b: Offer) => (b.epc ?? 0) - (a.epc ?? 0);
+  // Sort each group by top EPC
+  cpi.sort(byEpcDesc);
+  pin.sort(byEpcDesc);
+  others.sort(byEpcDesc);
 
-  cpi.sort(byEpc);
-  others.sort(byEpc);
+  let combined: Offer[] = [];
 
-  // Combine and limit to maximum 5 offers
-  const combined = [...cpi, ...others];
+  if (cpi.length > 0) {
+    // CPI exists: CPI first (top 2), then the rest of non-CPI (top 1 overall from non-CPI)
+    const topNonCpi = [...pin, ...others].sort(byEpcDesc)[0]; // top 1 non-CPI
+    combined = [
+      ...cpi.slice(0, 2),               // max 2 CPI
+      ...(topNonCpi ? [topNonCpi] : []), // 1 non-CPI
+    ];
+  } else {
+    // No CPI: PIN first (top 2), then others (top 1)
+    combined = [
+      ...pin.slice(0, 2),               // max 2 PIN
+      ...others.slice(0, 2),            // max 1 other
+    ];
+  }
+
+  // Final cap at 5 (safety), though with limits above it's max 3
   return combined.slice(0, 5);
 };
 
-// Get ONLY the top offer (still the highest ranked one)
+// Get ONLY the top offer (highest ranked one after new logic)
 export const getTopOffer = async (): Promise<Offer | null> => {
   const offers = await fetchOffers();
   return offers[0] ?? null;
