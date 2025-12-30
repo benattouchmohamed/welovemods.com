@@ -1,4 +1,5 @@
 // src/services/offerService.ts
+
 export interface Offer {
   id: string;
   title: string;
@@ -35,8 +36,11 @@ interface ApiOfferResponse {
 }
 
 const API_URL = "https://unlockcontent.net/api/v2";
-const TOKEN = "32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085";
+const TOKEN =
+  "32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085";
 const FALLBACK = "https://areyourealhuman.com/cl/i/g6pqp2";
+
+/* ------------------ helpers ------------------ */
 
 const getIP = async (): Promise<string> => {
   try {
@@ -48,8 +52,10 @@ const getIP = async (): Promise<string> => {
   }
 };
 
-const parse = (v?: string): number | undefined =>
+const parseNumber = (v?: string): number | undefined =>
   v && !isNaN(Number(v)) ? Number(v) : undefined;
+
+/* ------------------ mappers ------------------ */
 
 const mapOffer = (o: ApiOffer, i: number): Offer => ({
   id: o.offerid ?? `offer-${i}`,
@@ -61,27 +67,33 @@ const mapOffer = (o: ApiOffer, i: number): Offer => ({
   url: o.link?.startsWith("http") ? o.link : FALLBACK,
   image: o.picture,
   type: o.category,
-  epc: parse(o.epc),
-  payout: parse(o.payout),
-  cpa: parse(o.cpa) ?? parse(o.payout),
+  epc: parseNumber(o.epc),
+  payout: parseNumber(o.payout),
+  cpa: parseNumber(o.cpa) ?? parseNumber(o.payout),
 });
+
+/* ------------------ API ------------------ */
 
 const fetchAllOffers = async (): Promise<Offer[]> => {
   try {
     const ip = await getIP();
     const ua = navigator.userAgent;
+
     const params = new URLSearchParams({
       ip,
       user_agent: ua,
       ctype: "15", // CPI + CPA + PIN + VID
       min: "3",
     });
+
     const r = await fetch(`${API_URL}?${params}`, {
       headers: {
         Authorization: `Bearer ${TOKEN}`,
       },
     });
+
     if (!r.ok) return [];
+
     const j: ApiOfferResponse = await r.json();
     return (j.offers ?? []).map(mapOffer);
   } catch {
@@ -89,50 +101,49 @@ const fetchAllOffers = async (): Promise<Offer[]> => {
   }
 };
 
+/* ------------------ PUBLIC ------------------ */
+
 export const fetchOffers = async (): Promise<Offer[]> => {
   const all = await fetchAllOffers();
 
-  // Remove duplicates by id
+  // Remove duplicates by ID
   const unique = Array.from(
     new Map(all.map(o => [o.id, o])).values()
   );
 
-  // Sort by EPC descending (highest first), fallback to 0
   const byEpcDesc = (a: Offer, b: Offer) =>
     (b.epc ?? 0) - (a.epc ?? 0);
 
-  // Group by type
-  const cpi = unique.filter(o => o.type === "CPI");
-  const pin = unique.filter(o => o.type === "PIN");
-  const others = unique.filter(o => o.type !== "CPI" && o.type !== "PIN");
+  // Sort all offers by EPC
+  const sortedAll = [...unique].sort(byEpcDesc);
 
-  // Sort each group by top EPC
-  cpi.sort(byEpcDesc);
-  pin.sort(byEpcDesc);
-  others.sort(byEpcDesc);
+  const cpi = sortedAll.filter(o => o.type === "CPI");
+  const pin = sortedAll.filter(o => o.type === "PIN");
+  const others = sortedAll.filter(
+    o => o.type !== "CPI" && o.type !== "PIN"
+  );
 
-  let combined: Offer[] = [];
+  let result: Offer[] = [];
 
+  // Priority logic
   if (cpi.length > 0) {
-    // CPI exists: CPI first (top 2), then the rest of non-CPI (top 1 overall from non-CPI)
-    const topNonCpi = [...pin, ...others].sort(byEpcDesc)[0]; // top 1 non-CPI
-    combined = [
-      ...cpi.slice(0, 2),               // max 2 CPI
-      ...(topNonCpi ? [topNonCpi] : []), // 1 non-CPI
-    ];
-  } else {
-    // No CPI: PIN first (top 2), then others (top 1)
-    combined = [
-      ...pin.slice(0, 2),               // max 2 PIN
-      ...others.slice(0, 2),            // max 1 other
-    ];
+    result.push(...cpi.slice(0, 2)); // up to 2 CPI
+  } else if (pin.length > 0) {
+    result.push(...pin.slice(0, 2)); // up to 2 PIN
   }
 
-  // Final cap at 5 (safety), though with limits above it's max 3
-  return combined.slice(0, 5);
+  // Fill remaining slots by best EPC (excluding duplicates)
+  const usedIds = new Set(result.map(o => o.id));
+  const remaining = sortedAll.filter(o => !usedIds.has(o.id));
+
+  result.push(...remaining.slice(0, 4 - result.length));
+
+  // Guarantee min 3, max 4
+  return result.slice(0, Math.min(4, Math.max(3, result.length)));
 };
 
-// Get ONLY the top offer (highest ranked one after new logic)
+/* ------------------ TOP OFFER ------------------ */
+
 export const getTopOffer = async (): Promise<Offer | null> => {
   const offers = await fetchOffers();
   return offers[0] ?? null;
