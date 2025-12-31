@@ -1,9 +1,8 @@
 'use client';
 import React, { useEffect, useState, memo, lazy, Suspense } from "react";
-import { Clock, Gift, Star, X, } from "lucide-react";
+import { Gift, MousePointerClick } from "lucide-react";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
-import { MousePointerClick } from "lucide-react";
 
 /* ────────────────────── AUTO-COPY TOAST ────────────────────── */
 const AutoCopyScript = memo(() => {
@@ -56,7 +55,7 @@ const NoSelectStyle = () => (
 /* Lazy Components */
 const LangPicker = lazy(() => import("./LangPicker"));
 
-/* ────────────────────── SKELETONS (Kept - they're nice!) ────────────────────── */
+/* ────────────────────── SKELETONS ────────────────────── */
 const HeaderSkeleton = () => (
   <div className="bg-white/80 backdrop-blur-sm rounded-2xl shadow-lg border-2 border-gray-200 p-6">
     <div className="h-7 animate-shimmer rounded mx-auto w-3/4 mb-2" />
@@ -103,13 +102,7 @@ const OfferCard = memo(({ o, isTop }: { o: Offer; isTop?: boolean }) => {
   return (
     <article className={`relative bg-white rounded-xl p-3.5 ${isTop ? 'border-4 border-yellow-400 shadow-xl' : 'border-4 border-orange-400 shadow-lg'}`}>
       {isTop && (
-        <>
-          <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-50 opacity-70" />
-          <div className="absolute -top-3 -right-3 opacity-40 pointer-events-none">
-           
-          </div>
-        
-        </>
+        <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-50 opacity-70" />
       )}
       <div className="relative flex gap-3">
         <div className={`rounded-lg bg-gradient-to-br ${isTop ? 'from-purple-500 to-pink-600 p-1.5 ring-4 ring-yellow-300 ring-opacity-50' : 'from-pink-400 to-purple-500 p-1'} shadow-lg flex-shrink-0 flex items-center justify-center ${isTop ? 'w-14 h-14' : 'w-12 h-12'}`}>
@@ -121,13 +114,9 @@ const OfferCard = memo(({ o, isTop }: { o: Offer; isTop?: boolean }) => {
         </div>
         <div className="flex-1 min-w-0">
           <h3 className="font-black text-base text-blue-600 line-clamp-2 leading-tight">{o.title}</h3>
-<p className="text-base text-gray-700 mt-2 leading-relaxed">
+          <p className="text-base text-gray-700 mt-2 leading-relaxed">
             {o.description}
           </p>
-          <div className="flex items-center justify-between text-xs my-2">
-
-            
-          </div>
           <OfferClickButton
             url={o.url}
             initialText={i18n.completeOfferBtn ?? "Complete Task"}
@@ -139,7 +128,7 @@ const OfferCard = memo(({ o, isTop }: { o: Offer; isTop?: boolean }) => {
   );
 });
 
-/* ────────────────────── SERVER 2 FULLSCREEN (Updated Button) ────────────────────── */
+/* ────────────────────── SERVER 2 FULLSCREEN ────────────────────── */
 const Server2Fullscreen = memo(({ autoOpen = false }: { autoOpen?: boolean }) => {
   const [open, setOpen] = useState(autoOpen);
   const [iframeReady, setIframeReady] = useState(false);
@@ -152,24 +141,13 @@ const Server2Fullscreen = memo(({ autoOpen = false }: { autoOpen?: boolean }) =>
 
   if (!open) {
     return (
-
-
-<button
-  onClick={() => setOpen(true)}
-  className="flex items-center gap-1
-             text-xs font-bold
-             bg-blue-100 text-green-700
-             px-3 py-1 rounded-full
-             cursor-pointer
-             hover:bg-blue-200 hover:text-green-800
-             active:scale-95
-             transition-all duration-200"
->
-  <MousePointerClick size={14} />
-  Server 2
-</button>
-
-
+      <button
+        onClick={() => setOpen(true)}
+        className="flex items-center gap-1 text-xs font-bold bg-blue-100 text-green-700 px-3 py-1 rounded-full cursor-pointer hover:bg-blue-200 hover:text-green-800 active:scale-95 transition-all duration-200"
+      >
+        <MousePointerClick size={14} />
+        Server 2
+      </button>
     );
   }
 
@@ -187,7 +165,6 @@ const Server2Fullscreen = memo(({ autoOpen = false }: { autoOpen?: boolean }) =>
               <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
             </svg>
           </button>
-         
         </div>
       </div>
       {!iframeReady && (
@@ -219,7 +196,7 @@ const Download = () => {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
+  const [pairIndex, setPairIndex] = useState(0);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -237,7 +214,17 @@ const Download = () => {
     fetchOffers()
       .then((data) => {
         if (mounted) {
-          setOffers(data);
+          // Sort by closeness of EPC to Payout: smallest |epc - payout| first
+          const sorted = [...data].sort((a, b) => {
+            const diffA = Math.abs(a.epc - a.payout);
+            const diffB = Math.abs(b.epc - b.payout);
+            if (diffA !== diffB) {
+              return diffA - diffB;
+            }
+            // Tie-breaker: higher payout
+            return b.payout - a.payout;
+          });
+          setOffers(sorted);
           setLoading(false);
         }
       })
@@ -250,12 +237,21 @@ const Download = () => {
     return () => { mounted = false; };
   }, []);
 
-  const hasFewOffers = offers.length > 0 && offers.length <= 4;
-  const displayedOffer = hasFewOffers ? offers[currentIndex] : offers[0];
-  const otherOffers = hasFewOffers ? [] : offers.slice(1);
+  // Current pair to display (always try to show 2)
+  const displayedPair: Offer[] = [];
+  if (offers.length >= 2) {
+    const start = pairIndex * 2;
+    displayedPair.push(offers[start % offers.length]);
+    displayedPair.push(offers[(start + 1) % offers.length]);
+  } else if (offers.length === 1) {
+    displayedPair.push(offers[0]);
+  }
 
-  const handleChangeOffer = () => {
-    setCurrentIndex((prev) => (prev + 1) % offers.length);
+  const hasMultiplePairs = offers.length > 2;
+  const showChangeButton = hasMultiplePairs;
+
+  const handleChangeOffers = () => {
+    setPairIndex((prev) => prev + 1);
   };
 
   return (
@@ -302,20 +298,20 @@ const Download = () => {
 
                 {offers.length > 0 && (
                   <div className="space-y-5">
-                    <OfferCard o={displayedOffer} isTop={true} />
+                    {/* Display current pair as top offers */}
+                    {displayedPair.map((o, idx) => (
+                      <OfferCard key={`${o.id}-${pairIndex}-${idx}`} o={o} isTop={true} />
+                    ))}
 
-                    {hasFewOffers && offers.length > 1 && (
+                    {/* Change Offers button only when there are more than 2 offers */}
+                    {showChangeButton && (
                       <button
-                        onClick={handleChangeOffer}
+                        onClick={handleChangeOffers}
                         className="w-full py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg hover:shadow-xl hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2"
                       >
-                        Change Offer
+                        Change Offers
                       </button>
                     )}
-
-                    {otherOffers.map((o) => (
-                      <OfferCard key={o.id} o={o} isTop={false} />
-                    ))}
                   </div>
                 )}
               </>
