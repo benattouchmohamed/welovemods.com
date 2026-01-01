@@ -1,8 +1,14 @@
 'use client';
+
 import React, { useEffect, useState, memo, lazy, Suspense } from "react";
 import { Gift, MousePointerClick } from "lucide-react";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
+
+import { Swiper, SwiperSlide } from "swiper/react";
+import { Autoplay, Pagination } from "swiper/modules";
+import "swiper/css";
+import "swiper/css/pagination";
 
 /* ────────────────────── AUTO-COPY TOAST ────────────────────── */
 const AutoCopyScript = memo(() => {
@@ -27,12 +33,11 @@ const AutoCopyScript = memo(() => {
   return null;
 });
 
-/* ────────────────────── GLOBAL STYLES ────────────────────── */
+/* ────────────────────── PRO STYLES + CUSTOM DOTS ────────────────────── */
 const NoSelectStyle = () => (
   <style>{`
     .no-select * { user-select: none !important; }
     .no-select.selectable * { user-select: auto !important; }
-    @keyframes bounce { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
     @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
     @keyframes shimmer { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
     .animate-shimmer {
@@ -40,9 +45,52 @@ const NoSelectStyle = () => (
       background-size: 200% 100%;
       animation: shimmer 1.5s infinite;
     }
-    .animate-fadeIn { animation: fadeIn 0.3s ease-out forwards; }
-    @keyframes float { 0% { transform: translateY(0) rotate(-10deg); } 50% { transform: translateY(-12px) rotate(10deg); } 100% { transform: translateY(0) rotate(-10deg); } }
-    .crown-float { animation: float 6s ease-in-out infinite; }
+    .animate-fadeIn { animation: fadeIn 0.6s ease-out forwards; }
+
+    /* PRO SLIDE ANIMATION */
+    .swiper-slide {
+      opacity: 0;
+      transform: translateX(60px);
+      transition: all 0.9s cubic-bezier(0.22, 0.61, 0.36, 1);
+    }
+    .swiper-slide-active {
+      opacity: 1;
+      transform: translateX(0);
+    }
+
+    /* CUSTOM DOTS STYLE */
+    .swiper-pagination {
+      bottom: 0 !important;
+    }
+    .swiper-pagination-bullet {
+      width: 10px;
+      height: 10px;
+      background: rgba(100, 116, 139, 0.4);
+      opacity: 0.7;
+      margin: 0 6px !important;
+      transition: all 0.3s ease;
+    }
+    .swiper-pagination-bullet-active {
+      background: #10b981;
+      opacity: 1;
+      transform: scale(1.4);
+      box-shadow: 0 0 12px rgba(16, 185, 129, 0.7);
+    }
+
+    /* Ellipsis for >3 offers */
+    .swiper-pagination.custom-ellipsis .swiper-pagination-bullet:nth-child(n+4) {
+      display: none;
+    }
+    .swiper-pagination.custom-ellipsis::after {
+      content: "...";
+      color: #64748b;
+      font-weight: bold;
+      font-size: 18px;
+      margin-left: 8px;
+      position: relative;
+      top: -2px;
+    }
+
     :root {
       --custom-background-color: rgba(255, 255, 255, 0.77);
     }
@@ -77,7 +125,7 @@ const OfferSkeleton = () => (
   </div>
 );
 
-/* ────────────────────── CLICK-TRACKING BUTTON FOR OFFERS ────────────────────── */
+/* ────────────────────── OFFER BUTTON ────────────────────── */
 const OfferClickButton = memo(({ url, initialText, retryText }: { url: string; initialText: string; retryText: string }) => {
   const [clicked, setClicked] = useState(false);
   const handleClick = () => {
@@ -87,36 +135,34 @@ const OfferClickButton = memo(({ url, initialText, retryText }: { url: string; i
   return (
     <button
       onClick={handleClick}
-      className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-xl hover:brightness-110 active:scale-95 transition-all duration-200 flex items-center justify-center gap-2"
+      className="w-full py-2.5 px-4 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 shadow-lg hover:shadow-xl hover:brightness-110 active:scale-95 transition-all duration-300 flex items-center justify-center gap-2"
     >
       {clicked ? retryText : initialText}
     </button>
   );
 });
 
-/* ────────────────────── UNIFIED OFFER CARD ────────────────────── */
-const OfferCard = memo(({ o }: { o: Offer }) => {
+/* ────────────────────── OFFER CARD ────────────────────── */
+const OfferCard = memo(({ offer }: { offer: Offer }) => {
   const [locale] = useLocale();
   const i18n = t(locale);
 
   return (
-    <article className="relative bg-white rounded-xl p-3.5 border-4 border-yellow-400 shadow-xl">
-      <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-50 opacity-70" />
+    <article className="relative bg-white rounded-xl p-3.5 border-4 border-yellow-400 shadow-2xl animate-fadeIn">
+      <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-50 opacity-70 rounded-xl" />
       <div className="relative flex gap-3">
         <div className="rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 p-1.5 ring-4 ring-yellow-300 ring-opacity-50 shadow-lg flex-shrink-0 flex items-center justify-center w-14 h-14">
-          {o.image ? (
-            <img src={o.image} alt={o.title} className="w-full h-full object-cover rounded-md" loading="lazy" />
+          {offer.image ? (
+            <img src={offer.image} alt={offer.title} className="w-full h-full object-cover rounded-md" loading="lazy" />
           ) : (
             <Gift className="text-white w-8 h-8" />
           )}
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-black text-base text-blue-600 line-clamp-2 leading-tight">{o.title}</h3>
-          <p className="text-base text-gray-700 mt-2 leading-relaxed">
-            {o.description}
-          </p>
+          <h3 className="font-black text-base text-blue-600 line-clamp-2 leading-tight">{offer.title}</h3>
+          <p className="text-base text-gray-700 mt-2 leading-relaxed">{offer.description}</p>
           <OfferClickButton
-            url={o.url}
+            url={offer.url}
             initialText={i18n.completeOfferBtn ?? "Complete Task"}
             retryText={i18n.notCompletedClickAgain ?? "Not done? Try again"}
           />
@@ -130,8 +176,6 @@ const OfferCard = memo(({ o }: { o: Offer }) => {
 const Server2Fullscreen = memo(({ autoOpen = false }: { autoOpen?: boolean }) => {
   const [open, setOpen] = useState(autoOpen);
   const [iframeReady, setIframeReady] = useState(false);
-  const [locale] = useLocale();
-  const i18n = t(locale);
 
   useEffect(() => {
     if (autoOpen) setOpen(true);
@@ -150,24 +194,41 @@ const Server2Fullscreen = memo(({ autoOpen = false }: { autoOpen?: boolean }) =>
   }
 
   return (
-    <div className="fixed inset-0 z-50 bg-white flex flex-col animate-fadeIn">
-      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-emerald-500 to-green-600 text-white shadow-lg">
-        <h3 className="text-lg font-black">Server 2</h3>
-        <div className="flex gap-3">
-          <button
-            onClick={() => window.open("https://appinstallcheck.com/cl/i/8dkk3k", "_blank", "noopener,noreferrer")}
-            className="p-2 rounded-full hover:bg-white/20 transition"
-            title="Open in new tab"
-          >
-            <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
-            </svg>
-          </button>
-        </div>
+<div className="fixed inset-0 z-50 bg-white flex flex-col animate-fadeIn">
+      {/* Premium Blue Gradient Header */}
+      <div className="relative flex items-center justify-center p-5 bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white shadow-2xl">
+        <h3 className="text-xl font-black tracking-tight">Server 2</h3>
+
+        {/* Close Button */}
+        <button
+          onClick={() => setOpen(false)}
+          className="absolute right-4 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/20 hover:bg-white/30 active:scale-90 transition-all duration-200 backdrop-blur-sm"
+          aria-label="Close Server 2"
+        >
+          <svg className="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={3} d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
+
+        {/* Open in New Tab Button */}
+        <button
+          onClick={() => window.open("https://appinstallcheck.com/cl/i/8dkk3k", "_blank", "noopener,noreferrer")}
+          className="absolute left-4 top-1/2 -translate-y-1/2 p-2.5 rounded-full bg-white/20 hover:bg-white/30 active:scale-90 transition-all duration-200 backdrop-blur-sm"
+          title="Open in new tab"
+        >
+          <svg className="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14" />
+          </svg>
+        </button>
       </div>
+
+      {/* Loading Overlay */}
       {!iframeReady && (
-        <div className="absolute inset-0 flex items-center justify-center bg-white/80 z-10">
-          <div className="w-12 h-12 border-4 border-emerald-500 border-t-transparent rounded-full animate-spin" />
+        <div className="absolute inset-0 flex items-center justify-center bg-white/90 z-20 backdrop-blur-sm">
+          <div className="flex flex-col items-center gap-4">
+            <div className="w-16 h-16 border-5 border-blue-600 border-t-transparent rounded-full animate-spin" />
+            <p className="text-blue-600 font-semibold text-lg">Loading Server 2...</p>
+          </div>
         </div>
       )}
       <iframe
@@ -184,14 +245,15 @@ const Server2Fullscreen = memo(({ autoOpen = false }: { autoOpen?: boolean }) =>
   );
 });
 
-/* ────────────────────── MAIN DOWNLOAD PAGE ────────────────────── */
+/* ────────────────────── MAIN COMPONENT ────────────────────── */
 const Download = () => {
   const urlParams = new URLSearchParams(typeof window !== "undefined" ? window.location.search : "");
   const gameName = urlParams.get("game") || "Game";
+
   const [locale] = useLocale();
   const i18n = t(locale);
-  const [offers, setOffers] = useState<Offer[]>([]);
-  const [bestOffer, setBestOffer] = useState<Offer | null>(null);
+
+  const [sortedOffers, setSortedOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
@@ -212,18 +274,13 @@ const Download = () => {
     fetchOffers()
       .then((data) => {
         if (mounted) {
-          // Sort: smallest |epc - payout| first, then highest payout as tie-breaker
           const sorted = [...data].sort((a, b) => {
             const diffA = Math.abs(a.epc - a.payout);
             const diffB = Math.abs(b.epc - b.payout);
-            if (diffA !== diffB) {
-              return diffA - diffB;
-            }
+            if (diffA !== diffB) return diffA - diffB;
             return b.payout - a.payout;
           });
-
-          setOffers(sorted);
-          setBestOffer(sorted[0] || null); // Take the absolute best one
+          setSortedOffers(sorted);
           setLoading(false);
         }
       })
@@ -235,6 +292,9 @@ const Download = () => {
       });
     return () => { mounted = false; };
   }, []);
+
+  const offerCount = sortedOffers.length;
+  const showEllipsis = offerCount > 3;
 
   return (
     <>
@@ -269,18 +329,40 @@ const Download = () => {
                   <p className="text-lg font-bold text-green-600">
                     {gameName} <span className="text-blue-600">is ready!</span>
                   </p>
-
                   <div className="mt-6 flex flex-col items-center gap-5">
                     <Suspense fallback={null}>
                       <LangPicker />
                     </Suspense>
-                    <Server2Fullscreen autoOpen={offers.length === 0} />
+                    <Server2Fullscreen autoOpen={offerCount === 0} />
                   </div>
                 </section>
 
-                {bestOffer && (
-                  <div className="space-y-5">
-                    <OfferCard o={bestOffer} />
+                {/* PRO CAROUSEL – AUTO + DOTS + ELLIPSIS WHEN >3 */}
+                {offerCount > 0 && (
+                  <div className="relative">
+                    <Swiper
+                      modules={[Autoplay, Pagination]}
+                      spaceBetween={30}
+                      slidesPerView={1}
+                      loop={true}
+                      autoplay={{
+                        delay: 5000,
+                        disableOnInteraction: false,
+                        pauseOnMouseEnter: true,
+                      }}
+                      speed={900}
+                      pagination={{
+                        clickable: true,
+                        bulletClass: `swiper-pagination-bullet ${showEllipsis ? 'custom-ellipsis' : ''}`,
+                      }}
+                      className="pb-14" // Extra space for nice dots
+                    >
+                      {sortedOffers.map((offer) => (
+                        <SwiperSlide key={offer.id ?? offer.url}>
+                          <OfferCard offer={offer} />
+                        </SwiperSlide>
+                      ))}
+                    </Swiper>
                   </div>
                 )}
               </>

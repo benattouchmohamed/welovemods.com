@@ -1,402 +1,3 @@
-// // src/i18n/translations.ts
-
-// export type Locale =
-//   | "en"
-//   | "es"
-//   | "ko"
-//   | "ja"
-//   | "ar"
-//   | "fr"
-//   | "ru"
-//   | "de"
-//   | "tr"
-//   | "pt"
-//   | "zh"
-//   | "hi"
-//   | "it";
-
-// export interface TranslationFunctions {
-//   completeOneTask: string;
-//   gameReady: string;
-//   downloadStarts: string;
-//   offersCompleted: (done: number, total: number) => string;
-//   howToGuide: string;
-//   completeOffer: (n: number) => string;
-//   oneOffer: string;
-//   toGetTheGame: string;
-//   appDownloadTip: string;
-//   downloadNow: string;
-//   completeOfferBtn: string;
-//   completeNow: string;
-//   topSite: string;
-  
-//   autoRedirect: string;
-//   mostUsers: (time: string) => string;
-//   language: string;
-//   playerFrom: string;
-//   tryServer2: string;               // Button text: "Try Server 2"
-//   notCompletedClickAgain: string;
-//   tryOffers?: string;
-//   noOffers?: string;
-//   confirmExit?: string;
-//   recommended: string;
-//   useMobileFaster: string;
-// }
-
-// export const translations: Record<Locale, TranslationFunctions> = {
-//   en: {
-//     completeOneTask: "Complete at least one task to verify you are human",
-//     gameReady: "{game} is ready! Finish 1 task to start download automatically",
-//     downloadStarts: "Your download will begin automatically.",
-//     offersCompleted: (done, total) => `${done} / ${total} task completed`,
-//     howToGuide: "Step-by-Step Guide",
-//     completeOffer: (n) => `Complete ${n} quick task`,
-//     oneOffer: "1 task",
-//     toGetTheGame: "to download instantly.",
-//     appDownloadTip: "Install & open any app for 30 seconds – fast and secure.",
-//     downloadNow: "Start Download",
-//     completeOfferBtn: "Complete Task",
-//     completeNow: "Complete Now",
-//     topSite: "Trusted by millions of gamers worldwide",
-//     autoRedirect: "instant download after task",
-//     mostUsers: (time) => `Most users download in under ${time}`,
-//     language: "Language",
-//     playerFrom: "Player from",
-//     tryServer2: " Server 2",
-//     notCompletedClickAgain: "Not completed yet? Click again",
-//     tryOffers: "Complete Task Here",
-//     noOffers: "No tasks available at the moment.",
-//     confirmExit: "Leave now? Your progress will be lost.",
-//     recommended: "Recommended",
-//     useMobileFaster: "Use this on mobile, it's faster",
-//   },
-
-//   ar: {
-//     completeOneTask: "أكمل مهمة واحدة على الأقل للتحقق من أنك إنسان",
-//     gameReady: "{game} جاهز! أكمل مهمة واحدة لبدء التحميل تلقائيًا",
-//     downloadStarts: "سيبدأ التحميل تلقائيًا.",
-//     offersCompleted: (d, t) => `${d} / ${t} مهمة مكتملة`,
-//     howToGuide: "دليل خطوة بخطوة",
-//     completeOffer: (n) => `أكمل ${n} مهمة سريعة`,
-//     oneOffer: "مهمة واحدة",
-//     toGetTheGame: "لتحميل اللعبة فورًا.",
-//     appDownloadTip: "قم بتثبيت أي تطبيق وافتحه لمدة 30 ثانية – سريع وآمن.",
-//     downloadNow: "ابدأ التحميل",
-//     completeOfferBtn: "أكمل المهمة",
-//     completeNow: "أكمل الآن",
-//     topSite: "موثوق من ملايين اللاعبين حول العالم",
-//     autoRedirect: "تحميل تلقائي بعد المهمة",
-//     mostUsers: (t) => `معظم المستخدمين يحملون في أقل من ${t}`,
-//     language: "اللغة",
-//     playerFrom: "لاعب من",
-//     tryServer2: "Server 2",
-//     notCompletedClickAgain: "لم تكتمل بعد؟ اضغط مرة أخرى",
-//     tryOffers: "أكمل المهمة هنا",
-//     noOffers: "لا توجد مهام متاحة الآن.",
-//     confirmExit: "هل تريد الخروج الآن؟ سيتم فقدان التقدم.",
-//     recommended: "موصى به",
-//     useMobileFaster: "استخدمه على الموبايل، أسرع بكثير",
-//   },
-
-//   es: {
-//     completeOneTask: "Completa al menos una tarea para verificar que eres humano",
-//     gameReady: "¡{game} está listo! Completa 1 tarea para iniciar la descarga automáticamente",
-//     downloadStarts: "La descarga comenzará automáticamente.",
-//     offersCompleted: (d, t) => `${d} / ${t} tarea completada`,
-//     howToGuide: "Guía paso a paso",
-//     completeOffer: (n) => `Completa ${n} tarea rápida`,
-//     oneOffer: "1 tarea",
-//     toGetTheGame: "para descargar al instante.",
-//     appDownloadTip: "Instala y abre cualquier app por 30 segundos – rápido y seguro.",
-//     downloadNow: "Iniciar Descarga",
-//     completeOfferBtn: "Completar Tarea",
-//     completeNow: "Completar Ahora",
-//     topSite: "Confiable para millones de jugadores",
-//     autoRedirect: "descarga instantánea tras tarea",
-//     mostUsers: (t) => `La mayoría descarga en menos de ${t}`,
-//     language: "Idioma",
-//     playerFrom: "Jugador de",
-//     tryServer2: " Server 2",
-//     notCompletedClickAgain: "¿No se completó aún? Haz clic de nuevo",
-//     tryOffers: "Completar Tarea Aquí",
-//     noOffers: "No hay tareas disponibles ahora.",
-//     confirmExit: "¿Salir ahora? Perderás tu progreso.",
-//     recommended: "Recomendado",
-//     useMobileFaster: "Úsalo en móvil, es más rápido",
-//   },
-
-//   fr: {
-//     completeOneTask: "Complétez au moins une tâche pour prouver que vous êtes humain",
-//     gameReady: "{game} est prêt ! Terminez 1 tâche pour lancer le téléchargement automatiquement",
-//     downloadStarts: "Le téléchargement commencera automatiquement.",
-//     offersCompleted: (d, t) => `${d} / ${t} tâche complétée`,
-//     howToGuide: "Guide étape par étape",
-//     completeOffer: (n) => `Complétez ${n} tâche rapide`,
-//     oneOffer: "1 tâche",
-//     toGetTheGame: "pour télécharger instantanément.",
-//     appDownloadTip: "Installez et ouvrez n'importe quelle app pendant 30 secondes – rapide et sûr.",
-//     downloadNow: "Démarrer le téléchargement",
-//     completeOfferBtn: "Compléter la tâche",
-//     completeNow: "Compléter maintenant",
-//     topSite: "Fiable pour des millions de joueurs",
-//     autoRedirect: "téléchargement instantané après tâche",
-//     mostUsers: (t) => `La plupart téléchargent en moins de ${t}`,
-//     language: "Langue",
-//     playerFrom: "Joueur de",
-//     tryServer2: "Server 2",
-//     notCompletedClickAgain: "Pas encore terminé ? Cliquez à nouveau",
-//     tryOffers: "Compléter ici",
-//     noOffers: "Aucune tâche disponible pour le moment.",
-//     confirmExit: "Quitter maintenant ? Votre progression sera perdue.",
-//     recommended: "Recommandé",
-//     useMobileFaster: "Utilisez sur mobile, c’est plus rapide",
-//   },
-
-//   de: {
-//     completeOneTask: "Erledige mindestens eine Aufgabe, um zu bestätigen, dass du ein Mensch bist",
-//     gameReady: "{game} ist bereit! Erledige 1 Aufgabe, um den Download automatisch zu starten",
-//     downloadStarts: "Dein Download startet automatisch.",
-//     offersCompleted: (d, t) => `${d} / ${t} Aufgaben erledigt`,
-//     howToGuide: "Schritt-für-Schritt-Anleitung",
-//     completeOffer: (n) => `${n} schnelle Aufgabe erledigen`,
-//     oneOffer: "1 Aufgabe",
-//     toGetTheGame: "für sofortigen Download.",
-//     appDownloadTip: "Installiere und öffne jede App 30 Sekunden – schnell und sicher.",
-//     downloadNow: "Download starten",
-//     completeOfferBtn: "Aufgabe erledigen",
-//     completeNow: "Jetzt erledigen",
-//     topSite: "Von Millionen von Gamern weltweit vertraut",
-//     autoRedirect: "sofortiger Download nach der Aufgabe",
-//     mostUsers: (t) => `Die meisten laden in unter ${t} herunter`,
-//     language: "Sprache",
-//     playerFrom: "Spieler aus",
-//     tryServer2: "Server 2 ",
-//     notCompletedClickAgain: "Noch nicht abgeschlossen? Nochmal klicken",
-//     tryOffers: "Aufgabe hier erledigen",
-//     noOffers: "Momentan keine Aufgaben verfügbar.",
-//     confirmExit: "Jetzt verlassen? Dein Fortschritt geht verloren.",
-//     recommended: "Empfohlen",
-//     useMobileFaster: "Auf dem Handy verwenden, ist schneller",
-//   },
-
-//   it: {
-//     completeOneTask: "Completa almeno un'attività per verificare che sei umano",
-//     gameReady: "{game} è pronto! Completa 1 attività per avviare automaticamente il download",
-//     downloadStarts: "Il download inizierà automaticamente.",
-//     offersCompleted: (d, t) => `${d} / ${t} attività completata`,
-//     howToGuide: "Guida Passo-Passo",
-//     completeOffer: (n) => `Completa ${n} attività veloce`,
-//     oneOffer: "1 attività",
-//     toGetTheGame: "per scaricare subito.",
-//     appDownloadTip: "Installa e apri un’app per 30 secondi – veloce e sicuro.",
-//     downloadNow: "Avvia Download",
-//     completeOfferBtn: "Completa Attività",
-//     completeNow: "Completa Ora",
-//     topSite: "Scelto da milioni di gamer",
-//     autoRedirect: "download immediato dopo attività",
-//     mostUsers: (t) => `La maggior parte scarica in meno di ${t}`,
-//     language: "Lingua",
-//     playerFrom: "Giocatore da",
-//     tryServer2: "Server 2",
-//     notCompletedClickAgain: "Non ancora completato? Clicca di nuovo",
-//     tryOffers: "Completa attività qui",
-//     noOffers: "Nessuna attività disponibile.",
-//     confirmExit: "Uscire ora? Progresso perso.",
-//     recommended: "Consigliato",
-//     useMobileFaster: "Usa sul cellulare, è più veloce",
-//   },
-
-//   pt: {
-//     completeOneTask: "Complete pelo menos uma tarefa para provar que você é humano",
-//     gameReady: "{game} está pronto! Termine 1 tarefa para iniciar o download automaticamente",
-//     downloadStarts: "Seu download iniciará automaticamente.",
-//     offersCompleted: (d, t) => `${d} / ${t} tarefa concluída`,
-//     howToGuide: "Guia Passo a Passo",
-//     completeOffer: (n) => `Complete ${n} tarefa rápida`,
-//     oneOffer: "1 tarefa",
-//     toGetTheGame: "para baixar instantaneamente.",
-//     appDownloadTip: "Instale e abra qualquer app por 30 segundos – rápido e seguro.",
-//     downloadNow: "Iniciar Download",
-//     completeOfferBtn: "Completar Tarefa",
-//     completeNow: "Completar Agora",
-//     topSite: "Confiável por milhões de gamers",
-//     autoRedirect: "download instantâneo após tarefa",
-//     mostUsers: (t) => `A maioria baixa em menos de ${t}`,
-//     language: "Idioma",
-//     playerFrom: "Jogador de",
-//     tryServer2: "Server 2",
-//     notCompletedClickAgain: "Ainda não concluído? Clique novamente",
-//     tryOffers: "Completar Tarefa Aqui",
-//     noOffers: "Nenhuma tarefa disponível no momento.",
-//     confirmExit: "Sair agora? Você perderá o progresso.",
-//     recommended: "Recomendado",
-//     useMobileFaster: "Use no celular, é mais rápido",
-//   },
-
-//   tr: {
-//     completeOneTask: "En az bir görev tamamlayarak insan olduğunuzu doğrulayın",
-//     gameReady: "{game} hazır! İndirme otomatik başlaması için 1 görev tamamlayın",
-//     downloadStarts: "İndirme otomatik olarak başlayacak.",
-//     offersCompleted: (d, t) => `${d} / ${t} görev tamamlandı`,
-//     howToGuide: "Adım Adım Rehber",
-//     completeOffer: (n) => `${n} hızlı görev tamamla`,
-//     oneOffer: "1 görev",
-//     toGetTheGame: "anında indirmek için.",
-//     appDownloadTip: "Herhangi bir uygulamayı 30 saniye kurup aç – hızlı ve güvenli.",
-//     downloadNow: "İndirmeyi Başlat",
-//     completeOfferBtn: "Görevi Tamamla",
-//     completeNow: "Şimdi Tamamla",
-//     topSite: "Dünya çapında milyonlarca oyuncu tarafından güveniliyor",
-//     autoRedirect: "görevden sonra anında indirme",
-//     mostUsers: (t) => `Çoğu kullanıcı ${t} içinde indiriyor`,
-//     language: "Dil",
-//     playerFrom: "Oyuncu",
-//     tryServer2: "Server 2",
-//     notCompletedClickAgain: "Henüz tamamlanmadı mı? Tekrar tıkla",
-//     tryOffers: "Görevi Burada Tamamla",
-//     noOffers: "Şu anda mevcut görev yok.",
-//     confirmExit: "Şimdi çıkılsın mı? İlerleme kaybolacak.",
-//     recommended: "Önerilen",
-//     useMobileFaster: "Mobilde kullan, daha hızlı",
-//   },
-
-//   ru: {
-//     completeOneTask: "Выполните хотя бы одно задание, чтобы подтвердить, что вы человек",
-//     gameReady: "{game} готов! Выполните 1 задание, чтобы загрузка началась автоматически",
-//     downloadStarts: "Загрузка начнется автоматически.",
-//     offersCompleted: (d, t) => `${d} / ${t} выполнено`,
-//     howToGuide: "Пошаговое руководство",
-//     completeOffer: (n) => `Выполните ${n} быстрое задание`,
-//     oneOffer: "1 задание",
-//     toGetTheGame: "для мгновенной загрузки.",
-//     appDownloadTip: "Установите и откройте любое приложение на 30 секунд – быстро и безопасно.",
-//     downloadNow: "Начать загрузку",
-//     completeOfferBtn: "Выполнить задание",
-//     completeNow: "Выполнить сейчас",
-//     topSite: "Доверено миллионами игроков по всему миру",
-//     autoRedirect: "мгновенная загрузка после задания",
-//     mostUsers: (t) => `Большинство скачивают за ${t}`,
-//     language: "Язык",
-//     playerFrom: "Игрок из",
-//     tryServer2: "Попробовать Server 2",
-//     notCompletedClickAgain: "Ещё не завершено? Нажмите ещё раз",
-//     tryOffers: "Выполнить задание здесь",
-//     noOffers: "Нет доступных заданий.",
-//     confirmExit: "Выйти сейчас? Прогресс будет потерян.",
-//     recommended: "Рекомендуется",
-//     useMobileFaster: "Используйте на мобильном, это быстрее",
-//   },
-
-//   zh: {
-//     completeOneTask: "完成至少一个任务以验证你是人类",
-//     gameReady: "{game} 已准备好！完成 1 个任务以自动开始下载",
-//     downloadStarts: "下载将自动开始。",
-//     offersCompleted: (d, t) => `${d} / ${t} 个任务已完成`,
-//     howToGuide: "步骤指南",
-//     completeOffer: (n) => `完成 ${n} 个快速任务`,
-//     oneOffer: "1 个任务",
-//     toGetTheGame: "即可立即下载。",
-//     appDownloadTip: "安装并打开任意应用 30 秒 – 快速安全。",
-//     downloadNow: "开始下载",
-//     completeOfferBtn: "完成任务",
-//     completeNow: "立即完成",
-//     topSite: "全球数百万玩家信任",
-//     autoRedirect: "任务后立即下载",
-//     mostUsers: (t) => `大多数用户在 ${t} 内下载完成`,
-//     language: "语言",
-//     playerFrom: "来自",
-//     tryServer2: "尝试 Server 2",
-//     notCompletedClickAgain: "还没完成？再点一次",
-//     tryOffers: "在此完成任务",
-//     noOffers: "暂无任务可用。",
-//     confirmExit: "确定离开吗？进度将丢失。",
-//     recommended: "推荐",
-//     useMobileFaster: "在手机上使用更快",
-//   },
-
-//   hi: {
-//     completeOneTask: "कम से कम एक कार्य पूरा करें ताकि आप मानव हैं यह साबित हो",
-//     gameReady: "{game} तैयार है! डाउनलोड शुरू करने के लिए 1 कार्य पूरा करें",
-//     downloadStarts: "डाउनलोड स्वतः शुरू होगा.",
-//     offersCompleted: (d, t) => `${d} / ${t} कार्य पूरा`,
-//     howToGuide: "स्टेप-बाय-स्टेप गाइड",
-//     completeOffer: (n) => `${n} तेज़ कार्य पूरा करें`,
-//     oneOffer: "1 कार्य",
-//     toGetTheGame: "तुरंत डाउनलोड के लिए।",
-//     appDownloadTip: "कोई भी ऐप इंस्टॉल करें और 30 सेकंड खोलें – तेज़ और सुरक्षित।",
-//     downloadNow: "डाउनलोड शुरू करें",
-//     completeOfferBtn: "कार्य पूरा करें",
-//     completeNow: "अभी पूरा करें",
-//     topSite: "दुनिया भर के लाखों गेमर्स का भरोसा",
-//     autoRedirect: "कार्य के बाद तुरंत डाउनलोड",
-//     mostUsers: (t) => `अधिकतर लोग ${t} में डाउनलोड कर लेते हैं`,
-//     language: "भाषा",
-//     playerFrom: "प्लेयर",
-//     tryServer2: "Server 2 आज़माएँ",
-//     notCompletedClickAgain: "अभी पूरा नहीं हुआ? फिर से क्लिक करें",
-//     tryOffers: "कार्य यहाँ पूरा करें",
-//     noOffers: "अभी कोई कार्य उपलब्ध नहीं है।",
-//     confirmExit: "अभी बाहर निकलें? प्रगति खो जाएगी.",
-//     recommended: "अनुशंसित",
-//     useMobileFaster: "मोबाइल पर इस्तेमाल करें, तेज़ है",
-//   },
-
-//   ko: {
-//     completeOneTask: "최소 한 개의 작업을 완료하여 사람이란 것을 인증하세요",
-//     gameReady: "{game} 준비 완료! 다운로드를 시작하려면 1개의 작업을 완료하세요",
-//     downloadStarts: "다운로드가 자동으로 시작됩니다.",
-//     offersCompleted: (d, t) => `${d} / ${t} 작업 완료`,
-//     howToGuide: "단계별 안내",
-//     completeOffer: (n) => `${n}개 빠른 작업 완료`,
-//     oneOffer: "1개 작업",
-//     toGetTheGame: "즉시 다운로드.",
-//     appDownloadTip: "앱 설치 후 30초 실행 – 빠르고 안전합니다.",
-//     downloadNow: "다운로드 시작",
-//     completeOfferBtn: "작업 완료",
-//     completeNow: "지금 완료",
-//     topSite: "전 세계 수백만 게이머가 신뢰",
-//     autoRedirect: "작업 후 즉시 다운로드",
-//     mostUsers: (t) => `대부분 ${t} 이내 다운로드`,
-//     language: "언어",
-//     playerFrom: "플레이어",
-//     tryServer2: "Server 2 시도",
-//     notCompletedClickAgain: "아직 완료되지 않았나요? 다시 클릭하세요",
-//     tryOffers: "여기서 작업 완료",
-//     noOffers: "현재 작업 없음",
-//     confirmExit: "지금 나가면 진행 상황이 사라집니다.",
-//     recommended: "추천",
-//     useMobileFaster: "모바일에서 사용하면 더 빠릅니다",
-//   },
-
-//   ja: {
-//     completeOneTask: "少なくとも1つのタスクを完了して、人間であることを確認してください",
-//     gameReady: "{game} が準備完了！ダウンロードを開始するには1つのタスクを完了してください",
-//     downloadStarts: "ダウンロードが自動的に開始されます。",
-//     offersCompleted: (d, t) => `${d} / ${t} タスク完了`,
-//     howToGuide: "ステップバイステップガイド",
-//     completeOffer: (n) => `${n}件の簡単タスクを完了`,
-//     oneOffer: "1件のタスク",
-//     toGetTheGame: "即時ダウンロード。",
-//     appDownloadTip: "アプリをインストール後30秒実行 – 高速かつ安全。",
-//     downloadNow: "ダウンロード開始",
-//     completeOfferBtn: "タスクを完了",
-//     completeNow: "今すぐ完了",
-//     topSite: "世界中の数百万ゲーマーから信頼",
-//     autoRedirect: "タスク後即時ダウンロード",
-//     mostUsers: (t) => `ほとんどのユーザーが${t}以内で入手`,
-//     language: "言語",
-//     playerFrom: "プレイヤー",
-//     tryServer2: "Server 2を試す",
-//     notCompletedClickAgain: "まだ完了していませんか？もう一度クリック",
-//     tryOffers: "ここでタスクを完了",
-//     noOffers: "現在タスクはありません",
-//     confirmExit: "今終了しますか？進行状況が失われます。",
-//     recommended: "おすすめ",
-//     useMobileFaster: "モバイルで使うと速い",
-//   },
-// } as const;
-// src/i18n/translations.ts
-
 export type Locale =
   | "en"
   | "es"
@@ -437,6 +38,7 @@ export interface TranslationFunctions {
   confirmExit?: string;
   recommended: string;
   useMobileFaster: string;
+  taskNotEasyChangeIt: string;
 }
 
 export const translations: Record<Locale, TranslationFunctions> = {
@@ -465,6 +67,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "Leave now? You'll lose your progress.",
     recommended: "Recommended",
     useMobileFaster: "Best experience on mobile – much faster!",
+    taskNotEasyChangeIt: "If you see this task not easy, click here to change it",
   },
 
   es: {
@@ -492,6 +95,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "¿Salir ahora? Perderás tu progreso.",
     recommended: "Recomendado",
     useMobileFaster: "Mejor en móvil – ¡mucho más rápido!",
+    taskNotEasyChangeIt: "Si ves que esta tarea no es fácil, haz clic aquí para cambiarla",
   },
 
   ar: {
@@ -519,6 +123,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "الخروج الآن؟ ستفقد تقدمك.",
     recommended: "موصى به",
     useMobileFaster: "أفضل على الموبايل – أسرع بكثير!",
+    taskNotEasyChangeIt: "إذا رأيت أن هذه المهمة ليست سهلة، انقر هنا لتغييرها",
   },
 
   fr: {
@@ -546,6 +151,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "Quitter maintenant ? Vous perdrez votre progression.",
     recommended: "Recommandé",
     useMobileFaster: "Meilleur sur mobile – bien plus rapide !",
+    taskNotEasyChangeIt: "Si vous trouvez cette tâche difficile, cliquez ici pour la changer",
   },
 
   de: {
@@ -573,6 +179,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "Jetzt verlassen? Dein Fortschritt geht verloren.",
     recommended: "Empfohlen",
     useMobileFaster: "Am Handy viel schneller!",
+    taskNotEasyChangeIt: "Falls du diese Aufgabe nicht einfach findest, klicke hier, um sie zu wechseln",
   },
 
   it: {
@@ -600,6 +207,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "Uscire ora? Perderai i progressi.",
     recommended: "Consigliato",
     useMobileFaster: "Su cellulare è molto più veloce!",
+    taskNotEasyChangeIt: "Se trovi questa tarea non facile, clicca qui per cambiarla",
   },
 
   pt: {
@@ -627,6 +235,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "Sair agora? Você perderá o progresso.",
     recommended: "Recomendado",
     useMobileFaster: "No celular é bem mais rápido!",
+    taskNotEasyChangeIt: "Se achar esta tarefa difícil, clique aqui para trocá-la",
   },
 
   tr: {
@@ -654,6 +263,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "Şimdi çıkılsın mı? İlerlemen kaybolacak.",
     recommended: "Önerilen",
     useMobileFaster: "Mobilde kullan, çok daha hızlı",
+    taskNotEasyChangeIt: "Bu görevi kolay bulmazsan, değiştirmek için buraya tıkla",
   },
 
   ru: {
@@ -681,6 +291,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "Выйти сейчас? Прогресс будет потерян.",
     recommended: "Рекомендуется",
     useMobileFaster: "На телефоне работает быстрее!",
+    taskNotEasyChangeIt: "Если считаешь эту задачу сложной, нажми здесь, чтобы сменить её",
   },
 
   zh: {
@@ -708,6 +319,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "现在离开？进度将丢失。",
     recommended: "推荐",
     useMobileFaster: "手机上使用更快！",
+    taskNotEasyChangeIt: "如果觉得这个任务不简单，点击这里更换",
   },
 
   hi: {
@@ -735,6 +347,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "अभी बाहर निकलें? प्रोग्रेस खो जाएगी।",
     recommended: "अनुशंसित",
     useMobileFaster: "मोबाइल पर इस्तेमाल करें, बहुत तेज़ है",
+    taskNotEasyChangeIt: "अगर आपको यह टास्क आसान नहीं लग रहा, तो इसे बदलने के लिए यहां क्लिक करें",
   },
 
   ko: {
@@ -762,6 +375,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "지금 나가면 진행 상황이 사라집니다.",
     recommended: "추천",
     useMobileFaster: "모바일에서 사용하면 훨씬 빠릅니다",
+    taskNotEasyChangeIt: "이 작업이 어렵다고 느끼면, 여기 클릭해서 변경하세요",
   },
 
   ja: {
@@ -789,5 +403,6 @@ export const translations: Record<Locale, TranslationFunctions> = {
     confirmExit: "今終了しますか？進行状況が失われます。",
     recommended: "おすすめ",
     useMobileFaster: "モバイルだとずっと速いです",
+    taskNotEasyChangeIt: "このタスクが簡単でないと思ったら、ここをクリックして変更してください",
   },
 } as const;
