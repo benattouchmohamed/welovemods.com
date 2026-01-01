@@ -320,9 +320,7 @@ const Download = () => {
             {!loading && !error && (
               <>
                 <section className="bg-white rounded-3xl shadow-xl p-6 mb-6 text-center border-2 border-[#D4AF37] hover:border-[#F6E27F] transition-all">
-                  <div className="flex items-center justify-center gap-2 mb-4">
-                    <span className="text-xs font-bold bg-blue-100 text-blue-700 px-3 py-1 rounded-full">Server 1</span>
-                  </div>
+                 
                   <h1 className="text-2xl font-extrabold text-gray-800 mb-2">
                     {i18n.completeOneTask ?? "Do 1 quick task"}
                   </h1>
