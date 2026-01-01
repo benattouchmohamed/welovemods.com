@@ -95,21 +95,19 @@ const OfferClickButton = memo(({ url, initialText, retryText }: { url: string; i
 });
 
 /* ────────────────────── UNIFIED OFFER CARD ────────────────────── */
-const OfferCard = memo(({ o, isTop }: { o: Offer; isTop?: boolean }) => {
+const OfferCard = memo(({ o }: { o: Offer }) => {
   const [locale] = useLocale();
   const i18n = t(locale);
 
   return (
-    <article className={`relative bg-white rounded-xl p-3.5 ${isTop ? 'border-4 border-yellow-400 shadow-xl' : 'border-4 border-orange-400 shadow-lg'}`}>
-      {isTop && (
-        <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-50 opacity-70" />
-      )}
+    <article className="relative bg-white rounded-xl p-3.5 border-4 border-yellow-400 shadow-xl">
+      <div className="absolute inset-0 bg-gradient-to-br from-yellow-100 via-amber-50 to-orange-50 opacity-70" />
       <div className="relative flex gap-3">
-        <div className={`rounded-lg bg-gradient-to-br ${isTop ? 'from-purple-500 to-pink-600 p-1.5 ring-4 ring-yellow-300 ring-opacity-50' : 'from-pink-400 to-purple-500 p-1'} shadow-lg flex-shrink-0 flex items-center justify-center ${isTop ? 'w-14 h-14' : 'w-12 h-12'}`}>
+        <div className="rounded-lg bg-gradient-to-br from-purple-500 to-pink-600 p-1.5 ring-4 ring-yellow-300 ring-opacity-50 shadow-lg flex-shrink-0 flex items-center justify-center w-14 h-14">
           {o.image ? (
             <img src={o.image} alt={o.title} className="w-full h-full object-cover rounded-md" loading="lazy" />
           ) : (
-            <Gift className={`text-white ${isTop ? 'w-8 h-8' : 'w-6 h-6'}`} />
+            <Gift className="text-white w-8 h-8" />
           )}
         </div>
         <div className="flex-1 min-w-0">
@@ -193,10 +191,10 @@ const Download = () => {
   const [locale] = useLocale();
   const i18n = t(locale);
   const [offers, setOffers] = useState<Offer[]>([]);
+  const [bestOffer, setBestOffer] = useState<Offer | null>(null);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState(false);
   const [isScrolling, setIsScrolling] = useState(false);
-  const [pairIndex, setPairIndex] = useState(0);
 
   useEffect(() => {
     let timer: NodeJS.Timeout;
@@ -214,17 +212,18 @@ const Download = () => {
     fetchOffers()
       .then((data) => {
         if (mounted) {
-          // Sort by closeness of EPC to Payout: smallest |epc - payout| first
+          // Sort: smallest |epc - payout| first, then highest payout as tie-breaker
           const sorted = [...data].sort((a, b) => {
             const diffA = Math.abs(a.epc - a.payout);
             const diffB = Math.abs(b.epc - b.payout);
             if (diffA !== diffB) {
               return diffA - diffB;
             }
-            // Tie-breaker: higher payout
             return b.payout - a.payout;
           });
+
           setOffers(sorted);
+          setBestOffer(sorted[0] || null); // Take the absolute best one
           setLoading(false);
         }
       })
@@ -236,23 +235,6 @@ const Download = () => {
       });
     return () => { mounted = false; };
   }, []);
-
-  // Current pair to display (always try to show 2)
-  const displayedPair: Offer[] = [];
-  if (offers.length >= 2) {
-    const start = pairIndex * 2;
-    displayedPair.push(offers[start % offers.length]);
-    displayedPair.push(offers[(start + 1) % offers.length]);
-  } else if (offers.length === 1) {
-    displayedPair.push(offers[0]);
-  }
-
-  const hasMultiplePairs = offers.length > 2;
-  const showChangeButton = hasMultiplePairs;
-
-  const handleChangeOffers = () => {
-    setPairIndex((prev) => prev + 1);
-  };
 
   return (
     <>
@@ -296,22 +278,9 @@ const Download = () => {
                   </div>
                 </section>
 
-                {offers.length > 0 && (
+                {bestOffer && (
                   <div className="space-y-5">
-                    {/* Display current pair as top offers */}
-                    {displayedPair.map((o, idx) => (
-                      <OfferCard key={`${o.id}-${pairIndex}-${idx}`} o={o} isTop={true} />
-                    ))}
-
-                    {/* Change Offers button only when there are more than 2 offers */}
-                    {showChangeButton && (
-                      <button
-                        onClick={handleChangeOffers}
-                        className="w-full py-3 rounded-xl text-sm font-bold text-white bg-gradient-to-r from-purple-500 to-pink-500 shadow-lg hover:shadow-xl hover:brightness-110 active:scale-95 transition-all flex items-center justify-center gap-2"
-                      >
-                        Change Offers
-                      </button>
-                    )}
+                    <OfferCard o={bestOffer} />
                   </div>
                 )}
               </>
