@@ -331,7 +331,7 @@ const Download = () => {
                   </p>
                   <div className="mt-6 flex flex-col items-center gap-5">
                     <Suspense fallback={null}>
-                      <LangPicker />
+                      {/* <LangPicker /> */}
                     </Suspense>
                     <Server2Fullscreen autoOpen={offerCount === 0} />
                   </div>
