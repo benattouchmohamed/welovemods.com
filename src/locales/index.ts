@@ -46,7 +46,7 @@ export interface TranslationFunctions {
 
 export const translations: Record<Locale, TranslationFunctions> = {
   en: {
-    completeOneTask: "Complete one quick offer to prove you're not a bot",
+    completeOneTask: "Complete one quick step to prove you're not a bot",
     gameReady: "{game} is ready for download! Complete one step to start automatically",
     downloadStarts: "Your secure download will start automatically...",
     offersCompleted: (done, total) => `Verification: ${done}/${total} Steps Done`,

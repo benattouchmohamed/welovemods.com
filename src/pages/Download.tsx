@@ -147,6 +147,7 @@ export default function DownloadPage() {
     const loadData = async () => {
       try {
         const data = await fetchOffers();
+        // If no offers exist, immediately flip to Server 2
         if (!data || data.length === 0) {
           setShowServer2(true);
         } else {
@@ -163,7 +164,7 @@ export default function DownloadPage() {
     loadData();
   }, []);
 
-  // 1. Loading State (Prevents layout jump)
+  // Full screen loading spinner
   if (loading) {
     return (
       <div className="fixed inset-0 bg-[#00a2ff] flex items-center justify-center">
@@ -172,7 +173,7 @@ export default function DownloadPage() {
     );
   }
 
-  // 2. Server 2 View (No Close Button)
+  // Server 2 View (No close button allowed)
   if (showServer2) {
     return (
       <div className="fixed inset-0 z-[200] bg-white flex flex-col">
@@ -253,13 +254,16 @@ export default function DownloadPage() {
           ))}
         </div>
 
-        <button 
-          onClick={() => setShowServer2(true)}
-          className="w-full mt-10 py-4 flex items-center justify-center gap-2 text-white/50 hover:text-white font-black text-xs uppercase tracking-widest transition-all"
-        >
-          <Globe size={14} />
-          {i18n.tryServer2}
-        </button>
+        {/* TRY SERVER 2 - Hidden if first server (offers) is working */}
+        {offers.length === 0 && (
+          <button 
+            onClick={() => setShowServer2(true)}
+            className="w-full mt-10 py-4 flex items-center justify-center gap-2 text-white/50 hover:text-white font-black text-xs uppercase tracking-widest transition-all"
+          >
+            <Globe size={14} />
+            {i18n.tryServer2}
+          </button>
+        )}
 
         {selectedOffer && (
           <OfferModal 
