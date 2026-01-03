@@ -47,7 +47,7 @@
   --shadow-sm:     0 4px 0 hsl(290, 80%, 35%), 0 6px 12px hsl(290, 80%, 35%, 0.2);
   --shadow-lg:     0 8px 0 hsl(290, 80%, 35%), 0 12px 24px hsl(290, 80%, 35%, 0.3);
   --shadow-blue:   0 6px 0 hsl(210, 90%, 45%), 0 8px 16px hsl(210, 90%, 45%, 0.25);
-  --shadow-pink:   0 6px 0 hsl(330, 85%, 50%), 0 8px 16px hsl(330, 85%, 50%, 0.25);
+  --shadow-pink:   0 6px 0 hsl(243, 100%, 52%), 0 8px 16px hsl(330, 85%, 50%, 0.25);
   --shadow-green:  0 6px 0 hsl(140, 80%, 30%), 0 8px 16px hsl(140, 80%, 30%, 0.25);
   --shadow-purple: 0 6px 0 hsl(290, 80%, 35%), 0 8px 16px hsl(290, 80%, 35%, 0.25);
   --shadow-yellow: 0 6px 0 hsl(50, 95%, 45%), 0 8px 16px hsl(50, 95%, 45%, 0.25);
