@@ -6,16 +6,47 @@ import React, {
   useMemo,
   memo,
 } from "react";
-import { Search } from "lucide-react";
+import { Search, X } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import Navbar from "@/components/Navbar";
 import GameCard from "@/components/GameCard";
 import { fetchGames } from "@/services/gameService";
 import type { Game } from "@/services/gameService";
 
+// --- Configuration & Constants ---
 const INITIAL_LOAD = 12;
 const LOAD_MORE = 12;
 const SEARCH_DEBOUNCE_MS = 300;
+const DOMAIN = "https://welovemods.com";
+
+// --- Helper Components & Hooks ---
+
+/**
+ * useDebounce Hook: Delays search execution to save CPU/Memory
+ */
+function useDebounce<T>(value: T, delay: number): T {
+  const [debouncedValue, setDebouncedValue] = useState<T>(value);
+  useEffect(() => {
+    const handler = setTimeout(() => setDebouncedValue(value), delay);
+    return () => clearTimeout(handler);
+  }, [value, delay]);
+  return debouncedValue;
+}
+
+/**
+ * SkeletonCard: Memoized to prevent re-renders during list updates
+ * Improves perceived performance (Core Web Vitals)
+ */
+const SkeletonCard = memo(() => (
+  <div className="bg-white border border-sky-200 rounded-2xl p-4 shadow-sm animate-pulse">
+    <div className="aspect-square bg-sky-100 rounded-xl mb-4" />
+    <div className="h-5 bg-sky-200 rounded-full mb-3" />
+    <div className="h-4 bg-orange-200 rounded-full w-3/4" />
+  </div>
+));
+SkeletonCard.displayName = "SkeletonCard";
+
+// --- Main Page Component ---
 
 const Index = () => {
   const [games, setGames] = useState<Game[]>([]);
@@ -24,34 +55,35 @@ const Index = () => {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [hasMore, setHasMore] = useState(true);
-  const sentinelRef = useRef<HTMLDivElement>(null);
-  const observerRef = useRef<IntersectionObserver | null>(null);
 
-  // Debounced search query
+  const sentinelRef = useRef<HTMLDivElement>(null);
   const debouncedSearchQuery = useDebounce(searchQuery.trim().toLowerCase(), SEARCH_DEBOUNCE_MS);
 
-  // Load all games once
+  // 1. Initial Data Fetch
   useEffect(() => {
     window.scrollTo(0, 0);
+    let isMounted = true;
+
     const load = async () => {
       try {
         const allGames = await fetchGames();
+        if (!isMounted) return;
         setGames(allGames);
         setDisplayedGames(allGames.slice(0, INITIAL_LOAD));
         setHasMore(allGames.length > INITIAL_LOAD);
       } catch (e) {
-        console.error("Failed to fetch games:", e);
+        console.error("SEO Error: Failed to fetch games for indexing", e);
       } finally {
-        setIsLoading(false);
+        if (isMounted) setIsLoading(false);
       }
     };
     load();
+    return () => { isMounted = false; };
   }, []);
 
-  // Memoized filtered games based on debounced query
+  // 2. Optimized Filtering Logic
   const filteredGames = useMemo(() => {
     if (!debouncedSearchQuery) return games;
-
     return games.filter(
       (g) =>
         g.title.toLowerCase().includes(debouncedSearchQuery) ||
@@ -59,159 +91,136 @@ const Index = () => {
     );
   }, [games, debouncedSearchQuery]);
 
-  // Reset displayed games when filter changes
+  // Sync list when filter changes
   useEffect(() => {
     setDisplayedGames(filteredGames.slice(0, INITIAL_LOAD));
     setHasMore(filteredGames.length > INITIAL_LOAD);
   }, [filteredGames]);
 
-  // Load more games
+  // 3. Load More Function (Performance Optimized)
   const loadMoreGames = useCallback(() => {
     if (isLoadingMore || !hasMore) return;
 
     setIsLoadingMore(true);
+    // requestAnimationFrame ensures the browser is ready to paint
     requestAnimationFrame(() => {
       setDisplayedGames((prev) => {
         const nextStart = prev.length;
         const nextChunk = filteredGames.slice(nextStart, nextStart + LOAD_MORE);
         const newDisplayed = [...prev, ...nextChunk];
-
-        if (nextStart + LOAD_MORE >= filteredGames.length) {
-          setHasMore(false);
-        }
+        setHasMore(newDisplayed.length < filteredGames.length);
         return newDisplayed;
       });
       setIsLoadingMore(false);
     });
   }, [filteredGames, isLoadingMore, hasMore]);
 
-  // Intersection Observer setup
+  // 4. Infinite Scroll Observer
   useEffect(() => {
-    if (!sentinelRef.current) return;
-
-    observerRef.current = new IntersectionObserver(
+    const observer = new IntersectionObserver(
       (entries) => {
         if (entries[0].isIntersecting && hasMore && !isLoadingMore) {
           loadMoreGames();
         }
       },
-      {
-        rootMargin: "400px", // Load earlier for smoother experience
-        threshold: 0.1,
-      }
+      { rootMargin: "600px" } // Pre-load 600px before user hits bottom
     );
 
-    observerRef.current.observe(sentinelRef.current);
-
-    return () => observerRef.current?.disconnect();
+    if (sentinelRef.current) observer.observe(sentinelRef.current);
+    return () => observer.disconnect();
   }, [loadMoreGames, hasMore, isLoadingMore]);
 
-  const DOMAIN = "https://welovemods.com";
+  // 5. Schema.org JSON-LD (Max SEO)
+  const jsonLd = useMemo(() => ({
+    "@context": "https://schema.org",
+    "@type": "CollectionPage",
+    "name": "WeLoveMods - Android Game Mods & APKs 2026",
+    "description": "Premium destination for safe, tested Android modded APKs.",
+    "url": DOMAIN,
+    "mainEntity": {
+      "@type": "ItemList",
+      "itemListElement": displayedGames.slice(0, 12).map((game, index) => ({
+        "@type": "ListItem",
+        "position": index + 1,
+        "name": game.title,
+        "url": `${DOMAIN}/game/${game.id}`
+      }))
+    }
+  }), [displayedGames]);
 
   return (
     <div className="min-h-screen bg-gradient-to-b from-sky-100 via-sky-50 to-orange-50 flex flex-col">
       <Helmet>
-        <title>WeLoveMods - Download Android Game Mods & APKs 2025</title>
-        <meta
-          name="description"
-          content="Download the latest Android game mods with unlimited coins, unlocked features, and cheats in 2025. Safe and free game APKs at WeLoveMods."
-        />
-        <meta
-          name="keywords"
-          content="Android game mods, mod APK 2025, unlimited coins APK, game cheats 2025, free mods, WeLoveMods"
-        />
+        <title>WeLoveMods - Download Android Game Mods & APKs 2026</title>
+        <meta name="description" content="Download the latest Android game mods with unlimited coins, unlocked features, and cheats in 2026. Safe and free game APKs at WeLoveMods." />
+        <meta name="keywords" content="Android game mods, mod APK 2026, unlimited coins APK, game cheats, WeLoveMods" />
         <link rel="canonical" href={DOMAIN} />
-        {/* Other OG/Twitter tags... */}
+        <script type="application/ld+json">{JSON.stringify(jsonLd)}</script>
       </Helmet>
 
-      {/* Header */}
+      {/* Semantic Header */}
       <header className="w-full px-6 pt-8 pb-6 text-center">
-        <div className="inline-flex items-center gap-3 px-6 py-3 rounded-2xl bg-white shadow-md border border-sky-200 mb-6">
-          {/* Logo */}
-          <h1 className="text-2xl font-bold text-sky-700">WeLoveMods</h1>
-        </div>
-
-        {/* Search Bar */}
-        <div className="w-full max-w-md mx-auto">
-          <div className="flex items-center px-5 py-4 rounded-full bg-white shadow-md border border-sky-200 transition-shadow hover:shadow-lg">
-            <Search className="w-5 h-5 text-sky-500" />
+       
+<br /><br /> <br />
+        {/* Search Section */}
+        <section className="w-full max-w-md mx-auto" aria-label="Game Search">
+          <div className="relative flex items-center px-5 py-4 rounded-full bg-white shadow-md border border-sky-200 focus-within:ring-2 focus-within:ring-sky-400 transition-all">
+            <label htmlFor="game-search" className="sr-only">Search for modded games</label>
+            <Search className="w-5 h-5 text-sky-500" aria-hidden="true" />
             <input
-              type="text"
-              placeholder="Search games..."
+              id="game-search"
+              type="search"
+              placeholder="Search 1,000+ mods..."
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
               className="ml-3 flex-1 bg-transparent text-sky-800 placeholder-sky-400 outline-none font-medium"
-              autoFocus={false}
             />
             {searchQuery && (
-              <button
+              <button 
                 onClick={() => setSearchQuery("")}
-                className="text-sky-400 hover:text-sky-600"
+                className="p-1 hover:bg-sky-50 rounded-full"
+                aria-label="Clear search"
               >
-                ✕
+                <X className="w-4 h-4 text-sky-400" />
               </button>
             )}
           </div>
-        </div>
+        </section>
       </header>
 
-      {/* Games Grid */}
-      <main className="flex-1 w-full px-6 pb-24">
-        <div className="grid grid-cols-2 md:grid-cols-4 gap-5 max-w-md md:max-w-5xl mx-auto">
-          {isLoading
-            ? Array.from({ length: INITIAL_LOAD }).map((_, i) => (
-                <SkeletonCard key={i} />
-              ))
-            : displayedGames.length > 0
-            ? displayedGames.map((game) => (
-                <GameCard key={game.id} game={game} />
-              ))
-            : (
-                <div className="col-span-full text-center py-12">
-                  <p className="text-xl font-semibold text-sky-700">
-                    No games found for "{searchQuery}"
-                  </p>
-                  <p className="text-sky-600 mt-2">Try a different search term</p>
-                </div>
-              )}
+      {/* Main Content Grid */}
+      <main className="flex-1 w-full px-4 pb-24">
+        <div className="grid grid-cols-2 md:grid-cols-3 lg:grid-cols-4 gap-4 md:gap-6 max-w-6xl mx-auto">
+          {isLoading ? (
+            Array.from({ length: INITIAL_LOAD }).map((_, i) => <SkeletonCard key={i} />)
+          ) : displayedGames.length > 0 ? (
+            displayedGames.map((game) => (
+              <GameCard key={game.id} game={game} />
+            ))
+          ) : (
+            <article className="col-span-full text-center py-20 bg-white/40 rounded-3xl border-2 border-dashed border-sky-200">
+              <h2 className="text-xl font-bold text-sky-700">No results for "{searchQuery}"</h2>
+              <p className="text-sky-600 mt-2">Try searching for "Menu" or "Unlimited"</p>
+            </article>
+          )}
 
-          {/* Load more spinner */}
+          {/* Load More Indicator */}
           {isLoadingMore && (
-            <div className="col-span-full flex justify-center py-10">
-              <div className="animate-spin rounded-full h-10 w-10 border-t-3 border-b-3 border-sky-600"></div>
+            <div className="col-span-full flex justify-center py-8">
+              <div className="animate-spin rounded-full h-8 w-8 border-t-2 border-sky-600" role="status">
+                <span className="sr-only">Loading more games...</span>
+              </div>
             </div>
           )}
 
-          {/* Sentinel */}
-          {hasMore && <div ref={sentinelRef} className="h-20 col-span-full" />}
+          {/* Scroll Target */}
+          <div ref={sentinelRef} className="h-10 col-span-full" aria-hidden="true" />
         </div>
       </main>
 
-      {/* Fixed Bottom Navbar */}
       <Navbar />
     </div>
   );
 };
-
-// Simple debounce hook
-function useDebounce<T>(value: T, delay: number): T {
-  const [debouncedValue, setDebouncedValue] = useState<T>(value);
-
-  useEffect(() => {
-    const handler = setTimeout(() => setDebouncedValue(value), delay);
-    return () => clearTimeout(handler);
-  }, [value, delay]);
-
-  return debouncedValue;
-}
-
-// Skeleton component
-const SkeletonCard = memo(() => (
-  <div className="bg-white border border-sky-200 rounded-2xl p-4 shadow-sm animate-pulse">
-    <div className="aspect-square bg-sky-100 rounded-xl mb-4"></div>
-    <div className="h-5 bg-sky-200 rounded-full mb-3"></div>
-    <div className="h-4 bg-orange-200 rounded-full w-3/4"></div>
-  </div>
-));
 
 export default Index;

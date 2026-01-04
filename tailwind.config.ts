@@ -1,7 +1,7 @@
 import type { Config } from "tailwindcss";
 
 export default {
-  darkMode: ["class"], // Dark mode via .dark class
+  darkMode: ["class"],
   content: [
     "./pages/**/*.{ts,tsx}",
     "./components/**/*.{ts,tsx}",
@@ -44,20 +44,9 @@ export default {
           DEFAULT: "hsl(var(--accent))",
           foreground: "hsl(var(--accent-foreground))",
         },
-        popover: {
-          DEFAULT: "hsl(var(--popover))",
-          foreground: "hsl(var(--popover-foreground))",
-        },
         card: {
           DEFAULT: "hsl(var(--card))",
           foreground: "hsl(var(--card-foreground))",
-        },
-        chart: {
-          "1": "hsl(var(--chart-1))",
-          "2": "hsl(var(--chart-2))",
-          "3": "hsl(var(--chart-3))",
-          "4": "hsl(var(--chart-4))",
-          "5": "hsl(var(--chart-5))",
         },
         cartoon: {
           sky: "hsl(var(--cartoon-sky))",
@@ -75,12 +64,15 @@ export default {
         cartoon: ["Fredoka One", "cursive"],
       },
       boxShadow: {
-        cartoon: "var(--shadow-cartoon)",
-        "cartoon-sm": "var(--shadow-cartoon-sm)",
-        "cartoon-lg": "var(--shadow-cartoon-lg)",
+        // Linked to your Global CSS variables
+        "cartoon": "var(--shadow-base)",
+        "cartoon-sm": "var(--shadow-sm)",
+        "cartoon-lg": "var(--shadow-lg)",
         "cartoon-pink": "var(--shadow-pink)",
         "cartoon-blue": "var(--shadow-blue)",
         "cartoon-purple": "var(--shadow-purple)",
+        "cartoon-green": "var(--shadow-green)",
+        "cartoon-yellow": "var(--shadow-yellow)",
       },
       borderRadius: {
         lg: "var(--radius)",
@@ -88,9 +80,9 @@ export default {
         sm: "calc(var(--radius) - 4px)",
         "3xl": "1.5rem",
         "4xl": "2rem",
+        "5xl": "3rem",
       },
       keyframes: {
-        // Accordion (shadcn/ui)
         "accordion-down": {
           from: { height: "0" },
           to: { height: "var(--radix-accordion-content-height)" },
@@ -99,22 +91,26 @@ export default {
           from: { height: "var(--radix-accordion-content-height)" },
           to: { height: "0" },
         },
-
-        // Shimmer for beautiful skeleton
         shimmer: {
           "0%": { backgroundPosition: "-200% 0" },
           "100%": { backgroundPosition: "200% 0" },
         },
+        // Custom bounce for that U.S. Game Style
+        "squish": {
+          "0%, 100%": { transform: "scale(1, 1)" },
+          "50%": { transform: "scale(1.05, 0.95)" },
+        }
       },
       animation: {
         "accordion-down": "accordion-down 0.2s ease-out",
         "accordion-up": "accordion-up 0.2s ease-out",
         shimmer: "shimmer 1.8s infinite",
+        squish: "squish 0.5s ease-in-out",
       },
     },
   },
   plugins: [
     require("tailwindcss-animate"),
-    require("tailwind-scrollbar"), // v3
+    require("tailwind-scrollbar"),
   ],
 } satisfies Config;

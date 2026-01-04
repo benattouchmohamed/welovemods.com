@@ -1,29 +1,29 @@
-/* -----------------------
-   FUN GAME-STYLE THEME
-   (Enhanced U.S. Look)
------------------------ */
+/* -----------------------------------------------------------
+   FUN GAME-STYLE THEME (Fixed & Enhanced)
+----------------------------------------------------------- */
 
-/* Font: rounded, playful */
-@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;600&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Fredoka+One&family=Poppins:wght@400;500;600;700;800&display=swap');
 
+:root {
+ 
+  --custom-foreground-color: #fff8d9;          /* Creamy white */
+  --custom-button-left: #00e676;               /* Vivid green */
+  --custom-button-right: #5f5f5f;              /* Electric blue */
+  --custom-accent-pink: #ff4081;               /* Hot pink */
+  --custom-accent-yellow: #ffeb3b;             /* Bright yellow */
+  --custom-shadow: rgba(0, 0, 0, 0.25);
+  --custom-font-main: "Fredoka One", cursive;
+  --custom-font-body: "Poppins", sans-serif;
+}
+
+/* Global Reset & Background */
 html, body {
-  font-family: "Fredoka One", Poppins, system-ui, -apple-system, "Segoe UI", Roboto, Arial !important;
+  font-family: var(--custom-font-main), var(--custom-font-body), system-ui !important;
   background-color: var(--custom-background-color) !important;
   color: #222 !important;
   scroll-behavior: smooth;
-}
-
-/* -----------------------
-   COLOR PALETTE
------------------------ */
-:root {
-  --custom-background-color: rgb(0, 170, 255) !important;   /* Bright ocean blue */
-  --custom-foreground-color: #fff8d9 !important;   /* Creamy white */
-  --custom-button-color-left: #00e676 !important;  /* Vivid green */
-  --custom-button-color-right: #2979ff !important; /* Electric blue */
-  --custom-accent-pink: #ff4081 !important;        /* Hot pink */
-  --custom-accent-yellow: #ffeb3b !important;      /* Bright yellow */
-  --custom-shadow: rgba(0, 0, 0, 0.25);
+  margin: 0;
+  padding: 0;
 }
 
 /* -----------------------
@@ -31,89 +31,95 @@ html, body {
 ----------------------- */
 .app, .card, .box {
   background-color: var(--custom-foreground-color) !important;
-  border: 3px solid var(--custom-accent-pink) !important;
-  border-radius: 18px !important;
-  box-shadow: 0 10px 20px var(--custom-shadow) !important;
+  border: 4px solid var(--custom-accent-pink) !important;
+  border-radius: 22px !important;
+  box-shadow: 0 10px 0px rgba(0,0,0,0.1), 0 12px 20px var(--custom-shadow) !important;
   color: #222 !important;
   text-align: center !important;
-  transition: all 0.2s ease-in-out !important;
+  transition: all 0.25s cubic-bezier(0.175, 0.885, 0.32, 1.275) !important;
 }
+
 .app:hover, .card:hover, .box:hover {
-  transform: translateY(-4px) !important;
-  box-shadow: 0 14px 25px rgba(0, 0, 0, 0.35) !important;
+  transform: translateY(-6px) rotate(-1deg) !important;
+  box-shadow: 0 15px 30px rgba(0, 0, 0, 0.3) !important;
 }
 
 /* -----------------------
-   BUTTONS
+   BUTTONS (Squishy 3D Style)
 ----------------------- */
 .checker .container,
 .incentive,
 .action-btn {
-  background: linear-gradient(45deg, var(--custom-button-color-left), var(--custom-button-color-right)) !important;
+  background: linear-gradient(45deg, var(--custom-button-left), var(--custom-button-right)) !important;
   color: #fff !important;
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
-  border: 2px solid #000 !important;
-  border-radius: 12px !important;
-  box-shadow: 0 6px 0 #0003, 0 12px 15px var(--custom-shadow) !important;
+  font-family: var(--custom-font-main) !important;
+  text-shadow: 2px 2px 0px rgba(0,0,0,0.2) !important;
+  border: 3px solid #000 !important;
+  border-radius: 16px !important;
+  box-shadow: 0 6px 0 #0003, 0 10px 15px var(--custom-shadow) !important;
   font-weight: bold !important;
-  transition: 0.2s ease-in-out !important;
+  padding: 12px 24px;
+  cursor: pointer;
+  transition: all 0.15s ease !important;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
 }
-.checker .container:hover,
-.incentive:hover,
+
 .action-btn:hover {
-  filter: brightness(1.2) !important;
-  transform: translateY(-3px) !important;
+  filter: brightness(1.1) !important;
+  transform: translateY(-2px) !important;
+  box-shadow: 0 8px 0 #0003, 0 12px 20px var(--custom-shadow) !important;
+}
+
+.action-btn:active {
+  transform: translateY(4px) !important;
+  box-shadow: 0 2px 0 #0003 !important;
 }
 
 /* -----------------------
    BADGES
 ----------------------- */
+.download-badge, .version-badge {
+  font-family: var(--custom-font-main) !important;
+  padding: 6px 14px !important;
+  border-radius: 10px !important;
+  font-size: 0.8rem !important;
+  text-transform: uppercase;
+  box-shadow: 0 4px 0 rgba(0,0,0,0.1) !important;
+}
+
 .download-badge { 
   background: var(--custom-accent-yellow) !important; 
-  color: #000 !important; 
-  border-radius: 6px !important;
-  padding: 6px 12px !important;
-  font-weight: 700 !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.25) !important;
+  color: #333 !important; 
 }
 
 .version-badge { 
   background: var(--custom-accent-pink) !important; 
   color: #fff !important; 
-  border-radius: 6px !important;
-  padding: 6px 12px !important;
-  font-weight: 700 !important;
-  box-shadow: 0 2px 4px rgba(0,0,0,0.25) !important;
 }
 
 /* -----------------------
-   SPINNER
------------------------ */
-.spinner-border { 
-  border-color: rgba(255,255,255,0.25) !important; 
-  border-top-color: var(--custom-accent-yellow) !important; 
-}
-
-/* -----------------------
-   TEXT
+   TEXT STYLING
 ----------------------- */
 .name { 
+  font-family: var(--custom-font-main) !important;
   color: var(--custom-accent-pink) !important; 
-  text-shadow: 1px 1px 2px rgba(0,0,0,0.5) !important;
-  font-weight: 800 !important;
-}
-.description { 
-  color: #222 !important; 
-  font-weight: 500 !important;
+  text-shadow: 2px 2px 0px rgba(255,255,255,1), 3px 3px 0px rgba(0,0,0,0.1) !important;
+  font-size: 1.5rem;
+  letter-spacing: -0.02em;
 }
 
-/* -----------------------
-   RATINGS
------------------------ */
+.description { 
+  font-family: var(--custom-font-body) !important;
+  color: #444 !important; 
+  font-weight: 500 !important;
+  line-height: 1.4;
+}
+
 .rating {
   color: var(--custom-accent-yellow) !important;
-  font-size: 1.25em !important;
-  text-shadow: 0 1px 1px rgba(0,0,0,0.3) !important;
+  filter: drop-shadow(0 2px 2px rgba(0,0,0,0.2));
 }
 
 /* -----------------------
@@ -122,72 +128,45 @@ html, body {
 .instructions.pro-style {
   background: linear-gradient(180deg, #fffbe7 0%, #fff2c2 100%);
   border: 4px solid var(--custom-accent-yellow);
-  border-radius: 20px;
-  padding: 20px 25px;
-  margin: 25px auto;
-  box-shadow: 0 8px 16px rgba(0,0,0,0.25), 0 0 10px rgba(255, 235, 59, 0.4);
-  max-width: 520px;
-  min-width: 300px;
-  text-align: center;
-  color: #333;
-  font-family: "Poppins", Arial, sans-serif;
-  line-height: 1.6;
-  font-size: 1rem;
-  transition: all 0.25s ease-in-out;
+  border-radius: 24px;
+  padding: 25px;
+  box-shadow: 0 10px 20px rgba(0,0,0,0.15);
+  font-family: var(--custom-font-body);
 }
-.instructions.pro-style:hover {
-  transform: translateY(-3px);
-  box-shadow: 0 10px 22px rgba(0,0,0,0.3), 0 0 18px rgba(255, 235, 59, 0.6);
-}
+
 .instructions.pro-style .instructions-header {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 8px;
-  font-size: 1.25rem;
-  font-weight: 700;
-  margin-bottom: 10px;
+  font-family: var(--custom-font-main);
   color: var(--custom-accent-pink);
-}
-.instructions.pro-style .hl-time { color: #e53935; font-weight: 800; }
-.instructions.pro-style .hl-app { color: #00c853; font-weight: 800; }
-.instructions.pro-style .hl-item { color: #1976d2; font-weight: 800; }
-.instructions.pro-style .warning {
-  color: #d50000;
-  font-weight: 700;
-  font-size: 0.95rem;
-  margin-top: 12px;
-}
-.instructions.pro-style .icon {
-  animation: bounce 1.2s infinite;
-}
-@keyframes bounce {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-3px); }
+  font-size: 1.4rem;
+  margin-bottom: 15px;
 }
 
 /* -----------------------
    NAVIGATION
 ----------------------- */
-.nav-btn.home { background: linear-gradient(180deg, #ff4081, #f50057) !important; }
-.nav-btn.profile { background: linear-gradient(180deg, #00c853, #1b5e20) !important; }
-.nav-btn.settings { background: linear-gradient(180deg, #2196f3, #1565c0) !important; }
-
-/* -----------------------
-   TITLE & SMALL TEXT
------------------------ */
-.title { display: none !important; }
-.fs-xs, .fs-sm, .description, .name { 
-  text-shadow: 0 1px 0 rgba(0,0,0,0.4) !important; 
+.nav-btn {
+  border: 2px solid rgba(0,0,0,0.2) !important;
+  border-radius: 12px !important;
+  transition: 0.2s;
 }
 
+.nav-btn.home { background: linear-gradient(180deg, #ff4081, #f50057) !important; }
+.nav-btn.profile { background: linear-gradient(180deg, #00c853, #1b5e20) !important; }
+
 /* -----------------------
-   RESPONSIVE TWEAKS
+   ANIMATIONS
 ----------------------- */
+@keyframes bounce {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-5px); }
+}
+
+.icon-bounce {
+  animation: bounce 1.5s infinite ease-in-out;
+}
+
+/* Responsive fixes */
 @media (max-width: 600px) {
-  .instructions.pro-style {
-    max-width: 90%;
-    padding: 18px 15px;
-    font-size: 0.95rem;
-  }
+  .name { font-size: 1.25rem; }
+  .card { border-radius: 18px !important; }
 }
