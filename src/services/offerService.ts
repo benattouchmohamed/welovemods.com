@@ -1,5 +1,3 @@
-// src/services/offerService.ts
-
 export interface Offer {
   id: string;
   title: string;
@@ -45,10 +43,11 @@ const FALLBACK = "https://areyourealhuman.com/cl/i/g6pqp2";
 const PRO_CONFIG = {
   MIN_PAYOUT: 0.80,       // Global filter: ignore low payout
   MIN_EPC: 0.10,          // Global filter: ignore low conversion
-  API_MIN: "2",          // API level constraint
-  API_MAX: "3",          // API level constraint
-  WEIGHT_EPC: 0.80,       // Heavy focus on actual conversion performance
-  WEIGHT_PAYOUT: 0.20     // Secondary focus on the dollar amount
+  API_MIN: "2",           // API level constraint
+  API_MAX: "12",          // Increased fetch count to ensure we find PIN offers in the mix
+  WEIGHT_EPC: 0.75,       // Focus on conversion
+  WEIGHT_PAYOUT: 0.25,    // Focus on dollar amount
+  PIN_BOOST: 0.20         // Priority boost for PIN submits with good EPC
 };
 
 /* ------------------ HELPERS ------------------ */
@@ -77,11 +76,20 @@ const parseNumber = (v?: string): number => {
 
 /**
  * Advanced Scoring: Prioritizes EPC but scales with Payout.
+ * Logic: If it's a PIN offer and EPC is better than average, it gets a score boost.
  */
-const calculatePerformanceScore = (epc: number, payout: number): number => {
+const calculatePerformanceScore = (epc: number, payout: number, category?: string): number => {
   const normEpc = Math.min(epc / 0.8, 1.5); 
   const normPayout = Math.min(payout / 4.0, 1.5);
-  return (normEpc * PRO_CONFIG.WEIGHT_EPC) + (normPayout * PRO_CONFIG.WEIGHT_PAYOUT);
+  let score = (normEpc * PRO_CONFIG.WEIGHT_EPC) + (normPayout * PRO_CONFIG.WEIGHT_PAYOUT);
+
+  // Apply PIN Priority: If category contains PIN and has decent EPC, boost it
+  const isPin = category?.toUpperCase().includes("PIN");
+  if (isPin && epc >= PRO_CONFIG.MIN_EPC) {
+    score += PRO_CONFIG.PIN_BOOST;
+  }
+
+  return score;
 };
 
 /* ------------------ MAPPERS ------------------ */
@@ -102,7 +110,7 @@ const mapOffer = (o: ApiOffer, i: number): Offer => {
     epc,
     payout,
     cpa: parseNumber(o.cpa) || payout,
-    score: calculatePerformanceScore(epc, payout)
+    score: calculatePerformanceScore(epc, payout, o.category)
   };
 };
 
@@ -116,10 +124,10 @@ const fetchAllOffersFromApi = async (): Promise<Offer[]> => {
     const params = new URLSearchParams({
       ip,
       user_agent: navigator.userAgent,
-      ctype: "15",              // CPI + CPA + PIN + VID
-      min: PRO_CONFIG.API_MIN,  // Min 2 requested from API
-      max: PRO_CONFIG.API_MAX,  // Max 3 requested from API
-      device: device !== "desktop" ? device : "" // Filter by mobile OS if applicable
+      ctype: "15",              // 1 (CPI) + 2 (CPA) + 4 (PIN) + 8 (VID)
+      min: PRO_CONFIG.API_MIN,
+      max: PRO_CONFIG.API_MAX,  // Pull more so we can filter for the best PINs
+      device: device !== "desktop" ? device : "" 
     });
 
     const r = await fetch(`${API_URL}?${params}`, {
@@ -139,23 +147,24 @@ const fetchAllOffersFromApi = async (): Promise<Offer[]> => {
 export const fetchOffers = async (): Promise<Offer[]> => {
   const all = await fetchAllOffersFromApi();
 
-  // 1. Remove duplicates and bad offers
+  // 1. Remove duplicates
   const unique = Array.from(new Map(all.map(o => [o.id, o])).values());
 
-  // 2. Pro Filter: Remove high-payout but broken/non-converting offers
+  // 2. Pro Filter: Remove high-payout but broken offers
   const qualityOffers = unique.filter(o => {
     const p = o.payout ?? 0;
     const e = o.epc ?? 0;
-    // If payout is > $2 and EPC is tiny, the offer is likely dead/broken
+    
+    // If payout is > $2.00 and EPC is dead (< 0.04), it's a fake/broken offer
     if (p > 2.0 && e < 0.04) return false;
+    
     return p >= PRO_CONFIG.MIN_PAYOUT && e >= PRO_CONFIG.MIN_EPC;
   });
 
-  // 3. Sort by our advanced performance score
+  // 3. Sort by Score (Score already includes PIN boost)
   const sorted = qualityOffers.sort((a, b) => (b.score ?? 0) - (a.score ?? 0));
 
-  // 4. Final selection: If quality filters left us with nothing, 
-  // we return the best 2-3 raw offers from the API (Fallback)
+  // 4. Fallback Selection
   if (sorted.length < 2) {
     return unique
       .sort((a, b) => (b.epc ?? 0) - (a.epc ?? 0))
