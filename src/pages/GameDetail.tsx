@@ -124,9 +124,20 @@ const GameDetail = memo(() => {
               <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="md:col-span-7 lg:col-span-8 space-y-6">
                 <div className="space-y-2">
                   {/* Cleaned up Title Style: Tight, Bold, and No Extra Margin */}
-                  <h1 className="text-5xl lg:text-7xl font-black text-slate-900 tracking-[-0.04em] leading-[0.9] uppercase italic">
-                    {game.title}
-                  </h1>
+                  <h1 className="
+  text-3xl 
+  sm:text-4xl 
+  lg:text-6xl 
+  font-extrabold 
+  text-slate-900 
+  tracking-tight 
+  leading-tight 
+  uppercase 
+  italic
+">
+  {game.title}
+</h1>
+
                   <div className="flex flex-wrap gap-2 pt-2">
                     <div className="bg-yellow-400 text-white px-3 py-1 rounded-full flex items-center gap-1 font-black text-sm">
                       <Star size={14} fill="currentColor" /> {game.rating}

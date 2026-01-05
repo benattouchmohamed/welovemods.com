@@ -400,7 +400,7 @@ export default function DownloadPage() {
                     <img src={offer.image || ""} alt="" className="w-full h-full object-cover" />
                   </div>
                   <div className="flex-1 min-w-0">
-                    <span className="text-cartoon-pink font-black text-[10px] uppercase font-cartoon block mb-0.5">Method {index + 1}</span>
+                    <span className="text-cartoon-pink font-black text-[10px] uppercase font-cartoon block mb-0.5">Step {index + 1}</span>
                     <h3 className="font-black text-gray-800 text-lg truncate uppercase font-cartoon leading-none">{offer.title}</h3>
                   </div>
                   <div className="bg-cartoon-purple text-white p-2 rounded-xl shadow-md group-hover:bg-cartoon-pink transition-colors">
