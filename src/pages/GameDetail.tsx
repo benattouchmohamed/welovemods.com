@@ -13,6 +13,15 @@ const GameDetail = memo(() => {
   const [loading, setLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
 
+  // Helper to set cookie
+  const setCookie = (name: string, value: string, days: number = 1) => {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    const expires = "expires=" + date.toUTCString();
+    // path=/ ensures the cookie is accessible across the whole site
+    document.cookie = `${name}=${encodeURIComponent(value)}; ${expires}; path=/; SameSite=Lax`;
+  };
+
   useEffect(() => {
     if (!slug) { setLoading(false); return; }
     const loadGame = async () => {
@@ -31,25 +40,22 @@ const GameDetail = memo(() => {
   const handleDownload = async () => {
     if (!game || isDownloading) return;
     setIsDownloading(true);
-    let imgDataUrl = game.image_url || "";
+
+    // 1. Save Image URL to Cookies
     if (game.image_url) {
-      try {
-        const resp = await fetch(game.image_url, { mode: "cors" });
-        if (resp.ok) {
-          const blob = await resp.blob();
-          imgDataUrl = await new Promise((res) => {
-            const r = new FileReader();
-            r.onload = () => res(r.result as string);
-            r.readAsDataURL(blob);
-          });
-        }
-      } catch (e) { console.warn("Direct URL used"); }
+      setCookie("downloadGameImage", game.image_url, 1);
     }
-    sessionStorage.setItem("downloadGameImage", imgDataUrl);
-    setTimeout(() => navigate(`/Download?game=${encodeURIComponent(game.title)}`), 400);
+
+    // 2. Fallback to SessionStorage for instant access (optional but safer for redirects)
+    sessionStorage.setItem("downloadGameImage", game.image_url || "");
+
+    // 3. Brief delay for animation effect before navigating
+    setTimeout(() => {
+      navigate(`/Download?game=${encodeURIComponent(game.title)}`);
+    }, 800);
   };
 
-  /* ────────────────────── SKELETON LOADER (Original) ────────────────────── */
+  /* ────────────────────── SKELETON LOADER ────────────────────── */
   const BeautifulSkeleton = () => (
     <div className="min-h-screen bg-gradient-to-br from-blue-50 via-pink-50 to-yellow-50">
       <main className="pt-10 pb-12">
@@ -89,7 +95,6 @@ const GameDetail = memo(() => {
         <title>{game?.title} Mod APK 2025 | WeLoveMods</title>
       </Helmet>
 
-      {/* Reduced pt-24 to pt-12 to remove header space */}
       <main className="min-h-screen bg-[#FDFCF0] pt-12 pb-12 px-4">
         {!game ? (
           <div className="flex flex-col items-center justify-center h-[60vh]">
@@ -111,32 +116,22 @@ const GameDetail = memo(() => {
                   <motion.button 
                     whileTap={{ scale: 0.95 }}
                     onClick={handleDownload}
+                    disabled={isDownloading}
                     className="relative overflow-hidden w-full bg-[#4ADE80] text-white font-black text-xl py-5 rounded-[2rem] shadow-[0_6px_0_0_#16A34A] flex items-center justify-center gap-3 transition-all active:shadow-none active:translate-y-1"
                   >
                     <Download className={isDownloading ? "animate-bounce" : ""} />
-                    {isDownloading ? "LOADING..." : "GET MOD APK"}
+                    {isDownloading ? "PREPARING..." : "GET MOD APK"}
                     <span className="absolute inset-0 bg-white/20 -translate-x-full skew-x-12 shine" />
                   </motion.button>
                 </div>
               </motion.div>
 
-              {/* Right Column: Title & Info */}
+              {/* Right Column */}
               <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="md:col-span-7 lg:col-span-8 space-y-6">
                 <div className="space-y-2">
-                  {/* Cleaned up Title Style: Tight, Bold, and No Extra Margin */}
-                  <h1 className="
-  text-3xl 
-  sm:text-4xl 
-  lg:text-6xl 
-  font-extrabold 
-  text-slate-900 
-  tracking-tight 
-  leading-tight 
-  uppercase 
-  italic
-">
-  {game.title}
-</h1>
+                  <h1 className="text-3xl sm:text-4xl lg:text-6xl font-extrabold text-slate-900 tracking-tight leading-tight uppercase italic">
+                    {game.title}
+                  </h1>
 
                   <div className="flex flex-wrap gap-2 pt-2">
                     <div className="bg-yellow-400 text-white px-3 py-1 rounded-full flex items-center gap-1 font-black text-sm">

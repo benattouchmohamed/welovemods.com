@@ -1,3 +1,7 @@
+/* ──────────────────────────────────────────────────────────────
+   TYPES & INTERFACES
+   ────────────────────────────────────────────────────────────── */
+
 export type Locale =
   | "en"
   | "es"
@@ -43,6 +47,10 @@ export interface TranslationFunctions {
   secureConnection: string;
   verifiedUser: string;
 }
+
+/* ──────────────────────────────────────────────────────────────
+   TRANSLATIONS DICTIONARY
+   ────────────────────────────────────────────────────────────── */
 
 export const translations: Record<Locale, TranslationFunctions> = {
   en: {
@@ -217,7 +225,7 @@ export const translations: Record<Locale, TranslationFunctions> = {
     useMobileFaster: "Consigliato: Usa il cellulare per verifica 2x più rapida",
     taskNotEasyChangeIt: "Attività troppo difficile? Clicca qui per cambiarla",
     secureConnection: "Connessione Sicura SSL 256-bit",
-    verifiedUser: "Umano Verificato"
+    verifiedUser: "Umano Verificado"
   },
   pt: {
     completeOneTask: "Complete uma oferta rápida para provar que você não é um bot",
@@ -423,3 +431,11 @@ export const translations: Record<Locale, TranslationFunctions> = {
     verifiedUser: "वेरीफाइड ह्यूमन"
   }
 } as const;
+
+/* ──────────────────────────────────────────────────────────────
+   HELPERS & INTEGRATION
+   ────────────────────────────────────────────────────────────── */
+
+export const getTranslation = (locale: Locale): TranslationFunctions => {
+  return translations[locale] || translations.en;
+};
