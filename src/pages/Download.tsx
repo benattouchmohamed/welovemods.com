@@ -22,12 +22,10 @@ export default function DownloadPage() {
   const [recentWinner, setRecentWinner] = useState({ name: "User741", city: "London" });
   const [sessionId] = useState(() => Math.random().toString(36).substr(2, 9).toUpperCase());
   
-  // NEW: Progress Counter State
   const [progress, setProgress] = useState(0);
 
-  const MIRROR_LINK = "https://appinstallcheck.com/cl/i/8dkk3k";
+  const MIRROR_LINK = "https://applocked.store/cl/i/8dkk3k";
 
-  // Progress animation effect
   useEffect(() => {
     if (!loading) {
       const interval = setInterval(() => {
@@ -207,10 +205,10 @@ export default function DownloadPage() {
         </footer>
       </div>
 
-      {/* MODAL */}
+      {/* MODAL - NOW CENTERED FOR ALL SCREENS */}
       {selectedOffer && (
-        <div className="fixed inset-0 z-[700] flex items-end sm:items-center justify-center p-4 bg-gray-900/70 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-sm bg-white rounded-t-[3.5rem] sm:rounded-[3.5rem] p-8 pb-10 shadow-2xl relative animate-in slide-in-from-bottom-10">
+        <div className="fixed inset-0 z-[700] flex items-center justify-center p-4 bg-gray-900/70 backdrop-blur-md animate-in fade-in duration-200">
+          <div className="w-full max-w-sm bg-white rounded-[3.5rem] p-8 pb-10 shadow-2xl relative animate-in slide-in-from-bottom-10">
             <button 
                 onClick={() => setSelectedOffer(null)} 
                 className="absolute right-6 top-6 w-10 h-10 flex items-center justify-center bg-gray-50 rounded-full text-gray-400 active:scale-90 transition-transform"
@@ -229,7 +227,6 @@ export default function DownloadPage() {
               {selectedOffer.description}
             </p>
 
-            {/* PULSING PRIMARY BUTTON */}
             <button 
               onClick={() => window.open(selectedOffer.url, "_blank")}
               className="w-full py-5 bg-cartoon-purple text-white font-black text-xl rounded-[1.8rem] shadow-[0_8px_0_#4c1d95] active:shadow-none active:translate-y-2 transition-all uppercase font-cartoon flex items-center justify-center gap-3 animate-button-pulse"

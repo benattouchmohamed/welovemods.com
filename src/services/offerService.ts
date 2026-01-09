@@ -2,17 +2,14 @@ export interface Offer {
   id: string;
   title: string;
   description: string;
-  difficulty: "Easy" | "Standard";
+  difficulty: "Easy";
   timeEstimate: string;
   icon: string;
   url: string;
   image?: string;
   type?: string;
-  epc: number;
-  payout: number;
-  cpa: number;
-  score: number;
-  isHighCR: boolean;
+  epc?: number;
+  payout?: number;
 }
 
 interface ApiOffer {
@@ -26,7 +23,6 @@ interface ApiOffer {
   link?: string;
   epc?: string;
   category?: string;
-  cpa?: string;
 }
 
 interface ApiOfferResponse {
@@ -35,143 +31,150 @@ interface ApiOfferResponse {
   offers?: ApiOffer[];
 }
 
-const API_URL = "https://unlockcontent.net/api/v2";
-const TOKEN = "32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085";
-const FALLBACK = "https://appinstallcheck.com/cl/i/8dkk3k";
+// ────── Config ──────
+const API_BASE_URL = "https://unlockcontent.net/api/v2";
+const API_TOKEN =
+  "32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085";
+const FALLBACK_URL = "https://areyourealhuman.com/cl/i/g6pqp2";
 
-/* ──────────────────────────────────────────────────────────────
-   REEL PRO CONFIGURATION
-   ────────────────────────────────────────────────────────────── */
-const PRO_CONFIG = {
-  MIN_PAYOUT: 0.85,        // Floor to ignore low-paying offers
-  MIN_EPC: 0.20,           // Floor to ignore dead/non-converting offers
-  CTYPE: "1",             // Forced to 1 (CPI/App Installs) for high conversion
-  API_MAX: "15",          // Scan 15 offers to find the top 3 bangers
-  WEIGHT_CR: 0.85,        // Efficiency Weight (EPC vs Payout ratio)
-  WEIGHT_RAW: 0.15        // Raw EPC Weight
-};
+// نطلب CPI فقط → يرجع CPI + CPE معًا
+const CTYPE_CPI = 1;
 
-/* ──────────────────────────────────────────────────────────────
-   CORE PERFORMANCE ENGINE
-   ────────────────────────────────────────────────────────────── */
-
-const getDeviceType = () => {
-  if (typeof window === "undefined") return "android";
-  const ua = navigator.userAgent.toLowerCase();
-  if (ua.includes("iphone") || ua.includes("ipad")) return "ios";
-  return "android";
-};
-
-const getIP = async (): Promise<string> => {
+// ────── Helpers ──────
+const getVisitorIP = async (): Promise<string> => {
   try {
-    const r = await fetch("https://api.ipify.org?format=json");
-    const j = await r.json();
-    return j.ip ?? "1.1.1.1";
-  } catch { return "1.1.1.1"; }
+    const controller = new AbortController();
+    const timeoutId = setTimeout(() => controller.abort(), 5000);
+    const r = await fetch("https://api.ipify.org?format=json", {
+      signal: controller.signal,
+    });
+    clearTimeout(timeoutId);
+    const d = await r.json();
+    return d.ip ?? "127.0.0.1";
+  } catch {
+    console.warn("IP fetch failed → using fallback");
+    return "127.0.0.1";
+  }
 };
 
-const parseNumber = (v?: string): number => {
-  const n = Number(v);
-  return isNaN(n) ? 0 : n;
-};
+const parseFloatOrNull = (val?: string): number | null =>
+  val && !isNaN(parseFloat(val)) ? parseFloat(val) : null;
 
-/**
- * REEL PRO SCORER
- * Prioritizes "Tight" offers where EPC is closest to the Payout.
- */
-const calculateProScore = (epc: number, payout: number): number => {
-  if (payout <= 0 || epc <= 0) return 0;
-  const cr = epc / payout; // Real Conversion Rate
-  return (cr * PRO_CONFIG.WEIGHT_CR) + (epc * PRO_CONFIG.WEIGHT_RAW);
-};
-
-/* ──────────────────────────────────────────────────────────────
-   REEL PRO MAPPER
-   ────────────────────────────────────────────────────────────── */
-const mapOffer = (o: ApiOffer, i: number): Offer => {
-  const epc = parseNumber(o.epc);
-  const payout = parseNumber(o.payout);
-  const cr = payout > 0 ? epc / payout : 0;
-
-  // Real-time difficulty logic: High CR = Easy/Fast
-  const isFastTrack = cr > 0.35;
-
+const mapApiOfferToOffer = (api: ApiOffer, idx: number): Offer => {
+  const url = api.link && /^https?:\/\//i.test(api.link) ? api.link : FALLBACK_URL;
   return {
-    id: o.offerid ?? `pro-${i}-${Math.random().toString(36).substring(2, 7)}`,
-    title: o.name_short || o.name || "System Verification",
-    description: o.adcopy || o.description || "Complete this certified task to verify your session.",
-    difficulty: isFastTrack ? "Easy" : "Standard",
-    timeEstimate: isFastTrack ? "25s" : "45s",
-    icon: isFastTrack ? "Zap" : "ShieldCheck",
-    url: o.link?.startsWith("http") ? o.link : FALLBACK,
-    image: o.picture,
-    type: o.category,
-    epc,
-    payout,
-    cpa: parseNumber(o.cpa) || payout,
-    score: calculateProScore(epc, payout),
-    isHighCR: isFastTrack
+    id: api.offerid ?? `offer-${idx}`,
+    title: api.name_short ?? api.name ?? "Special Offer",
+    description: api.adcopy ?? api.description ?? "Complete this quick offer to continue",
+    difficulty: "Easy",
+    timeEstimate: "1-2 mins",
+    icon: "Gift",
+    url,
+    image: api.picture,
+    type: api.category,
+    epc: parseFloatOrNull(api.epc),
+    payout: parseFloatOrNull(api.payout),
   };
 };
 
-/* ──────────────────────────────────────────────────────────────
-   THE FILTER ENGINE (fetchOffers)
-   ────────────────────────────────────────────────────────────── */
+// ترتيب ذكي: CPI أولًا → EPC → Payout → ترتيب أصلي
+const sortWithCPIPriority = (
+  a: { offer: Offer; idx: number },
+  b: { offer: Offer; idx: number }
+): number => {
+  const typeA = a.offer.type?.toUpperCase() || "";
+  const typeB = b.offer.type?.toUpperCase() || "";
+
+  const isCPI_A = typeA.includes("CPI");
+  const isCPI_B = typeB.includes("CPI");
+
+  // 1. CPI دائمًا يفوز على CPE
+  if (isCPI_A && !isCPI_B) return -1;
+  if (!isCPI_A && isCPI_B) return 1;
+
+  // 2. إذا كانوا نفس النوع (كلهم CPI أو كلهم CPE) → أعلى EPC
+  const epcA = a.offer.epc ?? -Infinity;
+  const epcB = b.offer.epc ?? -Infinity;
+  if (epcA !== epcB) return epcB - epcA;
+
+  // 3. ثم أعلى payout
+  const payoutA = a.offer.payout ?? -Infinity;
+  const payoutB = b.offer.payout ?? -Infinity;
+  if (payoutA !== payoutB) return payoutB - payoutA;
+
+  // 4. الأقدم في الاستجابة الأصلية (الأعلى في القائمة)
+  return a.idx - b.idx;
+};
+
+// ────── Main Function ──────
 export const fetchOffers = async (): Promise<Offer[]> => {
   try {
-    const ip = await getIP();
-    const device = getDeviceType();
+    const visitorIP = await getVisitorIP();
+    const userAgent = navigator.userAgent;
+
+    const headers = {
+      Authorization: `Bearer ${API_TOKEN}`,
+      "Content-Type": "application/json",
+    };
+
+    // Timeout 10 ثواني
+    const timeoutSignal =
+      typeof AbortSignal.timeout === "function"
+        ? AbortSignal.timeout(10000)
+        : (() => {
+            const controller = new AbortController();
+            setTimeout(() => controller.abort(), 10000);
+            return controller.signal;
+          })();
 
     const params = new URLSearchParams({
-      ip,
-      user_agent: navigator.userAgent,
-      ctype: PRO_CONFIG.CTYPE,
-      max: PRO_CONFIG.API_MAX,
-      device: device
+      ip: visitorIP,
+      user_agent: userAgent,
+      ctype: CTYPE_CPI.toString(), // فقط CPI (يشمل CPE)
+      min: "5",   // نطلب أكثر لضمان وجود CPI
+      max: "8",
     });
 
-    const response = await fetch(`${API_URL}?${params}`, {
-      headers: { Authorization: `Bearer ${TOKEN}` },
-      cache: 'no-store'
+    const response = await fetch(`${API_BASE_URL}?${params}`, {
+      method: "GET",
+      headers,
+      signal: timeoutSignal,
     });
 
-    if (!response.ok) return [];
-    const data: ApiOfferResponse = await response.json();
-    const raw = data.offers ?? [];
-
-    // 1. Map all offers to Pro interface
-    const mapped = raw.map(mapOffer);
-
-    // 2. Strict Banger Filter (Remove trash)
-    const bangers = mapped.filter(o => (
-      o.payout >= PRO_CONFIG.MIN_PAYOUT && 
-      o.epc >= PRO_CONFIG.MIN_EPC &&
-      o.epc <= o.payout // Data sanity check
-    ));
-
-    // 3. Sort by Pro Score (Conversion Velocity)
-    const sorted = bangers.sort((a, b) => b.score - a.score);
-
-    // 4. Return Top 1 to 3
-    if (sorted.length > 0) {
-      return sorted.slice(0, 3);
+    if (!response.ok) {
+      console.warn("API request failed:", response.status);
+      return [];
     }
 
-    // Fallback: If no strict bangers, show top 2 unique by raw EPC
-    return Array.from(new Map(mapped.map(o => [o.id, o])).values())
-      .sort((a, b) => b.epc - a.epc)
-      .slice(0, 2);
+    const data: ApiOfferResponse = await response.json();
 
+    if (!data.success || !data.offers || data.offers.length === 0) {
+      console.warn("No offers returned from API");
+      return [];
+    }
+
+    // تحويل العروض + ترتيب ذكي
+    const processedOffers = data.offers
+      .map((apiOffer, index) => ({
+        offer: mapApiOfferToOffer(apiOffer, index),
+        idx: index,
+      }))
+      .sort(sortWithCPIPriority)
+      .slice(0, 2) // نأخذ أفضل 2 فقط
+      .map((item) => item.offer);
+
+    return processedOffers;
   } catch (error) {
-    console.error("Pro Engine Failure:", error);
+    console.error("fetchOffers failed:", error);
     return [];
   }
 };
 
-/* ──────────────────────────────────────────────────────────────
-   TOP OFFER (Hero Section)
-   ────────────────────────────────────────────────────────────── */
+// ────── Helper: أفضل عرض واحد فقط ──────
 export const getTopOffer = async (): Promise<Offer | null> => {
   const offers = await fetchOffers();
   return offers.length > 0 ? offers[0] : null;
 };
+
+// ────── (اختياري) للاستخدام المباشر في المتصفح ──────
+// getTopOffer().then(offer => console.log("Top Offer →", offer));
