@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, lazy, Suspense } from "react";
-import { X, ShieldCheck, ChevronRight, Star, Globe, Lock, Fingerprint, Activity, ShieldPlus } from "lucide-react";
+import { X, ShieldCheck, ChevronRight, Globe, Fingerprint, Activity, ShieldPlus, PlayCircle } from "lucide-react";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 
@@ -14,26 +14,28 @@ export default function DownloadPage() {
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
+  const [showTutorial, setShowTutorial] = useState(false);
   const [gameName, setGameName] = useState("Mod");
   const [gameImage, setGameImage] = useState<string | null>(null);
   
   const [userCity, setUserCity] = useState("Global");
   const [showToast, setShowToast] = useState(false);
   const [recentWinner, setRecentWinner] = useState({ name: "User741", city: "London" });
- 
   const [progress, setProgress] = useState(0);
 
   const MIRROR_LINK = "https://applocked.store/cl/i/8dkk3k";
 
+  // Progress Bar Logic
   useEffect(() => {
     if (!loading) {
       const interval = setInterval(() => {
-        setProgress(prev => (prev < 0 ? prev + 1 : 99));
-      }, 100);
+        setProgress(prev => (prev < 99 ? prev + 1 : 99));
+      }, 150);
       return () => clearInterval(interval);
     }
   }, [loading]);
 
+  // Geo-location Logic
   useEffect(() => {
     const fetchGeo = async () => {
       try {
@@ -45,6 +47,7 @@ export default function DownloadPage() {
     fetchGeo();
   }, []);
 
+  // Live Notifications
   useEffect(() => {
     const names = ["Alex", "Sultan", "Matteo", "Yuki", "Priya", "Carlos", "Emma", "Muller"];
     const cities = ["New York", "Dubai", "Rome", "Tokyo", "Mumbai", "Madrid", "Berlin", "Paris"];
@@ -55,10 +58,11 @@ export default function DownloadPage() {
       });
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3500);
-    }, 70000);
+    }, 12000);
     return () => clearInterval(interval);
   }, []);
 
+  // Data Loading
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setGameName(params.get("game") || "Premium Mod");
@@ -87,7 +91,7 @@ export default function DownloadPage() {
   return (
     <div className="min-h-[100dvh] bg-cartoon-cream selection:bg-cartoon-purple/20 overflow-x-hidden pb-10" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       
-      {/* MOBILE TOAST */}
+      {/* NOTIFICATION TOAST */}
       <div className={`fixed top-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:top-auto sm:w-72 z-[600] transition-all duration-500 transform ${showToast ? 'translate-y-0 opacity-100' : '-translate-y-12 opacity-0'}`}>
         <div className="bg-white/95 backdrop-blur-md border-2 border-cartoon-green/20 p-3 rounded-2xl shadow-xl flex items-center gap-3">
           <div className="w-9 h-9 bg-cartoon-green/10 rounded-xl flex items-center justify-center text-cartoon-green flex-shrink-0">
@@ -103,7 +107,6 @@ export default function DownloadPage() {
         
         <header className="flex justify-between items-center">
           <div className="space-y-1">
-           
             <div className="flex items-center gap-1 text-[10px] font-bold text-gray-500">
               <Globe size={10} className="text-cartoon-purple" />
               <span className="opacity-70">{i18n.playerFrom}</span> <span className="text-gray-900">{userCity}</span>
@@ -117,10 +120,7 @@ export default function DownloadPage() {
         {/* HERO SECTION */}
         <section className="bg-white rounded-[2.5rem] p-6 text-center border-[4px] border-white shadow-xl relative overflow-hidden">
           <div className="absolute inset-0 bg-gradient-to-b from-cartoon-purple/5 to-transparent pointer-events-none" />
-          
           <div className="relative z-10">
-          
-
             {gameImage && (
               <div className="relative flex justify-center mb-4">
                 <div className="w-20 h-20 rounded-3xl overflow-hidden border-[4px] border-cartoon-cream shadow-lg relative group active:scale-95 transition-transform">
@@ -131,7 +131,6 @@ export default function DownloadPage() {
                 </div>
               </div>
             )}
-
             <h1 className="text-[26px] font-black text-gray-800 leading-[1.1] mb-2 uppercase font-cartoon tracking-tight">
               {i18n.completeOneTask}
             </h1>
@@ -163,9 +162,23 @@ export default function DownloadPage() {
           </div>
         </div>
 
-     {/* TASK LIST */}
-        <div className="space-y-4">
+        {/* TUTORIAL TRIGGER */}
+        <div className="px-2">
+          <button 
+            onClick={() => setShowTutorial(true)}
+            className="w-full py-3.5 bg-white border-2 border-dashed border-cartoon-purple/30 rounded-2xl flex items-center justify-center gap-2 group hover:border-cartoon-purple transition-all active:scale-95"
+          >
+            <div className="w-7 h-7 bg-cartoon-purple/10 rounded-lg flex items-center justify-center text-cartoon-purple">
+              <PlayCircle size={18} className="animate-pulse" />
+            </div>
+            <span className="text-[11px] font-black text-gray-600 uppercase tracking-widest group-hover:text-cartoon-purple">
+               {i18n.howToComplete || "Tutorial: How to Unlock"}
+            </span>
+          </button>
+        </div>
 
+        {/* TASK LIST */}
+        <div className="space-y-4">
           {offers.map((offer, index) => (
             <button 
               key={offer.id}
@@ -193,6 +206,7 @@ export default function DownloadPage() {
             </button>
           ))}
         </div>
+
         <footer className="text-center pt-6 pb-4 opacity-40">
             <p className="text-gray-400 text-[8px] font-black uppercase tracking-[0.3em]">
               CloudShield Secured © 2026 • Node: {userCity}
@@ -200,7 +214,7 @@ export default function DownloadPage() {
         </footer>
       </div>
 
-      {/* MODAL - NOW CENTERED FOR ALL SCREENS */}
+      {/* TASK MODAL */}
       {selectedOffer && (
         <div className="fixed inset-0 z-[700] flex items-center justify-center p-4 bg-gray-900/70 backdrop-blur-md animate-in fade-in duration-200">
           <div className="w-full max-w-sm bg-white rounded-[3.5rem] p-8 pb-10 shadow-2xl relative animate-in slide-in-from-bottom-10">
@@ -229,6 +243,47 @@ export default function DownloadPage() {
               <Fingerprint size={24} />
               {i18n.completeOfferBtn}
             </button>
+          </div>
+        </div>
+      )}
+
+      {/* TUTORIAL VIDEO MODAL */}
+      {showTutorial && (
+        <div className="fixed inset-0 z-[800] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
+          <div className="w-full max-w-md aspect-[9/16] max-h-[85vh] bg-black rounded-[3rem] overflow-hidden relative border-4 border-white/10 shadow-2xl">
+            
+            {/* Header */}
+            <div className="absolute top-0 inset-x-0 p-6 bg-gradient-to-b from-black/90 to-transparent z-10 flex justify-between items-start">
+              <div className="space-y-1">
+                <h3 className="text-white font-black text-lg uppercase tracking-tight leading-none">Unlock Guide</h3>
+                <p className="text-cartoon-green text-[9px] font-black uppercase tracking-[0.2em] animate-pulse">Live Playback</p>
+              </div>
+              <button 
+                onClick={() => setShowTutorial(false)}
+                className="w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all active:scale-90"
+              >
+                <X size={20} strokeWidth={3} />
+              </button>
+            </div>
+
+            {/* Video Player */}
+            <div className="w-full h-full bg-black flex items-center justify-center">
+              <video 
+                src="/how-to-complete-tasks.MOV"
+                className="w-full h-full object-cover"
+                autoPlay 
+                controls
+                playsInline
+                onEnded={() => setShowTutorial(false)} // AUTO BACK LOGIC HERE
+              >
+                Your browser does not support the video tag.
+              </video>
+            </div>
+
+            {/* Bottom Floating Tip */}
+            <div className="absolute bottom-6 inset-x-6 z-10">
+               
+            </div>
           </div>
         </div>
       )}
