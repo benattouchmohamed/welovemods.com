@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, lazy, Suspense } from "react";
-import { X, ShieldCheck, ChevronRight, Globe, Fingerprint, Activity, ShieldPlus, PlayCircle } from "lucide-react";
+import { X, ShieldCheck, ChevronRight, Globe, Fingerprint, Activity, ShieldPlus, PlayCircle, Loader2 } from "lucide-react";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 
@@ -15,6 +15,7 @@ export default function DownloadPage() {
   const [loading, setLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
+  const [videoLoading, setVideoLoading] = useState(true); // NEW: Video loading state
   const [gameName, setGameName] = useState("Mod");
   const [gameImage, setGameImage] = useState<string | null>(null);
   
@@ -30,7 +31,7 @@ export default function DownloadPage() {
     if (!loading) {
       const interval = setInterval(() => {
         setProgress(prev => (prev < 99 ? prev + 1 : 99));
-      }, 150);
+      }, 20);
       return () => clearInterval(interval);
     }
   }, [loading]);
@@ -165,7 +166,7 @@ export default function DownloadPage() {
         {/* TUTORIAL TRIGGER */}
         <div className="px-2">
           <button 
-            onClick={() => setShowTutorial(true)}
+            onClick={() => { setShowTutorial(true); setVideoLoading(true); }}
             className="w-full py-3.5 bg-white border-2 border-dashed border-cartoon-purple/30 rounded-2xl flex items-center justify-center gap-2 group hover:border-cartoon-purple transition-all active:scale-95"
           >
             <div className="w-7 h-7 bg-cartoon-purple/10 rounded-lg flex items-center justify-center text-cartoon-purple">
@@ -252,8 +253,16 @@ export default function DownloadPage() {
         <div className="fixed inset-0 z-[800] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
           <div className="w-full max-w-md aspect-[9/16] max-h-[85vh] bg-black rounded-[3rem] overflow-hidden relative border-4 border-white/10 shadow-2xl">
             
+            {/* Loading Overlay */}
+            {videoLoading && (
+              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black">
+                <Loader2 size={40} className="text-cartoon-purple animate-spin mb-4" />
+                <p className="text-white/40 font-black text-[10px] uppercase tracking-widest">Optimizing Video...</p>
+              </div>
+            )}
+
             {/* Header */}
-            <div className="absolute top-0 inset-x-0 p-6 bg-gradient-to-b from-black/90 to-transparent z-10 flex justify-between items-start">
+            <div className="absolute top-0 inset-x-0 p-6 bg-gradient-to-b from-black/90 to-transparent z-30 flex justify-between items-start">
               <div className="space-y-1">
                 <h3 className="text-white font-black text-lg uppercase tracking-tight leading-none">Unlock Guide</h3>
                 <p className="text-cartoon-green text-[9px] font-black uppercase tracking-[0.2em] animate-pulse">Live Playback</p>
@@ -274,15 +283,11 @@ export default function DownloadPage() {
                 autoPlay 
                 controls
                 playsInline
-                onEnded={() => setShowTutorial(false)} // AUTO BACK LOGIC HERE
+                onCanPlayThrough={() => setVideoLoading(false)} // HIDE LOADING WHEN READY
+                onEnded={() => setShowTutorial(false)} // AUTO BACK LOGIC
               >
                 Your browser does not support the video tag.
               </video>
-            </div>
-
-            {/* Bottom Floating Tip */}
-            <div className="absolute bottom-6 inset-x-6 z-10">
-               
             </div>
           </div>
         </div>
