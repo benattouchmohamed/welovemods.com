@@ -92,7 +92,7 @@ const GameDetail = memo(() => {
   return (
     <>
       <Helmet>
-        <title>{game?.title} Mod APK 2025 | WeLoveMods</title>
+        <title>{game?.title} Mod APK 2026 | WeLoveMods</title>
       </Helmet>
 
       <main className="min-h-screen bg-[#FDFCF0] pt-12 pb-12 px-4">

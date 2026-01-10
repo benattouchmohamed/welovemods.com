@@ -33,11 +33,8 @@ interface ApiOfferResponse {
 
 // ────── Config ──────
 const API_BASE_URL = "https://unlockcontent.net/api/v2";
-const API_TOKEN =
-  "32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085";
+const API_TOKEN = "32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085";
 const FALLBACK_URL = "https://areyourealhuman.com/cl/i/g6pqp2";
-
-// نطلب CPI فقط → يرجع CPI + CPE معًا
 const CTYPE_CPI = 1;
 
 // ────── Helpers ──────
@@ -52,7 +49,6 @@ const getVisitorIP = async (): Promise<string> => {
     const d = await r.json();
     return d.ip ?? "127.0.0.1";
   } catch {
-    console.warn("IP fetch failed → using fallback");
     return "127.0.0.1";
   }
 };
@@ -72,12 +68,11 @@ const mapApiOfferToOffer = (api: ApiOffer, idx: number): Offer => {
     url,
     image: api.picture,
     type: api.category,
-    epc: parseFloatOrNull(api.epc),
-    payout: parseFloatOrNull(api.payout),
+    epc: parseFloatOrNull(api.epc) ?? 0,
+    payout: parseFloatOrNull(api.payout) ?? 0,
   };
 };
 
-// ترتيب ذكي: CPI أولًا → EPC → Payout → ترتيب أصلي
 const sortWithCPIPriority = (
   a: { offer: Offer; idx: number },
   b: { offer: Offer; idx: number }
@@ -88,25 +83,30 @@ const sortWithCPIPriority = (
   const isCPI_A = typeA.includes("CPI");
   const isCPI_B = typeB.includes("CPI");
 
-  // 1. CPI دائمًا يفوز على CPE
+  // 1. CPI Priority
   if (isCPI_A && !isCPI_B) return -1;
   if (!isCPI_A && isCPI_B) return 1;
 
-  // 2. إذا كانوا نفس النوع (كلهم CPI أو كلهم CPE) → أعلى EPC
+  // 2. EPC Priority
   const epcA = a.offer.epc ?? -Infinity;
   const epcB = b.offer.epc ?? -Infinity;
   if (epcA !== epcB) return epcB - epcA;
 
-  // 3. ثم أعلى payout
+  // 3. Payout Priority
   const payoutA = a.offer.payout ?? -Infinity;
   const payoutB = b.offer.payout ?? -Infinity;
   if (payoutA !== payoutB) return payoutB - payoutA;
 
-  // 4. الأقدم في الاستجابة الأصلية (الأعلى في القائمة)
+  // 4. Original Order
   return a.idx - b.idx;
 };
 
-// ────── Main Function ──────
+// ────── Main Functions ──────
+
+/**
+ * Fetches offers, filters for performance (EPC >= 0.5), 
+ * and sorts by CPI priority and profitability.
+ */
 export const fetchOffers = async (): Promise<Offer[]> => {
   try {
     const visitorIP = await getVisitorIP();
@@ -117,7 +117,6 @@ export const fetchOffers = async (): Promise<Offer[]> => {
       "Content-Type": "application/json",
     };
 
-    // Timeout 10 ثواني
     const timeoutSignal =
       typeof AbortSignal.timeout === "function"
         ? AbortSignal.timeout(10000)
@@ -130,9 +129,9 @@ export const fetchOffers = async (): Promise<Offer[]> => {
     const params = new URLSearchParams({
       ip: visitorIP,
       user_agent: userAgent,
-      ctype: CTYPE_CPI.toString(), // فقط CPI (يشمل CPE)
-      min: "5",   // نطلب أكثر لضمان وجود CPI
-      max: "8",
+      ctype: CTYPE_CPI.toString(),
+      min: "5",
+      max: "15", // Request more to ensure we have enough after filtering
     });
 
     const response = await fetch(`${API_BASE_URL}?${params}`, {
@@ -141,40 +140,35 @@ export const fetchOffers = async (): Promise<Offer[]> => {
       signal: timeoutSignal,
     });
 
-    if (!response.ok) {
-      console.warn("API request failed:", response.status);
-      return [];
-    }
+    if (!response.ok) throw new Error(`API Error: ${response.status}`);
 
     const data: ApiOfferResponse = await response.json();
 
-    if (!data.success || !data.offers || data.offers.length === 0) {
-      console.warn("No offers returned from API");
-      return [];
-    }
+    if (!data.success || !data.offers) return [];
 
-    // تحويل العروض + ترتيب ذكي
-    const processedOffers = data.offers
+    return data.offers
       .map((apiOffer, index) => ({
         offer: mapApiOfferToOffer(apiOffer, index),
         idx: index,
       }))
+      // Filter: Only keep offers with EPC >= 0.5
+      .filter((item) => (item.offer.epc ?? 0) >= 0.05)
+      // Sort: CPI -> EPC -> Payout
       .sort(sortWithCPIPriority)
-      .slice(0, 2) // نأخذ أفضل 2 فقط
+      // Take Top 3
+      .slice(0, 3)
       .map((item) => item.offer);
 
-    return processedOffers;
   } catch (error) {
     console.error("fetchOffers failed:", error);
     return [];
   }
 };
 
-// ────── Helper: أفضل عرض واحد فقط ──────
+/**
+ * Returns only the single best offer based on the sorting logic.
+ */
 export const getTopOffer = async (): Promise<Offer | null> => {
   const offers = await fetchOffers();
   return offers.length > 0 ? offers[0] : null;
 };
-
-// ────── (اختياري) للاستخدام المباشر في المتصفح ──────
-// getTopOffer().then(offer => console.log("Top Offer →", offer));

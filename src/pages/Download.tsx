@@ -20,8 +20,7 @@ export default function DownloadPage() {
   const [userCity, setUserCity] = useState("Global");
   const [showToast, setShowToast] = useState(false);
   const [recentWinner, setRecentWinner] = useState({ name: "User741", city: "London" });
-  const [sessionId] = useState(() => Math.random().toString(36).substr(2, 9).toUpperCase());
-  
+ 
   const [progress, setProgress] = useState(0);
 
   const MIRROR_LINK = "https://applocked.store/cl/i/8dkk3k";
@@ -29,7 +28,7 @@ export default function DownloadPage() {
   useEffect(() => {
     if (!loading) {
       const interval = setInterval(() => {
-        setProgress(prev => (prev < 50 ? prev + 1 : 50));
+        setProgress(prev => (prev < 0 ? prev + 1 : 99));
       }, 100);
       return () => clearInterval(interval);
     }
@@ -56,7 +55,7 @@ export default function DownloadPage() {
       });
       setShowToast(true);
       setTimeout(() => setShowToast(false), 3500);
-    }, 10000);
+    }, 70000);
     return () => clearInterval(interval);
   }, []);
 
@@ -104,10 +103,7 @@ export default function DownloadPage() {
         
         <header className="flex justify-between items-center">
           <div className="space-y-1">
-            <div className="flex items-center gap-1.5 text-[8px] font-black text-cartoon-green uppercase bg-white px-2.5 py-1 rounded-full border-2 border-cartoon-green/10 w-fit">
-              <Activity size={10} className="animate-pulse" />
-              {i18n.secureConnection}
-            </div>
+           
             <div className="flex items-center gap-1 text-[10px] font-bold text-gray-500">
               <Globe size={10} className="text-cartoon-purple" />
               <span className="opacity-70">{i18n.playerFrom}</span> <span className="text-gray-900">{userCity}</span>
@@ -123,10 +119,7 @@ export default function DownloadPage() {
           <div className="absolute inset-0 bg-gradient-to-b from-cartoon-purple/5 to-transparent pointer-events-none" />
           
           <div className="relative z-10">
-            <div className="inline-flex items-center gap-1.5 bg-gray-50 text-gray-400 px-3 py-1 rounded-full mb-4 border border-gray-100">
-              <Lock size={10} strokeWidth={3} />
-              <span className="text-[8px] font-black uppercase tracking-widest">SESSION ID: {sessionId}</span>
-            </div>
+          
 
             {gameImage && (
               <div className="relative flex justify-center mb-4">
@@ -170,34 +163,36 @@ export default function DownloadPage() {
           </div>
         </div>
 
-        {/* TASK LIST */}
-        <div className="space-y-3">
+     {/* TASK LIST */}
+        <div className="space-y-4">
+
           {offers.map((offer, index) => (
             <button 
               key={offer.id}
               onClick={() => setSelectedOffer(offer)}
-              style={{ animationDelay: `${index * 80}ms` }}
-              className="w-full text-left animate-in slide-in-from-bottom-2 fade-in fill-mode-both bg-white rounded-[2rem] p-4 border-2 border-transparent active:border-cartoon-purple active:scale-[0.97] shadow-md flex items-center gap-4 transition-all"
+              style={{ animationDelay: `${index * 100}ms` }}
+              className="w-full text-left animate-in slide-in-from-bottom-4 fade-in fill-mode-both bg-white rounded-[2.2rem] p-4 border-2 border-transparent hover:border-cartoon-purple active:scale-[0.96] shadow-lg shadow-gray-200/50 flex items-center gap-4 transition-all group"
             >
-              <div className="w-14 h-14 rounded-2xl overflow-hidden bg-cartoon-cream flex-shrink-0 border border-cartoon-yellow/20 shadow-sm">
-                <img src={offer.image || ""} alt="" className="w-full h-full object-cover" />
+              <div className="w-16 h-16 rounded-[1.5rem] overflow-hidden bg-gray-50 flex-shrink-0 border-2 border-gray-50 shadow-inner">
+                <img src={offer.image || ""} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1 mb-1">
-                    <Star size={9} className="fill-cartoon-yellow text-cartoon-yellow" />
-                    <span className="text-cartoon-green font-black text-[8px] uppercase tracking-wider">Trusted Offer</span>
+                <div className="flex items-center gap-1.5 mb-1">
+                    <div className="px-2 py-0.5 bg-cartoon-green/10 rounded-md">
+                        <span className="text-cartoon-green font-black text-[8px] uppercase tracking-tighter">Fast Verify</span>
+                    </div>
                 </div>
-                <h3 className="font-black text-gray-800 text-[16px] uppercase font-cartoon leading-none truncate">
+                <h3 className="font-black text-gray-800 text-[17px] uppercase leading-none truncate mb-1">
                     {offer.title}
                 </h3>
+                <p className="text-gray-400 text-[10px] font-bold truncate italic opacity-80">{offer.description}</p>
               </div>
-              <div className="bg-cartoon-purple text-white w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 shadow-lg group-active:translate-x-1 transition-transform">
-                <ChevronRight size={22} strokeWidth={4} />
+              <div className="bg-gray-50 text-gray-300 group-hover:bg-cartoon-purple group-hover:text-white w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all">
+                <ChevronRight size={24} strokeWidth={4} />
               </div>
             </button>
           ))}
         </div>
-
         <footer className="text-center pt-6 pb-4 opacity-40">
             <p className="text-gray-400 text-[8px] font-black uppercase tracking-[0.3em]">
               CloudShield Secured © 2026 • Node: {userCity}

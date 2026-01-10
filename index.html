@@ -6,7 +6,7 @@
       name="viewport"
       content="width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
     />
-    <title>WeLoveMods - Download MOD APK Games & Premium Apps (2025 Update)</title>
+    <title>WeLoveMods - Download MOD APK Games & Premium Apps (2026 Update)</title>
 
     <meta
       name="description"
@@ -14,13 +14,46 @@
     />
     <meta
       name="keywords"
-      content="mod apk, modded games, download mod apk 2025, android mods, unlimited money, unlocked all, free premium apps, hacked games, latest mod apk, welovemods, appsmod, happymod alternative, apkdone, moddroid, mod games, paid apps free download"
+      content="mod apk, modded games, download mod apk, android mods, unlimited money, unlocked all, free premium apps, hacked games, latest mod apk, welovemods, appsmod, happymod alternative, apkdone, moddroid, mod games, paid apps free download"
     />
     <meta name="author" content="WeLoveMods Team" />
     <meta name="robots" content="index, follow" />
     <meta name="theme-color" content="#0d5ea8" />
 
-    <!-- Google tag (gtag.js) -->
+    <script>
+      (function() {
+        document.addEventListener("DOMContentLoaded", function() {
+          const currentYear = new Date().getFullYear();
+          const elementsToUpdate = [
+            { selector: 'title', attr: null },
+            { selector: 'meta[name="description"]', attr: 'content' },
+            { selector: 'meta[property="og:title"]', attr: 'content' },
+            { selector: 'meta[property="og:description"]', attr: 'content' },
+            { selector: 'meta[name="twitter:title"]', attr: 'content' },
+            { selector: 'meta[name="twitter:description"]', attr: 'content' }
+          ];
+
+          elementsToUpdate.forEach(item => {
+            const el = document.querySelector(item.selector);
+            if (el) {
+              if (item.attr) {
+                const oldVal = el.getAttribute(item.attr);
+                el.setAttribute(item.attr, oldVal.replace(/202[0-9]/g, currentYear));
+              } else {
+                el.innerText = el.innerText.replace(/202[0-9]/g, currentYear);
+              }
+            }
+          });
+
+          // Update JSON-LD Structured Data
+          const jsonLd = document.querySelector('script[type="application/ld+json"]');
+          if (jsonLd) {
+            jsonLd.innerText = jsonLd.innerText.replace(/202[0-9]/g, currentYear);
+          }
+        });
+      })();
+    </script>
+
     <script async src="https://www.googletagmanager.com/gtag/js?id=G-T9LSFGGG3Q"></script>
     <script>
       window.dataLayer = window.dataLayer || [];
@@ -29,48 +62,37 @@
       gtag('config', 'G-T9LSFGGG3Q');
     </script>
 
-    <!-- Open Graph / Facebook -->
     <meta property="og:type" content="website" />
     <meta property="og:url" content="https://welovemods.com/" />
     <meta property="og:title" content="WeLoveMods - Download MOD APK Games & Premium Apps (2025)" />
     <meta property="og:description" content="Get the best MOD APK games and premium Android apps for free. Unlocked, safe, and updated daily – only on WeLoveMods." />
     <meta property="og:image" content="https://welovemods.com/images/og-image.jpg" />
 
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image" />
     <meta name="twitter:url" content="https://welovemods.com/" />
     <meta name="twitter:title" content="WeLoveMods - Download MOD APK Games & Premium Apps (2025)" />
     <meta name="twitter:description" content="Get free modded Android games with unlimited coins, unlocked levels, and premium apps. Safe & fast downloads – WeLoveMods 2025." />
     <meta name="twitter:image" content="https://welovemods.com/images/og-image.jpg" />
 
-    <!-- Canonical -->
     <link rel="canonical" href="https://welovemods.com/" />
-
-    <!-- Favicon -->
     <link rel="icon" type="image/png" href="/favicon.ico" sizes="32x32" />
     <link rel="apple-touch-icon" href="/favicon.ico" />
-
-    <!-- Manifest (only if you have the file in /public/site.webmanifest) -->
     <link rel="manifest" href="/site.webmanifest" />
-
-    <!-- Preconnect to your CDN -->
     <link rel="preconnect" href="https://cdn.gpteng.co" />
 
-    <!-- PWA meta tags -->
     <meta name="mobile-web-app-capable" content="yes" />
     <meta name="apple-mobile-web-app-capable" content="yes" />
     <meta name="application-name" content="WeLoveMods" />
     <meta name="apple-mobile-web-app-title" content="WeLoveMods" />
     <meta name="msapplication-starturl" content="/" />
 
-    <!-- Structured Data (JSON-LD) -->
     <script type="application/ld+json">
       {
         "@context": "https://schema.org",
         "@type": "WebSite",
         "name": "WeLoveMods",
         "url": "https://welovemods.com/",
-        "description": "Download MOD APK games and premium Android apps for free. Unlocked, safe, and updated daily – only on WeLoveMods.",
+        "description": "Download MOD APK games and premium Android apps for free. Unlocked, safe, and updated daily – only on WeLoveMods (2025).",
         "publisher": {
           "@type": "Organization",
           "name": "WeLoveMods Team",
@@ -84,14 +106,11 @@
       }
     </script>
 
-    <!-- This is the ONLY script tag you need for your React app (Vite handles everything else) -->
     <script type="module" crossorigin src="/src/main.tsx"></script>
   </head>
 
   <body>
     <div id="root"></div>
-
-    <!-- Optional external script (GPT Engineer or any other) -->
     <script src="https://cdn.gpteng.co/gptengineer.js" type="module"></script>
   </body>
 </html>
