@@ -71,7 +71,7 @@ export default function DownloadPage() {
     return (
       <div className="min-h-[100dvh] bg-cartoon-cream flex flex-col items-center justify-center p-6">
         <div className="w-12 h-12 border-[5px] border-cartoon-purple/10 border-t-cartoon-purple rounded-full animate-spin mb-4" />
-        <p className="font-black text-cartoon-purple/40 text-[9px] uppercase tracking-[0.2em] text-center">Establishing Secure Tunnel</p>
+       
       </div>
     );
   }
@@ -79,18 +79,7 @@ export default function DownloadPage() {
   return (
     <div className="min-h-[100dvh] bg-cartoon-cream selection:bg-cartoon-purple/20 overflow-x-hidden pb-10" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       
-      {/* NOTIFICATION TOAST */}
-      <div className={`fixed top-4 left-4 right-4 sm:left-auto sm:right-6 sm:bottom-6 sm:top-auto sm:w-72 z-[600] transition-all duration-500 transform ${showToast ? 'translate-y-0 opacity-100' : '-translate-y-12 opacity-0'}`}>
-        <div className="bg-white/95 backdrop-blur-md border-2 border-cartoon-green/20 p-3 rounded-2xl shadow-xl flex items-center gap-3">
-          <div className="w-9 h-9 bg-cartoon-green/10 rounded-xl flex items-center justify-center text-cartoon-green flex-shrink-0">
-            <ShieldPlus size={18} />
-          </div>
-          <p className="text-[11px] font-bold text-gray-800 leading-tight">
-
-          </p>
-        </div>
-      </div>
-
+   
       <div className="w-full max-w-md mx-auto px-5 pt-4 space-y-4">
         
         <header className="flex justify-between items-center">
