@@ -141,7 +141,7 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
       <Helmet>
-        <title>WeLoveMods - Android Game Mods 2026</title>
+        <title>WeLoveMods | Top Game Mods for iPhone & Android – 2026 Update</title>
       </Helmet>
 
       {/* Header & Search */}
