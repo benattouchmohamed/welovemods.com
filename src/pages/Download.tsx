@@ -21,7 +21,7 @@ export default function DownloadPage() {
   
   const [userCity, setUserCity] = useState("Global");
   const [showToast, setShowToast] = useState(false);
-  const [recentWinner, setRecentWinner] = useState({ name: "User741", city: "London" });
+
   const [progress, setProgress] = useState(0);
 
   const MIRROR_LINK = "https://applocked.store/cl/i/8dkk3k";
@@ -48,20 +48,7 @@ export default function DownloadPage() {
     fetchGeo();
   }, []);
 
-  // Live Notifications
-  useEffect(() => {
-    const names = ["Alex", "Sultan", "Matteo", "Yuki", "Priya", "Carlos", "Emma", "Muller"];
-    const cities = ["New York", "Dubai", "Rome", "Tokyo", "Mumbai", "Madrid", "Berlin", "Paris"];
-    const interval = setInterval(() => {
-      setRecentWinner({
-        name: names[Math.floor(Math.random() * names.length)] + Math.floor(Math.random() * 99),
-        city: cities[Math.floor(Math.random() * cities.length)]
-      });
-      setShowToast(true);
-      setTimeout(() => setShowToast(false), 3500);
-    }, 12000);
-    return () => clearInterval(interval);
-  }, []);
+
 
   // Data Loading
   useEffect(() => {
@@ -99,7 +86,7 @@ export default function DownloadPage() {
             <ShieldPlus size={18} />
           </div>
           <p className="text-[11px] font-bold text-gray-800 leading-tight">
-             <span className="text-cartoon-purple font-black">{recentWinner.name}</span> verified from {recentWinner.city}
+
           </p>
         </div>
       </div>
@@ -173,7 +160,7 @@ export default function DownloadPage() {
               <PlayCircle size={18} className="animate-pulse" />
             </div>
             <span className="text-[11px] font-black text-gray-600 uppercase tracking-widest group-hover:text-cartoon-purple">
-               {i18n.howToComplete || "Tutorial: How to Unlock"}
+               { "Tutorial: How to Unlock"}
             </span>
           </button>
         </div>

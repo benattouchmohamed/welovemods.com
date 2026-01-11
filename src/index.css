@@ -39,7 +39,7 @@
   --cartoon-yellow: 50 95% 55%;
 
   /* Gradients */
-  --gradient-sky: linear-gradient(180deg, hsl(200, 80%, 50%), hsl(200, 80%, 70%));
+  /* --gradient-sky: linear-gradient(180deg, hsl(200, 80%, 50%), hsl(200, 80%, 70%)); */
   --gradient-blue: linear-gradient(45deg, hsl(210, 90%, 55%), hsl(190, 90%, 50%));
   --gradient-pink: linear-gradient(45deg, hsl(330, 85%, 60%), hsl(310, 90%, 65%));
   --gradient-purple: linear-gradient(45deg, hsl(290, 80%, 45%), hsl(270, 80%, 50%));
