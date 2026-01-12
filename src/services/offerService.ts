@@ -156,7 +156,7 @@ export const fetchOffers = async (): Promise<Offer[]> => {
       // Sort: CPI -> EPC -> Payout
       .sort(sortWithCPIPriority)
       // Take Top 3
-      .slice(0, 3)
+      .slice(0, 1)
       .map((item) => item.offer);
 
   } catch (error) {
