@@ -70,14 +70,14 @@ export default function DownloadPage() {
   if (loading) {
     return (
       <div className="min-h-[100dvh] bg-cartoon-cream flex flex-col items-center justify-center p-6">
-        <div className="w-12 h-12 border-[5px] border-cartoon-purple/10 border-t-cartoon-purple rounded-full animate-spin mb-4" />
+        <div className="w-12 h-12 border-[5px] border-cartoon-BLUE/10 border-t-cartoon-blue rounded-full animate-spin mb-4" />
        
       </div>
     );
   }
 
   return (
-    <div className="min-h-[100dvh] bg-cartoon-cream selection:bg-cartoon-purple/20 overflow-x-hidden pb-10" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="min-h-[100dvh] bg-cartoon-cream selection:bg-cartoon-BLUE/20 overflow-x-hidden pb-10" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       
    
       <div className="w-full max-w-md mx-auto px-5 pt-4 space-y-4">
@@ -85,7 +85,7 @@ export default function DownloadPage() {
         <header className="flex justify-between items-center">
           <div className="space-y-1">
             <div className="flex items-center gap-1 text-[10px] font-bold text-gray-500">
-              <Globe size={10} className="text-cartoon-purple" />
+              <Globe size={10} className="text-cartoon-BLUE" />
               <span className="opacity-70">{i18n.playerFrom}</span> <span className="text-gray-900">{userCity}</span>
             </div>
           </div>
@@ -96,13 +96,13 @@ export default function DownloadPage() {
 
         {/* HERO SECTION */}
         <section className="bg-white rounded-[2.5rem] p-6 text-center border-[4px] border-white shadow-xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-cartoon-purple/5 to-transparent pointer-events-none" />
+          <div className="absolute inset-0 bg-gradient-to-b from-cartoon-blue/5 to-transparent pointer-events-none" />
           <div className="relative z-10">
             {gameImage && (
               <div className="relative flex justify-center mb-4">
                 <div className="w-20 h-20 rounded-3xl overflow-hidden border-[4px] border-cartoon-cream shadow-lg relative group active:scale-95 transition-transform">
                     <img src={gameImage} alt={gameName} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-cartoon-purple/10 flex items-center justify-center">
+                    <div className="absolute inset-0 bg-cartoon-blue/10 flex items-center justify-center">
                         <ShieldCheck size={24} className="text-white drop-shadow-md" />
                     </div>
                 </div>
@@ -121,7 +121,7 @@ export default function DownloadPage() {
         <div className="bg-white rounded-[2rem] p-5 shadow-lg border-b-4 border-black/5 space-y-3">
           <div className="flex justify-between items-end">
             <div>
-              <p className="text-cartoon-purple font-black text-[9px] uppercase tracking-widest leading-none mb-1">{i18n.autoRedirect}</p>
+              <p className="text-cartoon-blue font-black text-[9px] uppercase tracking-widest leading-none mb-1">{i18n.autoRedirect}</p>
               <p className="text-gray-800 font-black text-sm uppercase">{i18n.offersCompleted(0, 1)}</p>
             </div>
             <div className="text-right">
@@ -133,7 +133,7 @@ export default function DownloadPage() {
           </div>
           <div className="h-3 w-full bg-cartoon-cream rounded-full border-2 border-white shadow-inner overflow-hidden">
              <div 
-               className="h-full bg-gradient-to-r from-cartoon-purple via-cartoon-pink to-cartoon-purple bg-[length:200%_100%] animate-[gradient_2s_linear_infinite] transition-all duration-500 ease-out" 
+               className="h-full bg-gradient-to-r from-cartoon-blue via-cartoon-pink to-cartoon-blue bg-[length:200%_100%] animate-[gradient_2s_linear_infinite] transition-all duration-500 ease-out" 
                style={{ width: `${progress}%` }}
              />
           </div>
@@ -143,12 +143,12 @@ export default function DownloadPage() {
         <div className="px-2">
           <button 
             onClick={() => { setShowTutorial(true); setVideoLoading(true); }}
-            className="w-full py-3.5 bg-white border-2 border-dashed border-cartoon-purple/30 rounded-2xl flex items-center justify-center gap-2 group hover:border-cartoon-purple transition-all active:scale-95"
+            className="w-full py-3.5 bg-white border-2 border-dashed border-cartoon-blue/30 rounded-2xl flex items-center justify-center gap-2 group hover:border-cartoon-blue transition-all active:scale-95"
           >
-            <div className="w-7 h-7 bg-cartoon-purple/10 rounded-lg flex items-center justify-center text-cartoon-purple">
+            <div className="w-7 h-7 bg-cartoon-blue/10 rounded-lg flex items-center justify-center text-cartoon-blue">
               <PlayCircle size={18} className="animate-pulse" />
             </div>
-            <span className="text-[11px] font-black text-gray-600 uppercase tracking-widest group-hover:text-cartoon-purple">
+            <span className="text-[11px] font-black text-gray-600 uppercase tracking-widest group-hover:text-cartoon-blue">
                { "Tutorial: How to Unlock"}
             </span>
           </button>
@@ -161,7 +161,7 @@ export default function DownloadPage() {
               key={offer.id}
               onClick={() => setSelectedOffer(offer)}
               style={{ animationDelay: `${index * 100}ms` }}
-              className="w-full text-left animate-in slide-in-from-bottom-4 fade-in fill-mode-both bg-white rounded-[2.2rem] p-4 border-2 border-transparent hover:border-cartoon-purple active:scale-[0.96] shadow-lg shadow-gray-200/50 flex items-center gap-4 transition-all group"
+              className="w-full text-left animate-in slide-in-from-bottom-4 fade-in fill-mode-both bg-white rounded-[2.2rem] p-4 border-2 border-transparent hover:border-cartoon-blue active:scale-[0.96] shadow-lg shadow-gray-200/50 flex items-center gap-4 transition-all group"
             >
               <div className="w-16 h-16 rounded-[1.5rem] overflow-hidden bg-gray-50 flex-shrink-0 border-2 border-gray-50 shadow-inner">
                 <img src={offer.image || ""} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
@@ -177,7 +177,7 @@ export default function DownloadPage() {
                 </h3>
                 <p className="text-gray-400 text-[10px] font-bold truncate italic opacity-80">{offer.description}</p>
               </div>
-              <div className="bg-gray-50 text-gray-300 group-hover:bg-cartoon-purple group-hover:text-white w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all">
+              <div className="bg-gray-50 text-gray-300 group-hover:bg-cartoon-blue group-hover:text-white w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all">
                 <ChevronRight size={24} strokeWidth={4} />
               </div>
             </button>
@@ -185,7 +185,7 @@ export default function DownloadPage() {
         </div>
 
         <footer className="text-center pt-6 pb-4 opacity-40">
-            <p className="text-gray-400 text-[8px] font-black uppercase tracking-[0.3em]">
+            <p className="text-black-400 text-[8px] font-black uppercase tracking-[0.3em]">
               CloudShield Secured © 2026 • Node: {userCity}
             </p>
         </footer>
@@ -215,7 +215,7 @@ export default function DownloadPage() {
 
             <button 
               onClick={() => window.open(selectedOffer.url, "_blank")}
-              className="w-full py-5 bg-cartoon-purple text-white font-black text-xl rounded-[1.8rem] shadow-[0_8px_0_#4c1d95] active:shadow-none active:translate-y-2 transition-all uppercase font-cartoon flex items-center justify-center gap-3 animate-button-pulse"
+              className="w-full py-5 bg-cartoon-blue text-white font-black text-xl rounded-[1.8rem] shadow-[0_8px_0_#4c1d95] active:shadow-none active:translate-y-2 transition-all uppercase font-cartoon flex items-center justify-center gap-3 animate-button-pulse"
             >
               <Fingerprint size={24} />
               {i18n.completeOfferBtn}
@@ -232,7 +232,7 @@ export default function DownloadPage() {
             {/* Loading Overlay */}
             {videoLoading && (
               <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black">
-                <Loader2 size={40} className="text-cartoon-purple animate-spin mb-4" />
+                <Loader2 size={40} className="text-cartoon-blue animate-spin mb-4" />
                 <p className="text-white/40 font-black text-[10px] uppercase tracking-widest">Optimizing Video...</p>
               </div>
             )}
