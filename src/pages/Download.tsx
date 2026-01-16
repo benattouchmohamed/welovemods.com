@@ -1,7 +1,7 @@
 'use client';
 
 import React, { useEffect, useState, useMemo, lazy, Suspense } from "react";
-import { X, ShieldCheck, ChevronRight, Globe, Fingerprint, Activity, ShieldPlus, PlayCircle, Loader2 } from "lucide-react";
+import { X, ShieldCheck, ChevronRight, Globe, Fingerprint, PlayCircle, Loader2 } from "lucide-react";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
 
@@ -15,28 +15,14 @@ export default function DownloadPage() {
   const [loading, setLoading] = useState(true);
   const [selectedOffer, setSelectedOffer] = useState<Offer | null>(null);
   const [showTutorial, setShowTutorial] = useState(false);
-  const [videoLoading, setVideoLoading] = useState(true); // NEW: Video loading state
+  const [videoLoading, setVideoLoading] = useState(true);
   const [gameName, setGameName] = useState("Mod");
   const [gameImage, setGameImage] = useState<string | null>(null);
-  
   const [userCity, setUserCity] = useState("Global");
-  const [showToast, setShowToast] = useState(false);
-
-  const [progress, setProgress] = useState(0);
+  const [completedCount, setCompletedCount] = useState(0);
 
   const MIRROR_LINK = "https://applocked.store/cl/i/8dkk3k";
 
-  // Progress Bar Logic
-  useEffect(() => {
-    if (!loading) {
-      const interval = setInterval(() => {
-        setProgress(prev => (prev < 99 ? prev + 1 : 99));
-      }, 20);
-      return () => clearInterval(interval);
-    }
-  }, [loading]);
-
-  // Geo-location Logic
   useEffect(() => {
     const fetchGeo = async () => {
       try {
@@ -46,12 +32,7 @@ export default function DownloadPage() {
       } catch (err) { setUserCity("Global"); }
     };
     fetchGeo();
-  }, []);
 
-
-
-  // Data Loading
-  useEffect(() => {
     const params = new URLSearchParams(window.location.search);
     setGameName(params.get("game") || "Premium Mod");
     setGameImage(sessionStorage.getItem("downloadGameImage"));
@@ -67,223 +48,114 @@ export default function DownloadPage() {
     loadData();
   }, []);
 
-  if (loading) {
-    return (
-      <div className="min-h-[100dvh] bg-cartoon-cream flex flex-col items-center justify-center p-6">
-        <div className="w-12 h-12 border-[5px] border-cartoon-BLUE/10 border-t-cartoon-blue rounded-full animate-spin mb-4" />
-       
-      </div>
-    );
-  }
+  if (loading) return <div className="min-h-screen bg-[#FFFBEB] flex items-center justify-center"><Loader2 className="animate-spin text-blue-600" /></div>;
 
   return (
-    <div className="min-h-[100dvh] bg-cartoon-cream selection:bg-cartoon-BLUE/20 overflow-x-hidden pb-10" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
-      
-   
-      <div className="w-full max-w-md mx-auto px-5 pt-4 space-y-4">
+    <div className="min-h-screen bg-[#FFFBEB] pb-10 font-sans" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+      <div className="w-full max-w-md mx-auto px-5 pt-4 space-y-5">
         
+        {/* HEADER */}
         <header className="flex justify-between items-center">
-          <div className="space-y-1">
-            <div className="flex items-center gap-1 text-[10px] font-bold text-gray-500">
-              <Globe size={10} className="text-cartoon-BLUE" />
-              <span className="opacity-70">{i18n.playerFrom}</span> <span className="text-gray-900">{userCity}</span>
-            </div>
+          <div className="flex items-center gap-1.5 bg-white/50 px-3 py-1 rounded-full border border-black/5">
+            <Globe size={12} className="text-blue-500" />
+            <span className="text-[10px] font-black uppercase text-gray-500 tracking-tight">{userCity}</span>
           </div>
-          <Suspense fallback={<div className="w-8 h-8 rounded-full bg-white animate-pulse" />}>
-            <LangPicker />
-          </Suspense>
+          <Suspense fallback={<div className="w-8 h-8 rounded-full bg-white animate-pulse" />}><LangPicker /></Suspense>
         </header>
 
-        {/* HERO SECTION */}
-        <section className="bg-white rounded-[2.5rem] p-6 text-center border-[4px] border-white shadow-xl relative overflow-hidden">
-          <div className="absolute inset-0 bg-gradient-to-b from-cartoon-blue/5 to-transparent pointer-events-none" />
-          <div className="relative z-10">
-            {gameImage && (
-              <div className="relative flex justify-center mb-4">
-                <div className="w-20 h-20 rounded-3xl overflow-hidden border-[4px] border-cartoon-cream shadow-lg relative group active:scale-95 transition-transform">
-                    <img src={gameImage} alt={gameName} className="w-full h-full object-cover" />
-                    <div className="absolute inset-0 bg-cartoon-blue/10 flex items-center justify-center">
-                        <ShieldCheck size={24} className="text-white drop-shadow-md" />
-                    </div>
+        {/* STICKER CARD */}
+        <section className="bg-[#FFFDF0] rounded-[2.5rem] p-5 text-center border-[3px] border-[#FFEB3B] shadow-[0_8px_0_rgba(0,0,0,0.05)] relative overflow-hidden">
+          <div className="relative z-10 flex flex-col items-center gap-4">
+            <div className="flex items-center gap-3 w-full px-2">
+              <div className="relative shrink-0">
+                <div className="w-16 h-16 rounded-2xl overflow-hidden border-2 border-white shadow-md bg-white">
+                  <img src={gameImage || ""} alt="" className="w-full h-full object-cover" />
+                </div>
+                <div className="absolute -bottom-1 -right-1 bg-[#00D68F] p-0.5 rounded-full border-2 border-white shadow-sm">
+                  <ShieldCheck size={12} className="text-white" strokeWidth={4} />
                 </div>
               </div>
-            )}
-            <h1 className="text-[26px] font-black text-gray-800 leading-[1.1] mb-2 uppercase font-cartoon tracking-tight">
-              {i18n.completeOneTask}
-            </h1>
-            <p className="text-cartoon-yellow-dark font-black text-[10px] uppercase tracking-tighter bg-cartoon-yellow/10 inline-block px-4 py-1.5 rounded-xl border border-cartoon-yellow/10">
-              {i18n.gameReady.replace("{game}", gameName)}
-            </p>
+              <div className="text-left">
+                <h2 className="text-[18px] font-black text-[#333] leading-none uppercase tracking-tight">{gameName}</h2>
+                <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mt-1">{i18n.syncing}</p>
+              </div>
+            </div>
+            <div className="space-y-3 pt-3 border-t border-black/5 w-full">
+              <h1 className="text-[19px] font-black text-[#333] leading-tight px-2">{i18n.completeTasks}</h1>
+              <p className="text-[#333] font-bold text-[14px] leading-snug">{i18n.autoRedirect}</p>
+            </div>
           </div>
         </section>
 
-        {/* PROGRESS BOX */}
-        <div className="bg-white rounded-[2rem] p-5 shadow-lg border-b-4 border-black/5 space-y-3">
-          <div className="flex justify-between items-end">
-            <div>
-              <p className="text-cartoon-blue font-black text-[9px] uppercase tracking-widest leading-none mb-1">{i18n.autoRedirect}</p>
-              <p className="text-gray-800 font-black text-sm uppercase">{i18n.offersCompleted(0, 1)}</p>
-            </div>
-            <div className="text-right">
-                <p className="text-cartoon-green font-black text-[8px] uppercase animate-pulse mb-0.5">Syncing...</p>
-                <p className="text-gray-900 font-black text-2xl italic leading-none tracking-tighter transition-all">
-                  {progress}%
-                </p>
-            </div>
+        {/* PROGRESS PILL */}
+        <div className="w-full bg-gradient-to-r from-[#00D27F] via-[#00C5CC] to-[#2E86FB] rounded-full py-3.5 px-6 border-2 border-black shadow-[0_4px_0_rgba(0,0,0,0.15)] flex items-center justify-center gap-3 relative overflow-hidden">
+          <div className="relative w-5 h-5 shrink-0">
+            <div className="absolute inset-0 border-2 border-white/20 rounded-full"></div>
+            <div className="absolute inset-0 border-2 border-transparent border-t-yellow-300 rounded-full animate-spin"></div>
           </div>
-          <div className="h-3 w-full bg-cartoon-cream rounded-full border-2 border-white shadow-inner overflow-hidden">
-             <div 
-               className="h-full bg-gradient-to-r from-cartoon-blue via-cartoon-pink to-cartoon-blue bg-[length:200%_100%] animate-[gradient_2s_linear_infinite] transition-all duration-500 ease-out" 
-               style={{ width: `${progress}%` }}
-             />
-          </div>
-        </div>
-
-        {/* TUTORIAL TRIGGER */}
-        <div className="px-2">
-          <button 
-            onClick={() => { setShowTutorial(true); setVideoLoading(true); }}
-            className="w-full py-3.5 bg-white border-2 border-dashed border-cartoon-blue/30 rounded-2xl flex items-center justify-center gap-2 group hover:border-cartoon-blue transition-all active:scale-95"
-          >
-            <div className="w-7 h-7 bg-cartoon-blue/10 rounded-lg flex items-center justify-center text-cartoon-blue">
-              <PlayCircle size={18} className="animate-pulse" />
-            </div>
-            <span className="text-[11px] font-black text-gray-600 uppercase tracking-widest group-hover:text-cartoon-blue">
-               { "Tutorial: How to Unlock"}
-            </span>
-          </button>
+          <span className="text-white font-black text-[15px] uppercase tracking-wide drop-shadow-md">
+            {i18n.status(completedCount)}
+          </span>
+          <div className="absolute top-0 left-0 w-full h-1/2 bg-white/10 rounded-t-full pointer-events-none"></div>
         </div>
 
         {/* TASK LIST */}
-        <div className="space-y-4">
-          {offers.map((offer, index) => (
-            <button 
-              key={offer.id}
-              onClick={() => setSelectedOffer(offer)}
-              style={{ animationDelay: `${index * 100}ms` }}
-              className="w-full text-left animate-in slide-in-from-bottom-4 fade-in fill-mode-both bg-white rounded-[2.2rem] p-4 border-2 border-transparent hover:border-cartoon-blue active:scale-[0.96] shadow-lg shadow-gray-200/50 flex items-center gap-4 transition-all group"
-            >
-              <div className="w-16 h-16 rounded-[1.5rem] overflow-hidden bg-gray-50 flex-shrink-0 border-2 border-gray-50 shadow-inner">
-                <img src={offer.image || ""} alt="" className="w-full h-full object-cover group-hover:scale-110 transition-transform" />
+        <div className="space-y-2.5">
+          {offers.map((offer) => (
+            <button key={offer.id} onClick={() => setSelectedOffer(offer)} className="w-full text-left bg-white rounded-[1.5rem] p-3 border-b-[4px] border-gray-200 active:border-b-0 active:translate-y-1 transition-all flex items-center gap-3">
+              <div className="w-12 h-12 rounded-xl overflow-hidden bg-gray-50 shrink-0 border border-black/5">
+                <img src={offer.image || ""} alt="" className="w-full h-full object-cover" />
               </div>
               <div className="flex-1 min-w-0">
-                <div className="flex items-center gap-1.5 mb-1">
-                    <div className="px-2 py-0.5 bg-cartoon-green/10 rounded-md">
-                        <span className="text-cartoon-green font-black text-[8px] uppercase tracking-tighter">Fast Verify</span>
-                    </div>
-                </div>
-                <h3 className="font-black text-gray-800 text-[17px] uppercase leading-none truncate mb-1">
-                    {offer.title}
-                </h3>
-                <p className="text-gray-400 text-[10px] font-bold truncate italic opacity-80">{offer.description}</p>
+                <h3 className="font-black text-gray-800 text-[15px] uppercase truncate leading-tight">{offer.title}</h3>
+                <p className="text-gray-400 text-[10px] font-bold truncate uppercase tracking-tight">
+                    <span>{offer.description ? offer.description.substring(0, 35) + "..." : "Follow steps to verify"}</span>
+                </p>
               </div>
-              <div className="bg-gray-50 text-gray-300 group-hover:bg-cartoon-blue group-hover:text-white w-12 h-12 rounded-2xl flex items-center justify-center flex-shrink-0 transition-all">
-                <ChevronRight size={24} strokeWidth={4} />
-              </div>
+              <div className="bg-blue-50 text-blue-600 w-9 h-9 rounded-xl flex items-center justify-center shrink-0 border border-blue-100"><ChevronRight size={20} /></div>
             </button>
           ))}
         </div>
-
-        <footer className="text-center pt-6 pb-4 opacity-40">
-            <p className="text-black-400 text-[8px] font-black uppercase tracking-[0.3em]">
-              CloudShield Secured © 2026 • Node: {userCity}
-            </p>
-        </footer>
       </div>
 
-      {/* TASK MODAL */}
+      {/* MODAL - STRUCTURE UPDATED */}
       {selectedOffer && (
-        <div className="fixed inset-0 z-[700] flex items-center justify-center p-4 bg-gray-900/70 backdrop-blur-md animate-in fade-in duration-200">
-          <div className="w-full max-w-sm bg-white rounded-[3.5rem] p-8 pb-10 shadow-2xl relative animate-in slide-in-from-bottom-10">
-            <button 
-                onClick={() => setSelectedOffer(null)} 
-                className="absolute right-6 top-6 w-10 h-10 flex items-center justify-center bg-gray-50 rounded-full text-gray-400 active:scale-90 transition-transform"
-            >
-              <X size={20} strokeWidth={3} />
-            </button>
-            
-            <div className="w-24 h-24 rounded-[2rem] overflow-hidden mx-auto mb-5 border-[4px] border-cartoon-yellow shadow-xl rotate-3 bg-cartoon-cream">
+        <div className="fixed inset-0 z-[100] flex items-center justify-center p-6 bg-slate-900/80 backdrop-blur-sm">
+          <div className="w-full max-w-sm bg-white rounded-[2.5rem] p-7 shadow-2xl relative border-[6px] border-white animate-in zoom-in-95">
+            <button onClick={() => setSelectedOffer(null)} className="absolute -top-3 -right-3 w-10 h-10 bg-red-500 text-white rounded-full border-4 border-white flex items-center justify-center shadow-lg"><X size={20} strokeWidth={4} /></button>
+            <div className="w-20 h-20 rounded-2xl overflow-hidden mx-auto mb-4 border-4 border-[#FFFBEB] shadow-md -rotate-2">
               <img src={selectedOffer.image || ""} alt="" className="w-full h-full object-cover" />
             </div>
-
-            <h3 className="text-gray-800 text-2xl font-black mb-2 uppercase font-cartoon text-center leading-tight">
-              {selectedOffer.title}
-            </h3>
-            <p className="text-gray-400 font-bold text-xs mb-8 text-center px-4 leading-relaxed">
-              {selectedOffer.description}
+            <h3 className="text-gray-800 text-xl font-black mb-1 uppercase text-center leading-tight">{selectedOffer.title}</h3>
+            
+            {/* SPAN STRUCTURE UPDATED BELOW */}
+            <p className="text-gray-400 font-bold text-[11px] mb-6 text-center uppercase tracking-tight">
+               please follow the structure <span>{selectedOffer.description}</span>
             </p>
 
             <button 
-              onClick={() => window.open(selectedOffer.url, "_blank")}
-              className="w-full py-5 bg-cartoon-blue text-white font-black text-xl rounded-[1.8rem] shadow-[0_8px_0_#4c1d95] active:shadow-none active:translate-y-2 transition-all uppercase font-cartoon flex items-center justify-center gap-3 animate-button-pulse"
+              onClick={() => { window.open(selectedOffer.url, "_blank"); setCompletedCount(1); setSelectedOffer(null); }}
+              className="w-full py-4 bg-blue-600 text-white font-black text-lg rounded-2xl shadow-[0_6px_0_#1e40af] active:shadow-none active:translate-y-1 transition-all uppercase flex items-center justify-center gap-2"
             >
-              <Fingerprint size={24} />
-              {i18n.completeOfferBtn}
+              <Fingerprint size={20} />
+              {i18n.btn}
             </button>
           </div>
         </div>
       )}
 
-      {/* TUTORIAL VIDEO MODAL */}
+      {/* TUTORIAL MODAL */}
       {showTutorial && (
-        <div className="fixed inset-0 z-[800] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl animate-in fade-in duration-300">
-          <div className="w-full max-w-md aspect-[9/16] max-h-[85vh] bg-black rounded-[3rem] overflow-hidden relative border-4 border-white/10 shadow-2xl">
-            
-            {/* Loading Overlay */}
-            {videoLoading && (
-              <div className="absolute inset-0 z-20 flex flex-col items-center justify-center bg-black">
-                <Loader2 size={40} className="text-cartoon-blue animate-spin mb-4" />
-                <p className="text-white/40 font-black text-[10px] uppercase tracking-widest">Optimizing Video...</p>
-              </div>
-            )}
-
-            {/* Header */}
-            <div className="absolute top-0 inset-x-0 p-6 bg-gradient-to-b from-black/90 to-transparent z-30 flex justify-between items-start">
-              <div className="space-y-1">
-                <h3 className="text-white font-black text-lg uppercase tracking-tight leading-none">Unlock Guide</h3>
-                <p className="text-cartoon-green text-[9px] font-black uppercase tracking-[0.2em] animate-pulse">Live Playback</p>
-              </div>
-              <button 
-                onClick={() => setShowTutorial(false)}
-                className="w-10 h-10 bg-white/10 hover:bg-white/20 backdrop-blur-md rounded-full flex items-center justify-center text-white transition-all active:scale-90"
-              >
-                <X size={20} strokeWidth={3} />
-              </button>
+        <div className="fixed inset-0 z-[800] flex items-center justify-center p-4 bg-black/95 backdrop-blur-xl">
+          <div className="w-full max-w-md aspect-[9/16] bg-black rounded-[3rem] overflow-hidden relative border-4 border-white/10 shadow-2xl">
+            <div className="absolute top-0 inset-x-0 p-6 z-30 flex justify-between items-start">
+              <h3 className="text-white font-black text-lg uppercase">Unlock Guide</h3>
+              <button onClick={() => setShowTutorial(false)} className="w-10 h-10 bg-white/10 rounded-full flex items-center justify-center text-white"><X size={20} /></button>
             </div>
-
-            {/* Video Player */}
-            <div className="w-full h-full bg-black flex items-center justify-center">
-              <video 
-                src="/how-to-complete-tasks.MOV"
-                className="w-full h-full object-cover"
-                autoPlay 
-                controls
-                playsInline
-                onCanPlayThrough={() => setVideoLoading(false)} // HIDE LOADING WHEN READY
-                onEnded={() => setShowTutorial(false)} // AUTO BACK LOGIC
-              >
-                Your browser does not support the video tag.
-              </video>
-            </div>
+            <video src="/how-to-complete-tasks.MOV" className="w-full h-full object-cover" autoPlay controls onEnded={() => setShowTutorial(false)} />
           </div>
         </div>
       )}
-
-      <style jsx global>{`
-        @keyframes gradient {
-          0% { background-position: 0% 50%; }
-          100% { background-position: 200% 50%; }
-        }
-        @keyframes button-pulse {
-          0% { transform: scale(1); }
-          50% { transform: scale(1.02); }
-          100% { transform: scale(1); }
-        }
-        .animate-button-pulse {
-          animation: button-pulse 2s infinite ease-in-out;
-        }
-        .font-cartoon { font-family: 'var(--font-cartoon)', system-ui, sans-serif; }
-      `}</style>
     </div>
   );
 }
