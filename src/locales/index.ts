@@ -2,120 +2,149 @@
    TYPES & INTERFACES
    ────────────────────────────────────────────────────────────── */
 
-export type Locale = 
-  | "en" | "es" | "ko" | "ja" | "ar" | "fr" | "ru" 
+export type Locale =
+  | "en" | "es" | "ko" | "ja" | "ar" | "fr" | "ru"
   | "de" | "tr" | "pt" | "zh" | "hi" | "it";
 
 export interface TranslationFunctions {
-  completeTasks: string;       // Sticker Card: "Complete one quick 2 steps..."
-  autoRedirect: string;        // Sticker Card: "Once you finish 2 tasks..."
-  status: (done: number) => string; // Progress Pill: "0 of 2 tasks Completed"
-  syncing: string;             // Sticker Card Subtitle: "System Syncing..."
-  btn: string;                 // Modal Button: "Download Now"
+  completeTasks: string;               // Sticker Card title
+  autoRedirect: string;                // Sticker Card subtitle
+  status: (done: number) => string;    // Progress pill text
+  syncing: string;                     // Sync text
+  btn: string;                         // Button text
 }
 
 /* ──────────────────────────────────────────────────────────────
-   PRO TRANSLATIONS (All 13 Languages)
+   TRANSLATIONS
    ────────────────────────────────────────────────────────────── */
 
 export const translations: Record<Locale, TranslationFunctions> = {
   en: {
-    completeTasks: "Complete one quick 2 steps to prove you're not a bot",
-    autoRedirect: "Once you finish 2 tasks, your download will start automatically",
-    status: (done) => `${done} of 2 tasks Completed`,
-    syncing: "System Syncing...",
-    btn: "Download Now"
+    syncing: "Syncing with server...",
+    completeTasks: "Verification Required",
+    autoRedirect: "Complete 1 task to start your download",
+    status: (count) =>
+      count > 0 ? "Verifying Completion..." : "Waiting for completion",
+    btn: "Install & Verify",
   },
-  es: {
-    completeTasks: "Completa 2 pasos rápidos para demostrar que no eres un robot",
-    autoRedirect: "Una vez que termines 2 tareas, tu descarga comenzará automáticamente",
-    status: (done) => `${done} de 2 tareas completadas`,
-    syncing: "Sincronizando sistema...",
-    btn: "Descargar ahora"
-  },
-  ar: {
-    completeTasks: "أكمل خطوتين سريعتين لإثبات أنك لست روبوتًا",
-    autoRedirect: "بمجرد الانتهاء من مهمتين، سيبدأ التحميل تلقائياً",
-    status: (done) => `تم إكمال ${done} من 2 مهام`,
-    syncing: "جاري مزامنة النظام...",
-    btn: "حمل الآن"
-  },
+
   fr: {
-    completeTasks: "Complétez 2 étapes rapides pour prouver que vous n'êtes pas un robot",
-    autoRedirect: "Une fois les 2 tâches finies, le téléchargement commencera",
-    status: (done) => `${done} sur 2 tâches terminées`,
-    syncing: "Synchronisation...",
-    btn: "Télécharger"
+    syncing: "Synchronisation avec le serveur...",
+    completeTasks: "Vérification requise",
+    autoRedirect: "Complétez 1 tâche pour démarrer le téléchargement",
+    status: (count) =>
+      count > 0 ? "Vérification en cours..." : "En attente de validation",
+    btn: "Installer & Vérifier",
   },
+
+  ar: {
+    syncing: "جارٍ المزامنة مع الخادم...",
+    completeTasks: "مطلوب التحقق",
+    autoRedirect: "أكمل مهمة واحدة لبدء التحميل",
+    status: (count) =>
+      count > 0 ? "جارٍ التحقق من الإكمال..." : "في انتظار الإكمال",
+    btn: "تثبيت والتحقق",
+  },
+
+  es: {
+    syncing: "Sincronizando con el servidor...",
+    completeTasks: "Verificación requerida",
+    autoRedirect: "Completa 1 tarea para iniciar la descarga",
+    status: (count) =>
+      count > 0 ? "Verificando finalización..." : "Esperando finalización",
+    btn: "Instalar y Verificar",
+  },
+
   de: {
-    completeTasks: "Schließe 2 kurze Schritte ab, um zu beweisen, dass du kein Bot bist",
-    autoRedirect: "Sobald du 2 Aufgaben erledigt hast, startet der Download automatisch",
-    status: (done) => `${done} von 2 Aufgaben erledigt`,
-    syncing: "System-Synchronisierung...",
-    btn: "Jetzt herunterladen"
+    syncing: "Synchronisiere mit dem Server...",
+    completeTasks: "Verifizierung erforderlich",
+    autoRedirect: "Schließe 1 Aufgabe ab, um den Download zu starten",
+    status: (count) =>
+      count > 0 ? "Überprüfung läuft..." : "Warten auf Abschluss",
+    btn: "Installieren & Prüfen",
   },
-  it: {
-    completeTasks: "Completa 2 rapidi passaggi per dimostrare che non sei un robot",
-    autoRedirect: "Una volta completate 2 attività, il download inizierà automaticamente",
-    status: (done) => `${done} di 2 attività completate`,
-    syncing: "Sincronizzazione...",
-    btn: "Scarica ora"
-  },
+
   pt: {
-    completeTasks: "Conclua 2 etapas rápidas para provar que você não é um robô",
-    autoRedirect: "Assim que terminar 2 tarefas, o download começará automaticamente",
-    status: (done) => `${done} de 2 tarefas concluídas`,
-    syncing: "Sincronizando...",
-    btn: "Baixar agora"
+    syncing: "Sincronizando com o servidor...",
+    completeTasks: "Verificação necessária",
+    autoRedirect: "Complete 1 tarefa para iniciar o download",
+    status: (count) =>
+      count > 0 ? "Verificando conclusão..." : "Aguardando conclusão",
+    btn: "Instalar e Verificar",
   },
-  tr: {
-    completeTasks: "Bot olmadığınızı kanıtlamak için 2 hızlı adımı tamamlayın",
-    autoRedirect: "2 görevi tamamladığınızda indirme otomatik olarak başlayacaktır",
-    status: (done) => `2 görevden ${done} tanesi tamamlandı`,
-    syncing: "Senkronize ediliyor...",
-    btn: "Şimdi İndir"
-  },
+
   ru: {
-    completeTasks: "Выполните 2 быстрых шага, чтобы доказать, что вы не бот",
-    autoRedirect: "После выполнения 2 заданий загрузка начнется автоматически",
-    status: (done) => `Выполнено ${done} из 2 заданий`,
-    syncing: "Синхронизация...",
-    btn: "Скачать"
+    syncing: "Синхронизация с сервером...",
+    completeTasks: "Требуется проверка",
+    autoRedirect: "Выполните 1 задание, чтобы начать загрузку",
+    status: (count) =>
+      count > 0 ? "Проверка завершения..." : "Ожидание выполнения",
+    btn: "Установить и проверить",
   },
+
+  tr: {
+    syncing: "Sunucu ile senkronize ediliyor...",
+    completeTasks: "Doğrulama Gerekli",
+    autoRedirect: "İndirmeye başlamak için 1 görev tamamla",
+    status: (count) =>
+      count > 0 ? "Doğrulama yapılıyor..." : "Tamamlanması bekleniyor",
+    btn: "Yükle ve Doğrula",
+  },
+
+  it: {
+    syncing: "Sincronizzazione con il server...",
+    completeTasks: "Verifica richiesta",
+    autoRedirect: "Completa 1 attività per avviare il download",
+    status: (count) =>
+      count > 0 ? "Verifica in corso..." : "In attesa di completamento",
+    btn: "Installa e Verifica",
+  },
+
   zh: {
-    completeTasks: "完成 2 个快速步骤以证明您不是机器人",
-    autoRedirect: "完成 2 个任务后，下载将自动开始",
-    status: (done) => `已完成 2 个任务中的 ${done} 个`,
-    syncing: "系统同步中...",
-    btn: "立即下载"
+    syncing: "正在与服务器同步...",
+    completeTasks: "需要验证",
+    autoRedirect: "完成 1 个任务即可开始下载",
+    status: (count) =>
+      count > 0 ? "正在验证完成情况..." : "等待完成",
+    btn: "安装并验证",
   },
-  ko: {
-    completeTasks: "봇이 아님을 증명하기 위해 2단계의 빠른 절차를 완료하세요",
-    autoRedirect: "2개 작업을 완료하면 다운로드가 자동으로 시작됩니다",
-    status: (done) => `2개 작업 중 ${done}개 완료`,
-    syncing: "동기화 중...",
-    btn: "다운로드"
-  },
+
   ja: {
-    completeTasks: "ロボットでないことを証明するために、2つの簡単なステップを完了してください",
-    autoRedirect: "2つのタスクを完了すると、ダウンロードが自動的に開始されます",
-    status: (done) => `2つのタスクのうち ${done} つを完了`,
-    syncing: "同期中...",
-    btn: "ダウンロード"
+    syncing: "サーバーと同期中...",
+    completeTasks: "確認が必要です",
+    autoRedirect: "ダウンロードを開始するには1つのタスクを完了してください",
+    status: (count) =>
+      count > 0 ? "確認中..." : "完了待ち",
+    btn: "インストールして確認",
   },
+
+  ko: {
+    syncing: "서버와 동기화 중...",
+    completeTasks: "인증 필요",
+    autoRedirect: "다운로드를 시작하려면 1개 작업을 완료하세요",
+    status: (count) =>
+      count > 0 ? "완료 확인 중..." : "완료 대기 중",
+    btn: "설치 및 확인",
+  },
+
   hi: {
-    completeTasks: "यह साबित करने के लिए कि आप रोबोट नहीं हैं, 2 त्वरित चरणों को पूरा करें",
-    autoRedirect: "2 टास्क पूरे होने पर डाउनलोड अपने आप शुरू हो जाएगा",
-    status: (done) => `2 में से ${done} टास्क पूरे हुए`,
-    syncing: "सिंक हो रहा है...",
-    btn: "अभी डाउनलोड करें"
-  }
-} as const;
+    syncing: "सर्वर से सिंक हो रहा है...",
+    completeTasks: "सत्यापन आवश्यक",
+    autoRedirect: "डाउनलोड शुरू करने के लिए 1 कार्य पूरा करें",
+    status: (count) =>
+      count > 0 ? "सत्यापन हो रहा है..." : "पूरा होने की प्रतीक्षा",
+    btn: "इंस्टॉल और सत्यापित करें",
+  },
+};
 
 /* ──────────────────────────────────────────────────────────────
    HELPER FUNCTION
    ────────────────────────────────────────────────────────────── */
 
-export const getTranslation = (locale: Locale): TranslationFunctions => {
-  return translations[locale] || translations.en;
+export const getTranslation = (locale: string): TranslationFunctions => {
+  const validLocale = (Object.keys(translations).includes(locale)
+    ? locale
+    : "en") as Locale;
+
+  return translations[validLocale];
 };
