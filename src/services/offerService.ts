@@ -145,8 +145,8 @@ export const fetchOffers = async (
     const commonParams = {
       ip,
       user_agent: userAgent,
-      min: "3",
-      max: "3",
+      min: "2",
+      max: "5",
     };
 
     // ── 1. CPI offers ────────────────────────────────
