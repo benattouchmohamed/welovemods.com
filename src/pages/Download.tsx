@@ -217,7 +217,7 @@ export default function DownloadPage() {
         <div className="bg-white rounded-3xl p-5 shadow-xl text-center">
           <img src={gameImage||""} className="w-24 h-24 mx-auto rounded-2xl mb-3"/>
           <h1 className="font-black text-xl">{gameName}</h1>
-          <p className="text-blue-500 font-bold">Complete tasks to unlock</p>
+          <p className="text-blue-500 font-bold">Complete 2 tasks to unlock</p>
 
           <div className="mt-4 bg-gradient-to-r from-green-500 to-blue-500 text-white rounded-full py-2 font-black flex justify-center items-center gap-2">
             <Users size={16}/> {liveUsers} users completing now
