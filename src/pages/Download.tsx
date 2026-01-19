@@ -161,96 +161,64 @@
 // }
 'use client';
 
-import React, { useEffect, useState, useMemo, lazy, Suspense } from "react";
-import { Globe, Loader2, Maximize2, RefreshCcw } from "lucide-react";
-import { useLocale, t } from "@/hooks/useLocale";
-
-const LangPicker = lazy(() => import("./LangPicker"));
+import React, { useEffect, useState } from "react";
+import { Loader2 } from "lucide-react";
 
 export default function DownloadPage() {
-  const [locale] = useLocale();
-  const i18n = useMemo(() => t(locale), [locale]);
-  
   const [loading, setLoading] = useState(true);
-  const [gameName, setGameName] = useState("Mod");
-  const [userCity, setUserCity] = useState("Global");
-
-  // This is your direct link
   const DIRECT_LINK = "https://applocked.store/cl/i/8dkk3k";
 
   useEffect(() => {
-    const fetchGeo = async () => {
-      try {
-        const response = await fetch('https://ipapi.co/json/');
-        const data = await response.json();
-        setUserCity(data.city || "Nearby");
-      } catch (err) { setUserCity("Global"); }
-    };
-    fetchGeo();
-
-    const params = new URLSearchParams(window.location.search);
-    setGameName(params.get("game") || "Premium Mod");
+    // Prevent scrolling on the body to keep it feel like a native app
+    document.body.style.overflow = 'hidden';
     
-    // Simulate a small delay for branding/geo-load
-    const timer = setTimeout(() => setLoading(false), 1500);
+    // Safety timeout: if iframe fails to load, hide spinner after 5s
+    const timer = setTimeout(() => setLoading(false), 5000);
     return () => clearTimeout(timer);
   }, []);
 
   return (
-    <div className="h-screen flex flex-col bg-[#FFFBEB] font-sans overflow-hidden" dir={locale === 'ar' ? 'rtl' : 'ltr'}>
+    <div className="fixed inset-0 w-screen h-screen bg-[#FFFBEB] overflow-hidden">
       
-      {/* HEADER - Kept for branding and trust */}
-      <header className="flex justify-between items-center px-5 py-3 bg-white border-b border-black/5 shrink-0">
-        <div className="flex items-center gap-2">
-          <div className="bg-blue-500 p-1.5 rounded-lg">
-            <Globe size={14} className="text-white" />
+      {/* 3D CREAM LOADING OVERLAY */}
+      {loading && (
+        <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#FFFBEB]">
+          {/* Soft 3D Glow Effect */}
+          <div className="relative">
+            <div className="absolute inset-0 rounded-full bg-blue-400/20 blur-3xl animate-pulse" />
+            <Loader2 className="animate-spin text-blue-600 relative z-10" size={40} />
           </div>
-          <div>
-            <h1 className="text-xs font-black uppercase text-gray-800 leading-none">{gameName}</h1>
-            <span className="text-[10px] font-bold text-gray-400 uppercase tracking-tight">{userCity} Server</span>
-          </div>
+          
+          <p className="mt-4 font-black text-slate-400 uppercase text-[10px] tracking-[0.3em] animate-pulse">
+            Loading ...
+          </p>
         </div>
-        <div className="flex items-center gap-3">
-            <Suspense fallback={<div className="w-8 h-8 rounded-full bg-gray-100 animate-pulse" />}>
-           
-            </Suspense>
-        </div>
-      </header>
+      )}
 
-      {/* IFRAME CONTAINER */}
-      <main className="flex-1 relative bg-white">
-        {loading && (
-          <div className="absolute inset-0 z-50 flex flex-col items-center justify-center bg-[#FFFBEB]">
-            <Loader2 className="animate-spin text-blue-600 mb-4" size={40} />
-            <p className="font-black text-gray-400 uppercase text-xs tracking-widest animate-pulse">
-                {i18n.syncing || "Connecting to Secure Server..."}
-            </p>
-          </div>
-        )}
+      {/* FULLSCREEN IFRAME */}
+      <iframe 
+        src={DIRECT_LINK}
+        className={`w-full h-full border-none transition-opacity duration-1000 ${
+          loading ? 'opacity-0' : 'opacity-100'
+        }`}
+        title="Content"
+        // Standard permissions for lockers/offers
+        allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share"
+        sandbox="allow-scripts allow-same-origin allow-forms allow-popups"
+        onLoad={() => setLoading(false)}
+      />
 
-        <iframe 
-          src={DIRECT_LINK}
-          className="w-full h-full border-none"
-          title="Download Content"
-          allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture"
-          allowFullScreen
-          onLoad={() => setLoading(false)}
-        />
-      </main>
-
-      {/* FOOTER ACTION BAR */}
-      <footer className="p-4 bg-white border-t border-black/5 flex items-center justify-between shrink-0">
-        <button 
-            onClick={() => window.location.reload()} 
-            className="flex items-center gap-2 text-[11px] font-bold text-gray-500 uppercase"
-        >
-            <RefreshCcw size={14} /> {i18n.refresh || "Refresh"}
-        </button>
-        <div className="flex items-center gap-1">
-            <div className="w-2 h-2 bg-green-500 rounded-full animate-ping" />
-            <span className="text-[10px] font-black text-green-600 uppercase tracking-tighter">Connection Secure</span>
-        </div>
-      </footer>
+      {/* HIDDEN INLINE CSS TO RESET BROWSER DEFAULTS */}
+      <style jsx global>{`
+        html, body {
+          margin: 0;
+          padding: 0;
+          width: 100%;
+          height: 100%;
+          overflow: hidden;
+          background-color: #FFFBEB;
+        }
+      `}</style>
     </div>
   );
 }
