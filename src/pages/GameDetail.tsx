@@ -47,27 +47,73 @@ const GameDetail = memo(() => {
     }, 1000);
   };
 
-  /* ────────────────────── BEAUTIFUL CREAM SKELETON ────────────────────── */
-  const BeautifulSkeleton = () => (
+/* ────────────────────── BEAUTIFUL CREAM SKELETON ────────────────────── */
+const BeautifulSkeleton = () => {
+  // Animation variant for a smooth, repeating pulse
+  const pulse = {
+    initial: { opacity: 0.6 },
+    animate: { 
+      opacity: [0.6, 0.4, 0.6],
+      transition: { 
+        duration: 1.5, 
+        repeat: Infinity, 
+        ease: "easeInOut" 
+      } 
+    }
+  };
+
+  const SkeletonItem = ({ className }: { className: string }) => (
+    <motion.div 
+      variants={pulse}
+      initial="initial"
+      animate="animate"
+      className={`${className} bg-amber-100/40 relative overflow-hidden`}
+    >
+      {/* Subtle sliding shimmer overlay */}
+      <motion.div 
+        animate={{ x: ['-100%', '200%'] }}
+        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
+        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
+      />
+    </motion.div>
+  );
+
+  return (
     <div className="min-h-screen bg-[#FFFBEB] pt-24 px-4">
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+          {/* Left Column Skeleton */}
           <div className="md:col-span-5 lg:col-span-4 space-y-4">
             <div className="bg-white rounded-[2.5rem] p-4 shadow-sm border border-amber-50">
-              <div className="aspect-square bg-amber-50/50 rounded-[2rem] shimmer mb-4" />
-              <div className="h-16 bg-amber-50/50 rounded-[1.8rem] shimmer" />
+              <SkeletonItem className="aspect-square rounded-[2rem] mb-4" />
+              <SkeletonItem className="h-16 rounded-[1.8rem]" />
             </div>
           </div>
+          
+          {/* Right Column Skeleton */}
           <div className="md:col-span-7 lg:col-span-8 space-y-6">
-            <div className="h-12 bg-amber-50/30 rounded-2xl w-3/4 shimmer" />
-            <div className="h-6 bg-amber-50/20 rounded-full w-1/2 shimmer" />
-            <div className="h-32 bg-white rounded-[2rem] shimmer border border-amber-50" />
+            <div className="space-y-3">
+              <SkeletonItem className="h-14 rounded-2xl w-3/4" />
+              <SkeletonItem className="h-14 rounded-2xl w-1/2" />
+            </div>
+            <div className="flex gap-2">
+              <SkeletonItem className="h-8 rounded-full w-24" />
+              <SkeletonItem className="h-8 rounded-full w-24" />
+            </div>
+            <SkeletonItem className="h-32 rounded-[2rem] border border-amber-50" />
+            
+            {/* Features Grid Skeleton */}
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
+              {[1, 2, 3, 4].map((i) => (
+                <SkeletonItem key={i} className="h-14 rounded-2xl" />
+              ))}
+            </div>
           </div>
         </div>
       </div>
     </div>
   );
-
+};
   if (loading) return <BeautifulSkeleton />;
 
   return (
