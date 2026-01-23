@@ -1,30 +1,17 @@
-import React, {
-  useEffect,
-  useState,
-  useRef,
-  useCallback,
-  useMemo,
-  memo,
-} from "react";
-import { Search, X, TrendingUp } from "lucide-react";
+import React, { useEffect, useState, useRef, useMemo, memo } from "react";
+import { Search, X, TrendingUp, ChevronLeft, ChevronRight } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { useNavigate } from "react-router-dom";
-import { motion, AnimatePresence } from "framer-motion"; // For smooth transitions
+import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import GameCard from "@/components/GameCard";
 import { fetchGames } from "@/services/gameService";
 import type { Game } from "@/services/gameService";
 
 // --- Configuration ---
-const INITIAL_LOAD = 12;
-const LOAD_MORE = 12;
+const ITEMS_PER_PAGE = 12; 
 const SEARCH_DEBOUNCE_MS = 300;
-const DOMAIN = "https://welovemods.com";
 
-/**
- * SkeletonCard: Memoized to prevent unnecessary re-renders.
- * Optimized for 3-column mobile and 4-column PC.
- */
 const SkeletonCard = memo(() => (
   <div className="bg-white border border-sky-200 rounded-2xl p-3 shadow-sm animate-pulse">
     <div className="aspect-square bg-sky-100 rounded-xl mb-3" />
@@ -32,7 +19,6 @@ const SkeletonCard = memo(() => (
     <div className="h-3 bg-orange-100 rounded-full w-2/3" />
   </div>
 ));
-SkeletonCard.displayName = "SkeletonCard";
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -46,14 +32,11 @@ function useDebounce<T>(value: T, delay: number): T {
 const Index = () => {
   const navigate = useNavigate();
   const [games, setGames] = useState<Game[]>([]);
-  const [displayedGames, setDisplayedGames] = useState<Game[]>([]);
+  const [currentPage, setCurrentPage] = useState(1);
   const [searchQuery, setSearchQuery] = useState("");
   const [showSuggestions, setShowSuggestions] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
-  const [isLoadingMore, setIsLoadingMore] = useState(false);
-  const [hasMore, setHasMore] = useState(true);
 
-  const sentinelRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLDivElement>(null);
   const debouncedSearchQuery = useDebounce(searchQuery.trim().toLowerCase(), SEARCH_DEBOUNCE_MS);
 
@@ -68,6 +51,7 @@ const Index = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
+  // Initial Fetch
   useEffect(() => {
     let isMounted = true;
     const load = async () => {
@@ -75,8 +59,6 @@ const Index = () => {
         const allGames = await fetchGames();
         if (!isMounted) return;
         setGames(allGames);
-        setDisplayedGames(allGames.slice(0, INITIAL_LOAD));
-        setHasMore(allGames.length > INITIAL_LOAD);
       } catch (e) {
         console.error("Fetch Error:", e);
       } finally {
@@ -87,6 +69,7 @@ const Index = () => {
     return () => { isMounted = false; };
   }, []);
 
+  // Filter logic
   const filteredGames = useMemo(() => {
     if (!debouncedSearchQuery) return games;
     return games.filter(g =>
@@ -95,6 +78,23 @@ const Index = () => {
     );
   }, [games, debouncedSearchQuery]);
 
+  // Pagination Logic
+  const totalPages = Math.ceil(filteredGames.length / ITEMS_PER_PAGE);
+  const displayedGames = useMemo(() => {
+    const start = (currentPage - 1) * ITEMS_PER_PAGE;
+    return filteredGames.slice(start, start + ITEMS_PER_PAGE);
+  }, [filteredGames, currentPage]);
+
+  // Reset to page 1 when searching
+  useEffect(() => {
+    setCurrentPage(1);
+  }, [debouncedSearchQuery]);
+
+  // Scroll to top on page change
+  useEffect(() => {
+    window.scrollTo({ top: 0, behavior: 'smooth' });
+  }, [currentPage]);
+
   const suggestions = useMemo(() => {
     if (searchQuery.length < 2) return [];
     return games
@@ -102,50 +102,16 @@ const Index = () => {
       .slice(0, 5);
   }, [games, searchQuery]);
 
-  useEffect(() => {
-    setDisplayedGames(filteredGames.slice(0, INITIAL_LOAD));
-    setHasMore(filteredGames.length > INITIAL_LOAD);
-  }, [filteredGames]);
-
-  const loadMoreGames = useCallback(() => {
-    if (isLoadingMore || !hasMore) return;
-    setIsLoadingMore(true);
-    requestAnimationFrame(() => {
-      setDisplayedGames(prev => {
-        const nextStart = prev.length;
-        const nextChunk = filteredGames.slice(nextStart, nextStart + LOAD_MORE);
-        const newDisplayed = [...prev, ...nextChunk];
-        setHasMore(newDisplayed.length < filteredGames.length);
-        return newDisplayed;
-      });
-      setIsLoadingMore(false);
-    });
-  }, [filteredGames, isLoadingMore, hasMore]);
-
-  useEffect(() => {
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries[0].isIntersecting && hasMore && !isLoadingMore && !isLoading) {
-          loadMoreGames();
-        }
-      },
-      { rootMargin: "600px" }
-    );
-    if (sentinelRef.current) observer.observe(sentinelRef.current);
-    return () => observer.disconnect();
-  }, [loadMoreGames, hasMore, isLoadingMore, isLoading]);
-
   const createSlug = (title: string) => 
     title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
 
   return (
     <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
       <Helmet>
-        <title>WeLoveMods | Top Game Mods for iPhone & Android – 2026 Update</title>
+        <title>WeLoveMods | Top Game Mods for iPhone & Android – 2026</title>
       </Helmet>
 
-      {/* Header & Search */}
-      <header className="w-full px-4 pt-20 pb-6 text-center z-50"> <br />
+      <header className="w-full px-4 pt-20 pb-6 text-center z-50">
         <section className="w-full max-w-md mx-auto relative" ref={searchRef}>
           <div className="relative flex items-center px-4 py-3 rounded-full bg-white shadow-xl shadow-sky-100/50 border border-sky-100 focus-within:ring-2 focus-within:ring-sky-400 transition-all">
             <Search className="w-5 h-5 text-sky-500" />
@@ -166,8 +132,8 @@ const Index = () => {
               </button>
             )}
           </div>
-
-          {/* Search Suggestions */}
+          
+          {/* Suggestions Dropdown (Same as before) */}
           <AnimatePresence>
             {showSuggestions && suggestions.length > 0 && (
               <motion.div 
@@ -201,34 +167,71 @@ const Index = () => {
         </section>
       </header>
 
-      {/* Main Grid */}
-      <main className="flex-1 w-full px-2 md:px-6 pb-24">
+      <main className="flex-1 w-full px-2 md:px-6 pb-12">
         <div className="grid grid-cols-3 md:grid-cols-4 gap-2 md:gap-6 max-w-6xl mx-auto">
           {isLoading ? (
-            // Show Skeletons during initial load
-            Array.from({ length: 12 }).map((_, i) => <SkeletonCard key={i} />)
+            Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => <SkeletonCard key={i} />)
           ) : (
-            <AnimatePresence>
-              {displayedGames.map((game, index) => (
-                <motion.div
-                  key={game.id}
-                  initial={{ opacity: 0, y: 20 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ delay: index * 0.03 }} // Subtle staggered entrance
-                >
-                  <GameCard game={game} />
-                </motion.div>
-              ))}
-            </AnimatePresence>
+            displayedGames.map((game) => (
+              <motion.div
+                key={game.id}
+                layout
+                initial={{ opacity: 0 }}
+                animate={{ opacity: 1 }}
+                exit={{ opacity: 0 }}
+              >
+                <GameCard game={game} />
+              </motion.div>
+            ))
           )}
-
-          {/* Infinite Scroll & Loader */}
-          <div ref={sentinelRef} className="h-20 col-span-full flex justify-center items-center">
-            {isLoadingMore && (
-              <div className="animate-spin rounded-full h-6 w-6 border-t-2 border-sky-600" />
-            )}
-          </div>
         </div>
+
+        {/* --- Pagination Controls --- */}
+        {!isLoading && totalPages > 1 && (
+          <div className="flex justify-center items-center gap-2 mt-12 pb-10">
+            <button
+              onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
+              disabled={currentPage === 1}
+              className="p-2 rounded-xl bg-white border border-sky-100 disabled:opacity-30 text-sky-600 shadow-sm"
+            >
+              <ChevronLeft size={20} />
+            </button>
+            
+            <div className="flex gap-1">
+              {[...Array(totalPages)].map((_, i) => {
+                const pageNum = i + 1;
+                // Only show current, first, last, and neighbors for clean UI
+                if (pageNum === 1 || pageNum === totalPages || Math.abs(pageNum - currentPage) <= 1) {
+                  return (
+                    <button
+                      key={pageNum}
+                      onClick={() => setCurrentPage(pageNum)}
+                      className={`w-10 h-10 rounded-xl font-bold transition-all ${
+                        currentPage === pageNum 
+                        ? "bg-sky-500 text-white shadow-lg shadow-sky-200" 
+                        : "bg-white text-slate-600 border border-sky-50 hover:border-sky-200"
+                      }`}
+                    >
+                      {pageNum}
+                    </button>
+                  );
+                }
+                if (Math.abs(pageNum - currentPage) === 2) {
+                   return <span key={pageNum} className="px-1 text-slate-300">...</span>;
+                }
+                return null;
+              })}
+            </div>
+
+            <button
+              onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
+              disabled={currentPage === totalPages}
+              className="p-2 rounded-xl bg-white border border-sky-100 disabled:opacity-30 text-sky-600 shadow-sm"
+            >
+              <ChevronRight size={20} />
+            </button>
+          </div>
+        )}
       </main>
 
       <Navbar />
