@@ -77,7 +77,7 @@ export default function DownloadPage() {
               </div>
               <div className="text-left">
                 <h2 className="text-[18px] font-black text-[#333] leading-none uppercase tracking-tight">{gameName}</h2>
-                <p className="text-[10px] font-bold text-blue-500 uppercase tracking-widest mt-1">{i18n.syncing}</p>
+
               </div>
             </div>
             <div className="space-y-3 pt-3 border-t border-black/5 w-full">
@@ -94,7 +94,9 @@ export default function DownloadPage() {
             <div className="absolute inset-0 border-2 border-transparent border-t-yellow-300 rounded-full animate-spin"></div>
           </div>
           <span className="text-white font-black text-[15px] uppercase tracking-wide drop-shadow-md">
-            {i18n.status(completedCount)}
+           0 of 1 tasks Completed
+
+
           </span>
           <div className="absolute top-0 left-0 w-full h-1/2 bg-white/10 rounded-t-full pointer-events-none"></div>
         </div>

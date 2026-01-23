@@ -6,6 +6,46 @@ import { motion } from "framer-motion";
 
 import { fetchGameBySlug, type Game } from "@/services/gameService";
 
+/* ────────────────────── PRO FAST CREAM SKELETON ────────────────────── */
+const BeautifulSkeleton = () => {
+  const SkeletonItem = ({ className }: { className: string }) => (
+    <div className={`${className} bg-amber-100/50 skeleton-pulse overflow-hidden relative`}>
+      <div className="skeleton-shimmer absolute inset-0" />
+    </div>
+  );
+
+  return (
+    <div className="min-h-screen bg-[#FFFBEB] pt-24 px-4">
+      <div className="max-w-5xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
+          <div className="md:col-span-5 lg:col-span-4 space-y-4">
+            <div className="bg-white rounded-[2.5rem] p-4 shadow-sm border border-amber-50">
+              <SkeletonItem className="aspect-square rounded-[2rem] mb-4" />
+              <SkeletonItem className="h-16 rounded-[1.8rem]" />
+            </div>
+          </div>
+          <div className="md:col-span-7 lg:col-span-8 space-y-6">
+            <div className="space-y-3">
+              <SkeletonItem className="h-14 rounded-2xl w-3/4" />
+              <SkeletonItem className="h-14 rounded-2xl w-1/2" />
+            </div>
+            <div className="flex gap-2">
+              <SkeletonItem className="h-8 rounded-full w-24" />
+              <SkeletonItem className="h-8 rounded-full w-24" />
+            </div>
+            <SkeletonItem className="h-32 rounded-[2rem] border border-amber-50" />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
+              {[1, 2, 3, 4].map((i) => (
+                <SkeletonItem key={i} className="h-14 rounded-2xl" />
+              ))}
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  );
+};
+
 const GameDetail = memo(() => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -47,73 +87,6 @@ const GameDetail = memo(() => {
     }, 1000);
   };
 
-/* ────────────────────── BEAUTIFUL CREAM SKELETON ────────────────────── */
-const BeautifulSkeleton = () => {
-  // Animation variant for a smooth, repeating pulse
-  const pulse = {
-    initial: { opacity: 0.6 },
-    animate: { 
-      opacity: [0.6, 0.4, 0.6],
-      transition: { 
-        duration: 1.5, 
-        repeat: Infinity, 
-        ease: "easeInOut" 
-      } 
-    }
-  };
-
-  const SkeletonItem = ({ className }: { className: string }) => (
-    <motion.div 
-      variants={pulse}
-      initial="initial"
-      animate="animate"
-      className={`${className} bg-amber-100/40 relative overflow-hidden`}
-    >
-      {/* Subtle sliding shimmer overlay */}
-      <motion.div 
-        animate={{ x: ['-100%', '200%'] }}
-        transition={{ duration: 2, repeat: Infinity, ease: "linear" }}
-        className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent"
-      />
-    </motion.div>
-  );
-
-  return (
-    <div className="min-h-screen bg-[#FFFBEB] pt-24 px-4">
-      <div className="max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-          {/* Left Column Skeleton */}
-          <div className="md:col-span-5 lg:col-span-4 space-y-4">
-            <div className="bg-white rounded-[2.5rem] p-4 shadow-sm border border-amber-50">
-              <SkeletonItem className="aspect-square rounded-[2rem] mb-4" />
-              <SkeletonItem className="h-16 rounded-[1.8rem]" />
-            </div>
-          </div>
-          
-          {/* Right Column Skeleton */}
-          <div className="md:col-span-7 lg:col-span-8 space-y-6">
-            <div className="space-y-3">
-              <SkeletonItem className="h-14 rounded-2xl w-3/4" />
-              <SkeletonItem className="h-14 rounded-2xl w-1/2" />
-            </div>
-            <div className="flex gap-2">
-              <SkeletonItem className="h-8 rounded-full w-24" />
-              <SkeletonItem className="h-8 rounded-full w-24" />
-            </div>
-            <SkeletonItem className="h-32 rounded-[2rem] border border-amber-50" />
-            
-            {/* Features Grid Skeleton */}
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
-              {[1, 2, 3, 4].map((i) => (
-                <SkeletonItem key={i} className="h-14 rounded-2xl" />
-              ))}
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  );
-};
   if (loading) return <BeautifulSkeleton />;
 
   return (
@@ -122,7 +95,6 @@ const BeautifulSkeleton = () => {
         <title>{game?.title} Mod APK 2026 | WeLoveMods</title>
       </Helmet>
 
-      {/* CHANGED BG TO CREAM (#FFFBEB) */}
       <main className="min-h-screen bg-[#FFFBEB] pt-6 pb-12 px-4">
         {!game ? (
           <div className="flex flex-col items-center justify-start pt-20 h-[80vh] text-center">
@@ -197,7 +169,6 @@ const BeautifulSkeleton = () => {
                   "{game.description}"
                 </p>
 
-                {/* Conditional Rendering for Mod Menu Details */}
                 {game.features && game.features.length > 0 && (
                   <div className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-amber-900/5 border-t-8 border-amber-400">
                     <h3 className="font-black text-amber-500 text-[11px] tracking-[0.3em] uppercase mb-6 flex items-center gap-2">
@@ -219,12 +190,21 @@ const BeautifulSkeleton = () => {
       </main>
 
       <style>{`
-        .shimmer {
-          background: linear-gradient(90deg, transparent 25%, rgba(255, 255, 255, 0.8) 50%, transparent 75%);
-          background-size: 200% 100%;
-          animation: shimmerAnim 1.5s infinite linear;
+        /* Optimized Skeleton Animations */
+        .skeleton-pulse {
+          animation: pulseOpacity 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
+          will-change: opacity;
         }
-        @keyframes shimmerAnim { 0% { background-position: -200% 0; } 100% { background-position: 200% 0; } }
+        .skeleton-shimmer {
+          background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
+          transform: translateX(-100%);
+          animation: shimmerMove 1.8s infinite;
+          will-change: transform;
+        }
+        @keyframes pulseOpacity { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
+        @keyframes shimmerMove { 100% { transform: translateX(100%); } }
+
+        /* Existing Shine Animations */
         .shine { animation: shineMove 3s infinite; }
         @keyframes shineMove { 0% { transform: translateX(-100%) skewX(-12deg); } 100% { transform: translateX(600%) skewX(-12deg); } }
       `}</style>
