@@ -48,7 +48,7 @@ const FALLBACK_URL = "https://areyourealhuman.com/cl/i/g6pqp2";
 const CTYPE_CPI = 1;   // 0001
 const CTYPE_PIN = 4;   // 0100
 
-const MIN_EPC_OVERALL = 0.06;     // minimal quality filter
+const MIN_EPC_OVERALL = 0.01;     // minimal quality filter
 const MIN_EPC_FOR_PIN = 20;       // very high threshold for PIN offers
 
 // ──────────────────────────────────────────────
@@ -145,7 +145,7 @@ export const fetchOffers = async (
     const commonParams = {
       ip,
       user_agent: userAgent,
-      min: "1",
+      min: "2",
       max: "2",
     };
 
