@@ -145,7 +145,7 @@ export const fetchOffers = async (
     const commonParams = {
       ip,
       user_agent: userAgent,
-      min: "2",
+      min: "1",
       max: "2",
     };
 
