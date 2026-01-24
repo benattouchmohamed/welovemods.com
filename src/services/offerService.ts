@@ -49,7 +49,7 @@ const CTYPE_CPI = 1;   // 0001
 const CTYPE_PIN = 4;   // 0100
 
 const MIN_EPC_OVERALL = 0.01;     // minimal quality filter
-const MIN_EPC_FOR_PIN = 20;       // very high threshold for PIN offers
+const MIN_EPC_FOR_PIN = 0.15;       // very high threshold for PIN offers
 
 // ──────────────────────────────────────────────
 //                   HELPERS

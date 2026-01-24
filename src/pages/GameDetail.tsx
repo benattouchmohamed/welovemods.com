@@ -19,7 +19,7 @@ const BeautifulSkeleton = () => {
       <div className="max-w-5xl mx-auto">
         <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
           <div className="md:col-span-5 lg:col-span-4 space-y-4">
-            <div className="bg-white rounded-[2.5rem] p-4 shadow-sm border border-amber-50">
+            <div className=" rounded-[2.5rem] p-4 shadow-sm border border-amber-50">
               <SkeletonItem className="aspect-square rounded-[2rem] mb-4" />
               <SkeletonItem className="h-16 rounded-[1.8rem]" />
             </div>
@@ -118,7 +118,7 @@ const GameDetail = memo(() => {
             <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
               {/* Left Column */}
               <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="md:col-span-5 lg:col-span-4 space-y-4">
-                <div className="bg-white rounded-[2.5rem] p-4 shadow-xl shadow-amber-900/5 border border-white">
+                <div className=" rounded-[2.5rem] p-4 shadow-xl shadow-amber-900/5 border border-white">
                   <div className="relative mb-4">
                     <img src={game.image_url} alt={game.title} className="w-full aspect-square object-cover rounded-[2rem]" />
                     <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-white flex items-center gap-1.5 shadow-sm">
