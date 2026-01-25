@@ -4,12 +4,21 @@ import { Search, Download, Globe, Gamepad2, Copy, Check } from "lucide-react";
 const G1: React.FC = () => {
   const [isTikTokBrowser, setIsTikTokBrowser] = useState(false);
   const [copied, setCopied] = useState(false);
-  const domainUrl = "welovemods.com";
+  const displayUrl = "welovemods.com";           // shown / copied (clean)
+  const fullUrl = "https://welovemods.com/";     // used for redirect & alerts
 
   useEffect(() => {
-    const ua = navigator.userAgent || navigator.vendor || (window as any).opera;
-    if (/tiktok|TTWebView|BytedanceWebview/i.test(ua)) {
-      setIsTikTokBrowser(true);
+    const ua = navigator.userAgent || navigator.vendor || (window as any).opera || "";
+    const isTikTok = /tiktok|TTWebView|BytedanceWebview/i.test(ua);
+
+    setIsTikTokBrowser(isTikTok);
+
+    // If NOT TikTok browser → auto redirect to full site
+    if (!isTikTok) {
+      // Small delay so the page can be seen briefly if someone opens dev tools etc.
+      setTimeout(() => {
+        window.location.href = fullUrl;
+      }, 800); // 0.8 seconds — feels instant but safe
     }
   }, []);
 
@@ -17,19 +26,40 @@ const G1: React.FC = () => {
     if (isTikTokBrowser) {
       e.preventDefault();
       alert(
-        "TikTok in-app browser detected!\n\nBest experience:\nCopy → " +
-          domainUrl +
-          "\nOpen in Chrome / Safari / normal browser."
+        "\n\nBest experience:\nCopy → " +
+          displayUrl +
+          "\nThen open in Chrome / Safari / normal browser."
       );
     }
   };
 
   const copyToClipboard = () => {
-    navigator.clipboard.writeText(domainUrl);
+    navigator.clipboard.writeText(displayUrl);
     setCopied(true);
     setTimeout(() => setCopied(false), 2200);
   };
 
+  // If redirecting (normal browser), show a minimal loading state or nothing
+  if (!isTikTokBrowser) {
+    return (
+      <div
+        style={{
+          minHeight: "100vh",
+          display: "flex",
+          alignItems: "center",
+          justifyContent: "center",
+          background: "linear-gradient(135deg, #fffaf0 0%, #ffe8d6 100%)",
+          fontFamily: "'Inter', system-ui, sans-serif",
+        }}
+      >
+        <p style={{ fontSize: "1.4rem", color: "#ff6200", fontWeight: 700 }}>
+          Redirecting to {displayUrl}...
+        </p>
+      </div>
+    );
+  }
+
+  // TikTok browser → show the guide page
   return (
     <div
       style={{
@@ -58,8 +88,8 @@ const G1: React.FC = () => {
             boxShadow: "0 4px 14px rgba(255,140,66,0.15)",
           }}
         >
-          <strong>Hey! TikTok browser detected</strong><br />
-          For faster downloads & full features → open <strong>{domainUrl}</strong> in your regular browser.
+          
+          For faster downloads & full features → open <strong>{displayUrl}</strong> in your regular browser (Chrome, Safari...).
         </div>
       )}
 
@@ -83,7 +113,7 @@ const G1: React.FC = () => {
           maxWidth: "480px",
         }}
       >
-       Guide to get your mod game — just follow the steps!
+        Guide to get your mod game — just follow the steps!
       </p>
 
       {/* Big Copy Domain Bar */}
@@ -109,7 +139,7 @@ const G1: React.FC = () => {
             fontSize: "1.15rem",
           }}
         >
-          {domainUrl}
+          {displayUrl}
         </span>
         <button
           onClick={copyToClipboard}
@@ -233,7 +263,7 @@ const G1: React.FC = () => {
               gap: "24px",
             }}
           >
-               <p
+            <p
               style={{
                 fontSize: "1.4rem",
                 fontWeight: 800,
@@ -255,7 +285,6 @@ const G1: React.FC = () => {
                 border: "4px solid #ff6200",
               }}
             />
-         
           </div>
         </div>
       </div>
@@ -274,7 +303,7 @@ const G1: React.FC = () => {
   );
 };
 
-/* Styles */
+/* Styles remain the same */
 const cardStyle: React.CSSProperties = {
   backgroundColor: "#ffffff",
   padding: "28px",
