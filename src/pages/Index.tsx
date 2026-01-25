@@ -112,7 +112,7 @@ const Index = () => {
       </Helmet>
 
       <header className="w-full px-4 pt-20 pb-6 text-center z-50">
-        <section className="w-full max-w-md mx-auto relative" ref={searchRef}>
+        <section className="w-full max-w-md mx-auto relative" ref={searchRef}> <br />
           <div className="relative flex items-center px-4 py-3 rounded-full bg-white shadow-xl shadow-sky-100/50 border border-sky-100 focus-within:ring-2 focus-within:ring-sky-400 transition-all">
             <Search className="w-5 h-5 text-sky-500" />
             <input
