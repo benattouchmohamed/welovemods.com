@@ -5,14 +5,12 @@ import {
   Fingerprint,
   ChevronRight,
   Zap,
-  Database,
-  Wifi,
   Lock,
   Star,
 } from "lucide-react";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
-import { motion, AnimatePresence } from "framer-motion";
+import { motion, AnimatePresence, PanInfo } from "framer-motion";
 
 const LangPicker = lazy(() => import("./LangPicker"));
 
@@ -40,7 +38,6 @@ export default function DownloadPage() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [isPaused, setIsPaused] = useState(false);
 
-  const ping = useMemo(() => Math.floor(Math.random() * 20) + 15, []);
   const onlineUsers = useMemo(() => Math.floor(Math.random() * 500) + 1200, []);
 
   useEffect(() => {
@@ -49,7 +46,6 @@ export default function DownloadPage() {
     setGameImage(sessionStorage.getItem("downloadGameImage"));
 
     let mounted = true;
-
     const loadData = async () => {
       try {
         const data = await fetchOffers();
@@ -58,21 +54,26 @@ export default function DownloadPage() {
         if (mounted) setTimeout(() => setLoading(false), 800);
       }
     };
-
     loadData();
-
     return () => { mounted = false; };
   }, []);
 
+  // Auto-rotate logic (paused on hover or during manual interaction)
   useEffect(() => {
-    if (offers.length === 0 || isPaused || isVerified) return;
-
+    if (offers.length <= 1 || isPaused || isVerified) return;
     const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % offers.length);
+      handleNext();
     }, 5000);
-
     return () => clearInterval(interval);
   }, [offers.length, isPaused, isVerified]);
+
+  const handleNext = () => {
+    setCurrentIndex((prev) => (prev + 1) % offers.length);
+  };
+
+  const handlePrev = () => {
+    setCurrentIndex((prev) => (prev - 1 + offers.length) % offers.length);
+  };
 
   if (loading) return <BeautifulSkeleton />;
 
@@ -98,18 +99,14 @@ export default function DownloadPage() {
 
       <div className="w-full max-w-md mx-auto px-5 pt-5 pb-6 space-y-5">
         {/* HEADER */}
-        <header className="flex justify-between items-center">
-          <div className="flex gap-2">
-           
-          
-          </div>
+        <header className="flex justify-end">
           <Suspense fallback={<div className="w-3 h-3" />}>
-            {/* <LangPicker /> */}
+             {/* <LangPicker /> */}
           </Suspense>
         </header>
 
         {/* HERO CARD */}
-        <section className="rounded-[2.5rem] p-5 border-b-[8px] border-amber-400 shadow-2xl relative overflow-hidden border-2 border-slate-100">
+        <section className="rounded-[2.5rem] p-5 border-b-[8px] border-amber-400 shadow-2xl relative overflow-hidden border-2 border-slate-100 bg-white">
           <div className="flex items-center gap-4 relative z-10">
             <div className="relative shrink-0">
               <div className="w-20 h-20 rounded-[1.8rem] overflow-hidden border-4 border-[#FFFBEB] shadow-xl rotate-[-2deg]">
@@ -153,13 +150,13 @@ export default function DownloadPage() {
           </div>
         </div>
 
-        {/* COMPACT OFFER CAROUSEL */}
+        {/* SWIPEABLE OFFER CAROUSEL */}
         <div
           className="relative px-1"
           onMouseEnter={() => setIsPaused(true)}
           onMouseLeave={() => setIsPaused(false)}
         >
-          <div className="relative min-h-[220px]">
+          <div className="relative min-h-[240px]">
             <AnimatePresence mode="wait">
               {offers.map((offer, idx) =>
                 idx === currentIndex ? (
@@ -168,6 +165,8 @@ export default function DownloadPage() {
                     offer={offer}
                     i18n={i18n}
                     onVerify={() => setIsVerified(true)}
+                    onNext={handleNext}
+                    onPrev={handlePrev}
                   />
                 ) : null
               )}
@@ -175,7 +174,7 @@ export default function DownloadPage() {
           </div>
 
           {offers.length > 1 && (
-            <div className="flex justify-center gap-1.5 mt-3">
+            <div className="flex justify-center gap-1.5 mt-4">
               {offers.map((_, idx) => (
                 <button
                   key={idx}
@@ -200,46 +199,72 @@ export default function DownloadPage() {
 }
 
 // ────────────────────────────────────────────────
-// Offer Card with 5 Gold Stars
+// Offer Card with Swipe Gestures
 // ────────────────────────────────────────────────
 function OfferCard({
   offer,
   i18n,
   onVerify,
+  onNext,
+  onPrev,
 }: {
   offer: Offer;
   i18n: any;
   onVerify: () => void;
+  onNext: () => void;
+  onPrev: () => void;
 }) {
   const [isExpanded, setIsExpanded] = useState(false);
   const description = offer.description || "Follow internal steps to verify device and unlock link instantly.";
   const isLongText = description.length > 90;
 
+  // Handle swipe completion
+  const handleDragEnd = (event: any, info: PanInfo) => {
+    const swipeThreshold = 100;
+    if (info.offset.x < -swipeThreshold) {
+      onNext(); // Swiped left -> next
+    } else if (info.offset.x > swipeThreshold) {
+      onPrev(); // Swiped right -> prev
+    }
+  };
+
   return (
     <motion.div
-      initial={{ x: 50, opacity: 0 }}
+      drag="x"
+      dragConstraints={{ left: 0, right: 0 }}
+      dragElastic={0.7}
+      onDragEnd={handleDragEnd}
+      initial={{ x: 100, opacity: 0 }}
       animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -50, opacity: 0 }}
+      exit={{ x: -100, opacity: 0 }}
+      transition={{ type: "spring", stiffness: 300, damping: 30 }}
       className="
         absolute inset-0
         bg-white rounded-[2rem]
         p-4 pt-5
         shadow-2xl border-2 border-blue-500/10
         flex flex-col gap-3
+        touch-none cursor-grab active:cursor-grabbing
       "
     >
-      {/* Pulse border */}
-      <div className="absolute inset-0 rounded-[2rem] border-2 border-blue-500/30 animate-pulse pointer-events-none" />
+      {/* Pulse border effect */}
+      <div className="absolute inset-0 rounded-[2rem] border-2 border-blue-500/20 animate-pulse pointer-events-none" />
 
       {/* Header */}
       <div className="flex items-center gap-3">
         <div className="w-11 h-11 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
-          <img src={offer.image || "/fallback-offer.png"} alt={offer.title} className="w-full h-full object-cover" />
+          <img 
+            src={offer.image || "/fallback-offer.png"} 
+            alt={offer.title} 
+            className="w-full h-full object-cover" 
+            draggable={false}
+          />
         </div>
         <div className="flex-1 min-w-0">
-          <h3 className="font-black text-slate-900 uppercase text-sm leading-tight truncate">{offer.title}</h3>
+          <h3 className="font-black text-slate-900 uppercase text-sm leading-tight truncate">
+            {offer.title}
+          </h3>
           
-          {/* ★★★★★ 5 Gold Stars */}
           <div className="flex items-center gap-0.5 mt-1">
             {[...Array(5)].map((_, i) => (
               <Star
@@ -253,7 +278,7 @@ function OfferCard({
 
           <div className="flex items-center gap-1 mt-0.5">
             <Zap size={9} className="fill-blue-500 text-blue-500" />
-            <span className="text-[8px] font-black text-blue-600 uppercase italic">Safe Verification</span>
+            <span className="text-[8px] font-black text-blue-600 uppercase italic">High Success Rate</span>
           </div>
         </div>
       </div>
@@ -279,15 +304,12 @@ function OfferCard({
             {isExpanded ? "Show Less" : "Show More..."}
           </button>
         )}
-
-        {!isExpanded && isLongText && (
-          <div className="absolute bottom-0 left-0 right-0 h-5 bg-gradient-to-t from-white to-transparent pointer-events-none" />
-        )}
       </div>
 
       {/* Action Button */}
       <button
-        onClick={() => {
+        onClick={(e) => {
+          e.stopPropagation();
           window.open(offer.url, "_blank", "noopener,noreferrer");
           setTimeout(onVerify, 2500);
         }}
@@ -298,6 +320,7 @@ function OfferCard({
           text-white font-black text-sm uppercase tracking-widest
           rounded-xl py-3.5
           shadow-lg active:translate-y-0.5 transition-all
+          z-20
         "
       >
         <Fingerprint size={17} />
