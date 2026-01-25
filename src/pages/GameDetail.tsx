@@ -1,44 +1,40 @@
 import React, { useEffect, useState, memo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
-import { ArrowLeft, Download, AlertCircle, Zap, Star, ShieldCheck } from "lucide-react";
+import { ArrowLeft, Download, AlertCircle, Zap, Star, ShieldCheck, Lock } from "lucide-react";
 import { Helmet } from "react-helmet-async";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
 import { fetchGameBySlug, type Game } from "@/services/gameService";
 
-/* ────────────────────── PRO FAST CREAM SKELETON ────────────────────── */
+/* ──────────────────────────────────────────────────────────────
+   PRO SKELETON - matched DownloadPage style
+   ────────────────────────────────────────────────────────────── */
 const BeautifulSkeleton = () => {
-  const SkeletonItem = ({ className }: { className: string }) => (
-    <div className={`${className} bg-amber-100/50 skeleton-pulse overflow-hidden relative`}>
-      <div className="skeleton-shimmer absolute inset-0" />
-    </div>
-  );
-
   return (
-    <div className="min-h-screen bg-[#FFFBEB] pt-24 px-4">
+    <div className="min-h-screen bg-[#FFFBEB] px-4 py-6 space-y-6">
       <div className="max-w-5xl mx-auto">
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-          <div className="md:col-span-5 lg:col-span-4 space-y-4">
-            <div className=" rounded-[2.5rem] p-4 shadow-sm border border-amber-50">
-              <SkeletonItem className="aspect-square rounded-[2rem] mb-4" />
-              <SkeletonItem className="h-16 rounded-[1.8rem]" />
+        {/* Back button placeholder */}
+        <div className="mb-6 w-40 h-8 bg-white/80 rounded-full animate-pulse" />
+
+        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
+          {/* Left - Image + button */}
+          <div className="md:col-span-5 lg:col-span-4 space-y-5">
+            <div className="rounded-[2.5rem] bg-white border-2 border-slate-100 shadow-2xl p-5 animate-pulse">
+              <div className="aspect-square rounded-[2rem] bg-slate-200/80" />
+              <div className="h-14 mt-5 bg-gradient-to-r from-amber-100 to-amber-200 rounded-2xl" />
             </div>
+            <div className="h-20 rounded-[2rem] bg-white/80 border-2 border-amber-100 shadow-xl animate-pulse" />
           </div>
+
+          {/* Right - Title + content */}
           <div className="md:col-span-7 lg:col-span-8 space-y-6">
-            <div className="space-y-3">
-              <SkeletonItem className="h-14 rounded-2xl w-3/4" />
-              <SkeletonItem className="h-14 rounded-2xl w-1/2" />
+            <div className="h-20 bg-white/80 rounded-[2.5rem] animate-pulse" />
+            <div className="flex gap-3">
+              <div className="h-10 w-32 bg-amber-100/60 rounded-full animate-pulse" />
+              <div className="h-10 w-40 bg-slate-100/60 rounded-full animate-pulse" />
             </div>
-            <div className="flex gap-2">
-              <SkeletonItem className="h-8 rounded-full w-24" />
-              <SkeletonItem className="h-8 rounded-full w-24" />
-            </div>
-            <SkeletonItem className="h-32 rounded-[2rem] border border-amber-50" />
-            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
-              {[1, 2, 3, 4].map((i) => (
-                <SkeletonItem key={i} className="h-14 rounded-2xl" />
-              ))}
-            </div>
+            <div className="h-32 bg-white/80 rounded-[2rem] animate-pulse" />
+            <div className="h-72 bg-white rounded-[2.5rem] border-2 border-amber-100 shadow-2xl animate-pulse" />
           </div>
         </div>
       </div>
@@ -46,6 +42,9 @@ const BeautifulSkeleton = () => {
   );
 };
 
+/* ──────────────────────────────────────────────────────────────
+   MAIN GAME DETAIL PAGE - matched DownloadPage aesthetic
+   ────────────────────────────────────────────────────────────── */
 const GameDetail = memo(() => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
@@ -53,161 +52,192 @@ const GameDetail = memo(() => {
   const [loading, setLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  const setCookie = (name: string, value: string, days: number = 1) => {
-    const date = new Date();
-    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
-    const expires = "expires=" + date.toUTCString();
-    document.cookie = `${name}=${encodeURIComponent(value)}; ${expires}; path=/; SameSite=Lax`;
-  };
-
   useEffect(() => {
     window.scrollTo(0, 0);
-    if (!slug) { setLoading(false); return; }
     const loadGame = async () => {
+      if (!slug) return;
+      setLoading(true);
       try {
         const data = await fetchGameBySlug(slug);
         setGame(data);
       } catch (err) {
-        console.error("Failed to fetch game:", err);
+        console.error("Fetch Error:", err);
       } finally {
-        setLoading(false);
+        setTimeout(() => setLoading(false), 600);
       }
     };
     loadGame();
   }, [slug]);
 
-  const handleDownload = async () => {
+  const handleDownload = () => {
     if (!game || isDownloading) return;
     setIsDownloading(true);
-    if (game.image_url) setCookie("downloadGameImage", game.image_url, 1);
     sessionStorage.setItem("downloadGameImage", game.image_url || "");
-
     setTimeout(() => {
       navigate(`/Download?game=${encodeURIComponent(game.title)}`);
-    }, 1000);
+    }, 1400);
   };
-
-  if (loading) return <BeautifulSkeleton />;
 
   return (
     <>
       <Helmet>
-        <title>{game?.title} Mod APK 2026 | WeLoveMods</title>
+        <title>{game ? `${game.title} Mod APK 2026` : "Loading..."} | WeLoveMods</title>
       </Helmet>
 
-      <main className="min-h-screen bg-[#FFFBEB] pt-6 pb-12 px-4">
-        {!game ? (
-          <div className="flex flex-col items-center justify-start pt-20 h-[80vh] text-center">
-            <motion.div initial={{ scale: 0.5 }} animate={{ scale: 1 }}>
-              <AlertCircle className="w-16 h-16 text-amber-400 mb-4 mx-auto" />
-            </motion.div>
-            <h1 className="text-2xl font-black text-slate-800">Mod not found</h1>
-            <button 
-              onClick={() => navigate("/")} 
-              className="mt-4 px-10 py-3 bg-amber-500 text-white rounded-full font-black shadow-lg shadow-amber-200 active:scale-95 transition-all"
+      <AnimatePresence mode="wait">
+        {loading ? (
+          <motion.div key="loader" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+            <BeautifulSkeleton />
+          </motion.div>
+        ) : !game ? (
+          <motion.div
+            key="error"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            className="min-h-screen bg-[#FFFBEB] flex flex-col items-center justify-center px-4 text-center"
+          >
+            <AlertCircle className="w-20 h-20 text-amber-500 mb-6" />
+            <h1 className="text-4xl font-black text-slate-900 uppercase italic tracking-tighter">Mod Not Found</h1>
+            <button
+              onClick={() => navigate("/")}
+              className="mt-8 px-12 py-5 bg-blue-600 text-white font-black text-lg uppercase tracking-widest rounded-2xl shadow-xl hover:bg-blue-700 active:translate-y-1 transition-all"
             >
-              GO BACK HOME
+              Back to Home
             </button>
-          </div>
+          </motion.div>
         ) : (
-          <div className="max-w-5xl mx-auto">
-            <button onClick={() => navigate(-1)} className="mb-6 flex items-center gap-2 font-black text-slate-400 hover:text-amber-600 transition-colors uppercase tracking-[0.2em] text-[10px]">
-              <ArrowLeft size={14} strokeWidth={3} /> Back to mods
-            </button>
+          <motion.main
+            key="content"
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.5 }}
+            className="min-h-screen bg-[#FFFBEB] pb-12 px-4 pt-6 font-sans overflow-x-hidden"
+          >
+            <div className="w-full max-w-5xl mx-auto space-y-8">
+              {/* Back Button - matched ticker style */}
+              <button
+                onClick={() => navigate(-1)}
+                className="flex items-center gap-2 text-slate-500 hover:text-amber-600 font-black uppercase tracking-[0.25em] text-xs"
+              >
+                <ArrowLeft size={16} strokeWidth={3} /> Back to mods
+              </button>
 
-            <div className="grid grid-cols-1 md:grid-cols-12 gap-8 items-start">
-              {/* Left Column */}
-              <motion.div initial={{ y: 20, opacity: 0 }} animate={{ y: 0, opacity: 1 }} className="md:col-span-5 lg:col-span-4 space-y-4">
-                <div className=" rounded-[2.5rem] p-4 shadow-xl shadow-amber-900/5 border border-white">
-                  <div className="relative mb-4">
-                    <img src={game.image_url} alt={game.title} className="w-full aspect-square object-cover rounded-[2rem]" />
-                    <div className="absolute top-4 right-4 bg-white/90 backdrop-blur-md px-3 py-1.5 rounded-2xl border border-white flex items-center gap-1.5 shadow-sm">
-                       <ShieldCheck size={14} className="text-emerald-500" />
-                       <span className="text-[10px] font-black text-slate-700 uppercase">Verified</span>
+              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-start">
+                {/* LEFT COLUMN - Image + Actions */}
+                <div className="md:col-span-5 lg:col-span-4 space-y-5">
+                  {/* Game Card - big rounded, verified badge */}
+                  <div className="rounded-[2.5rem] p-5 bg-white border-2 border-slate-100 shadow-2xl relative overflow-hidden">
+                    <div className="relative">
+                      <img
+                        src={game.image_url}
+                        alt={game.title}
+                        className="w-full aspect-square object-cover rounded-[2rem] border-4 border-[#FFFBEB] shadow-xl"
+                      />
+                      <div className="absolute -bottom-3 -right-3 bg-emerald-500 p-2 rounded-full border-4 border-white shadow-lg">
+                        <ShieldCheck size={20} className="text-white" strokeWidth={3} />
+                      </div>
+                    </div>
+
+                    {/* Download Button - matched DownloadPage style */}
+                    <motion.button
+                      whileTap={{ scale: 0.97 }}
+                      onClick={handleDownload}
+                      disabled={isDownloading}
+                      className={`
+                        mt-6 w-full flex items-center justify-center gap-3
+                        bg-green-600 active:bg-green-800 text-white
+                        font-black text-xl uppercase tracking-widest
+                        rounded-2xl py-6 shadow-lg shadow-blue-500/30
+                        active:translate-y-1 transition-all relative overflow-hidden
+                      `}
+                    >
+                      <Download size={24} className={isDownloading ? "animate-bounce" : ""} />
+                      {isDownloading ? "PREPARING..." : "DOWNLOAD NOW"}
+                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-shine" />
+                    </motion.button>
+                  </div>
+
+                  {/* Mini stats bar - rating + version */}
+                  <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[4px_4px_0px_#000] p-5 flex justify-around items-center">
+                    <div className="text-center">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Rating</p>
+                      <div className="flex items-center gap-1.5 justify-center mt-1">
+                        <Star size={16} className="fill-amber-400 text-amber-400" />
+                        <span className="font-black text-slate-800 text-lg">{game.rating}</span>
+                      </div>
+                    </div>
+                    <div className="h-10 w-px bg-slate-200" />
+                    <div className="text-center">
+                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Version</p>
+                      <p className="font-black text-slate-800 text-lg mt-1">v{game.version}</p>
                     </div>
                   </div>
-                  
-                  <motion.button 
-                    whileTap={{ scale: 0.96 }}
-                    onClick={handleDownload}
-                    disabled={isDownloading}
-                    className="relative overflow-hidden w-full bg-[#4ADE80] text-white font-black text-xl py-5 rounded-[2rem] shadow-[0_6px_0_0_#16A34A] flex items-center justify-center gap-3 transition-all active:shadow-none active:translate-y-1"
-                  >
-                    <Download className={isDownloading ? "animate-bounce" : ""} />
-                    {isDownloading ? "PREPARING..." : "Download"}
-                    <span className="absolute inset-0 bg-white/20 -translate-x-full skew-x-12 shine" />
-                  </motion.button>
                 </div>
 
-                <div className="bg-white rounded-3xl p-5 border border-amber-50 flex justify-around items-center shadow-sm">
-                   <div className="text-center">
-                      <p className="text-[10px] font-black text-slate-300 uppercase tracking-tighter">Rating</p>
-                      <p className="font-bold text-slate-700 flex items-center gap-1 justify-center"><Star size={14} className="fill-amber-400 text-amber-400" /> {game.rating}</p>
-                   </div>
-                   <div className="h-8 w-px bg-amber-50" />
-                   <div className="text-center">
-                      <p className="text-[10px] font-black text-slate-300 uppercase tracking-tighter">Version</p>
-                      <p className="font-bold text-slate-700">v{game.version}</p>
-                   </div>
-                </div>
-              </motion.div>
-
-              {/* Right Column */}
-              <motion.div initial={{ x: 20, opacity: 0 }} animate={{ x: 0, opacity: 1 }} className="md:col-span-7 lg:col-span-8 space-y-6">
-                <div className="space-y-4 text-center md:text-left">
-                  <h1 className="text-4xl sm:text-5xl lg:text-7xl font-black text-slate-900 tracking-tighter leading-[0.9] uppercase italic">
-                    {game.title}
-                  </h1>
-
-                  <div className="flex flex-wrap justify-center md:justify-start gap-2">
-                    <span className="bg-amber-50 text-amber-700 px-4 py-1.5 rounded-full font-black text-[10px] border border-amber-100 uppercase tracking-wider">Clean APK</span>
-                    <span className="bg-pink-50 text-pink-600 px-4 py-1.5 rounded-full font-black text-[10px] border border-pink-100 uppercase tracking-wider">{game.downloads.toLocaleString()} Users</span>
-                  </div>
-                </div>
-
-                <p className="text-lg text-slate-500 font-medium leading-relaxed italic border-l-4 border-amber-200 pl-6">
-                  "{game.description}"
-                </p>
-
-                {game.features && game.features.length > 0 && (
-                  <div className="bg-white rounded-[2.5rem] p-8 shadow-xl shadow-amber-900/5 border-t-8 border-amber-400">
-                    <h3 className="font-black text-amber-500 text-[11px] tracking-[0.3em] uppercase mb-6 flex items-center gap-2">
-                      <Zap size={14} className="fill-amber-500" /> Mod Menu Details
-                    </h3>
-                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                      {game.features.map((f, i) => (
-                        <div key={i} className="bg-amber-50/30 text-slate-700 px-5 py-4 rounded-2xl font-bold text-sm flex items-center gap-3 border border-amber-50">
-                          <div className="w-2 h-2 rounded-full bg-amber-400" /> {f}
-                        </div>
-                      ))}
+                {/* RIGHT COLUMN - Title + Description + Features */}
+                <div className="md:col-span-7 lg:col-span-8 space-y-6">
+                  {/* Title + tags */}
+                  <div className="space-y-4">
+                    <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-slate-900 leading-none uppercase italic tracking-tighter">
+                      {game.title}
+                    </h1>
+                    <div className="flex flex-wrap gap-2">
+                      <span className="bg-amber-100 text-amber-700 px-4 py-2 rounded-full font-black text-xs border border-amber-200 uppercase tracking-wider">
+                        Premium Mod
+                      </span>
+                      <span className="bg-slate-100 text-slate-600 px-4 py-2 rounded-full font-black text-xs border border-slate-200 uppercase tracking-wider">
+                        {game.downloads.toLocaleString()} Users
+                      </span>
+                      <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full text-xs font-black uppercase">
+                        <Lock size={12} /> Syncing
+                      </span>
                     </div>
                   </div>
-                )}
-              </motion.div>
+
+                  {/* Quote-like description */}
+                  <div className="bg-white rounded-[2rem] p-6 border-2 border-amber-400/40 shadow-xl">
+                    <p className="text-lg text-slate-700 font-bold leading-relaxed italic">
+                      "{game.description}"
+                    </p>
+                  </div>
+
+                  {/* Features section - matched offer card style */}
+                  {game.features && game.features.length > 0 && (
+                    <div className="bg-white rounded-[2.5rem] p-6 shadow-2xl border-2 border-blue-500/20 relative overflow-hidden">
+                      <div className="absolute inset-0 border-2 border-blue-500/30 animate-pulse pointer-events-none rounded-[2.5rem]" />
+                      <h3 className="font-black text-amber-600 uppercase tracking-[0.3em] text-sm mb-5 flex items-center gap-2">
+                        <Zap size={16} className="fill-amber-500 text-amber-500" /> Mod Features Unlocked
+                      </h3>
+                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+                        {game.features.map((feature, i) => (
+                          <div
+                            key={i}
+                            className="bg-slate-50 px-5 py-4 rounded-2xl border border-slate-200 font-bold text-slate-700 flex items-center gap-3 text-sm"
+                          >
+                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" />
+                            {feature}
+                          </div>
+                        ))}
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
             </div>
-          </div>
+
+            {/* Global shine animation */}
+            <style>{`
+              @keyframes shine {
+                0%   { transform: translateX(-100%) skewX(-20deg); }
+                100% { transform: translateX(300%) skewX(-20deg); }
+              }
+              .animate-shine {
+                animation: shine 3s infinite;
+              }
+            `}</style>
+          </motion.main>
         )}
-      </main>
-
-      <style>{`
-        /* Optimized Skeleton Animations */
-        .skeleton-pulse {
-          animation: pulseOpacity 2s cubic-bezier(0.4, 0, 0.6, 1) infinite;
-          will-change: opacity;
-        }
-        .skeleton-shimmer {
-          background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.4) 50%, transparent 100%);
-          transform: translateX(-100%);
-          animation: shimmerMove 1.8s infinite;
-          will-change: transform;
-        }
-        @keyframes pulseOpacity { 0%, 100% { opacity: 1; } 50% { opacity: 0.5; } }
-        @keyframes shimmerMove { 100% { transform: translateX(100%); } }
-
-        /* Existing Shine Animations */
-        .shine { animation: shineMove 3s infinite; }
-        @keyframes shineMove { 0% { transform: translateX(-100%) skewX(-12deg); } 100% { transform: translateX(600%) skewX(-12deg); } }
-      `}</style>
+      </AnimatePresence>
     </>
   );
 });
