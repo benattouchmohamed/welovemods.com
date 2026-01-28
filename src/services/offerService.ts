@@ -1,226 +1,138 @@
-// =============================================
-//  Offer Wall - CPI Priority + High EPC PIN
-//  Last updated: January 2025
-// =============================================
+// ==========================================================
+//  Offer Wall - TRUE CPI ONLY MODE (API LEVEL)
+// ==========================================================
 
 export interface Offer {
   id: string;
   title: string;
   description: string;
-  difficulty: "Easy";
-  timeEstimate: string;
-  icon: string;
   url: string;
   image?: string;
-  type?: string;
-  epc?: number;
-  payout?: number;
-}
-
-interface ApiOffer {
-  offerid?: string;
-  name?: string;
-  name_short?: string;
-  description?: string;
-  adcopy?: string;
-  picture?: string;
-  payout?: string;
-  link?: string;
-  epc?: string;
-  category?: string;
-}
-
-interface ApiOfferResponse {
-  success?: boolean;
-  error?: string | null;
-  offers?: ApiOffer[];
+  type: string;
+  epc: number;
+  payout: number;
 }
 
 // ──────────────────────────────────────────────
-//                  CONFIGURATION
-// ──────────────────────────────────────────────
-
-const API_BASE_URL = "https://unlockcontent.net/api/v2";
-const API_TOKEN = "32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085";
-const FALLBACK_URL = "https://areyourealhuman.com/cl/i/g6pqp2";
-
-// ctype flags (bitwise)
-const CTYPE_CPI = 1;   // 0001
-const CTYPE_PIN = 4;   // 0100
-
-const MIN_EPC_OVERALL = 0.01;     // minimal quality filter
-const MIN_EPC_FOR_PIN = 1;       // very high threshold for PIN offers
-
-// ──────────────────────────────────────────────
-//                   HELPERS
+// IP LOOKUP (Multi-Service Fallback)
 // ──────────────────────────────────────────────
 
 const getVisitorIP = async (): Promise<string> => {
-  try {
-    const response = await fetch("https://api.ipify.org?format=json", {
-      signal: AbortSignal.timeout(5000),
-    });
-    const data = await response.json();
-    return data.ip ?? "127.0.0.1";
-  } catch {
-    return "127.0.0.1";
-  }
-};
+  const services = [
+    { url: "https://1.1.1.1/cdn-cgi/trace", parse: (d: string) => d.match(/ip=(.*)/)?.[1] },
+    { url: "https://checkip.amazonaws.com", parse: (d: string) => d.trim() },
+    { url: "https://ifconfig.me/ip", parse: (d: string) => d.trim() },
+    { url: "https://api.ipify.org", parse: (d: string) => d.trim() },
+    { url: "https://api64.ipify.org?format=json", parse: (d: string) => JSON.parse(d).ip },
+    { url: "https://ifconfig.co/json", parse: (d: string) => JSON.parse(d).ip },
+    { url: "https://api.seeip.org/jsonip", parse: (d: string) => JSON.parse(d).ip },
+    { url: "https://ipapi.co/json/", parse: (d: string) => JSON.parse(d).ip },
+    { url: "https://www.cloudflare.com/cdn-cgi/trace", parse: (d: string) => d.match(/ip=(.*)/)?.[1] }
+  ];
 
-const parseFloatOrNull = (value?: string): number | null => {
-  if (!value) return null;
-  const num = parseFloat(value);
-  return isNaN(num) ? null : num;
-};
-
-const mapApiOfferToOffer = (apiOffer: ApiOffer, index: number): Offer => {
-  const url = apiOffer.link && /^https?:\/\//i.test(apiOffer.link)
-    ? apiOffer.link
-    : FALLBACK_URL;
-
-  return {
-    id: apiOffer.offerid ?? `offer-${index + 1}`,
-    title: apiOffer.name_short ?? apiOffer.name ?? "Special Offer",
-    description: apiOffer.adcopy ?? apiOffer.description ?? "Complete this quick task to continue",
-    difficulty: "Easy" as const,
-    timeEstimate: "1-3 mins",
-    icon: "Gift",
-    url,
-    image: apiOffer.picture,
-    type: apiOffer.category,
-    epc: parseFloatOrNull(apiOffer.epc) ?? 0,
-    payout: parseFloatOrNull(apiOffer.payout) ?? 0,
-  };
-};
-
-// ──────────────────────────────────────────────
-//               SORTING LOGIC
-// ──────────────────────────────────────────────
-
-function compareOffers(a: Offer, b: Offer): number {
-  const typeA = (a.type ?? "").toUpperCase();
-  const typeB = (b.type ?? "").toUpperCase();
-
-  const isCPI_A = typeA.includes("CPI") || typeA.includes("APP");
-  const isCPI_B = typeB.includes("CPI") || typeB.includes("APP");
-
-  // 1. CPI offers always come first
-  if (isCPI_A && !isCPI_B) return -1;
-  if (!isCPI_A && isCPI_B) return 1;
-
-  // 2. Then sort by EPC descending (very important for good PIN)
-  if (a.epc !== b.epc) {
-    return b.epc - a.epc;
-  }
-
-  // 3. Higher payout as tie-breaker
-  if (a.payout !== b.payout) {
-    return b.payout - a.payout;
-  }
-
-  // 4. Stable sort fallback
-  return 0;
-}
-
-// ──────────────────────────────────────────────
-//               MAIN FUNCTIONS
-// ──────────────────────────────────────────────
-
-/**
- * Fetches CPI offers + very high EPC PIN offers
- * CPI always prioritized in final sorting
- */
-export const fetchOffers = async (
-  minEpcForPin: number = MIN_EPC_FOR_PIN
-): Promise<Offer[]> => {
-  try {
-    const ip = await getVisitorIP();
-    const userAgent = navigator.userAgent;
-
-    const headers = {
-      Authorization: `Bearer ${API_TOKEN}`,
-      "Content-Type": "application/json",
-    };
-
-    const commonParams = {
-      ip,
-      user_agent: userAgent,
-      min: "1",
-      max: "3",
-    };
-
-    // ── 1. CPI offers ────────────────────────────────
-    let allOffers: Offer[] = [];
-
-    const cpiParams = new URLSearchParams({
-      ...commonParams,
-      ctype: CTYPE_CPI.toString(),
-    });
-
-    const cpiResponse = await fetch(`${API_BASE_URL}?${cpiParams}`, {
-      headers,
-      signal: AbortSignal.timeout(10000),
-    });
-
-    if (cpiResponse.ok) {
-      const data: ApiOfferResponse = await cpiResponse.json();
-      if (data.success && data.offers?.length) {
-        allOffers = data.offers.map(mapApiOfferToOffer);
-      }
+  for (const service of services) {
+    try {
+      const res = await fetch(service.url, { signal: AbortSignal.timeout(2000) });
+      const data = service.url.includes("json") ? await res.json() : await res.text();
+      const ip = service.parse(data);
+      if (ip) return ip;
+    } catch {
+      continue;
     }
+  }
+  return "1.1.1.1"; // Ultimate fallback
+};
 
-    // ── 2. High EPC PIN offers ───────────────────────
-    const pinParams = new URLSearchParams({
-      ...commonParams,
-      ctype: CTYPE_PIN.toString(),
-    });
+// ──────────────────────────────────────────────
+// CORE FETCH FUNCTION
+// ──────────────────────────────────────────────
 
-    const pinResponse = await fetch(`${API_BASE_URL}?${pinParams}`, {
-      headers,
-      signal: AbortSignal.timeout(10000),
-    });
+const fetchFromAPI = async (
+  ip: string,
+  min: number,
+  max: number
+): Promise<any[]> => {
+  const params = new URLSearchParams({
+    ip,
+    user_agent: navigator.userAgent,
+    min: String(min),
+    max: String(max)
+  });
 
-    if (pinResponse.ok) {
-      const data: ApiOfferResponse = await pinResponse.json();
-      if (data.success && data.offers?.length) {
-        const goodPinOffers = data.offers
-          .map(mapApiOfferToOffer)
-          .filter((offer) => (offer.epc ?? 0) > minEpcForPin);
-
-        allOffers = [...allOffers, ...goodPinOffers];
+  try {
+    const res = await fetch(
+      `https://unlockcontent.net/api/v2?${params}`,
+      {
+        headers: {
+          Authorization: "Bearer 32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085"
+        },
+        signal: AbortSignal.timeout(8000)
       }
-    }
+    );
 
-    // Final processing
-    return allOffers
-      .filter((offer) => (offer.epc ?? 0) >= MIN_EPC_OVERALL)
-      .sort(compareOffers);
-
-  } catch (error) {
-    console.error("[fetchOffers] Failed:", error);
+    const data = await res.json();
+    return (data.success && Array.isArray(data.offers)) ? data.offers : [];
+  } catch (err) {
+    console.error("API Fetch Failed", err);
     return [];
   }
 };
 
-/**
- * Returns only the single best offer (usually CPI, sometimes very high EPC PIN)
- */
-export const getTopOffer = async (): Promise<Offer | null> => {
-  const offers = await fetchOffers();
-  return offers.length > 0 ? offers[0] : null;
-};
+// ──────────────────────────────────────────────
+// MAIN LOGIC: CPI ISOLATION MODE
+// ──────────────────────────────────────────────
 
-// For debugging / testing
-export const debugGetOffers = async () => {
-  const offers = await fetchOffers();
-  console.table(
-    offers.map(o => ({
-      Type: o.type || "—",
-      Title: o.title.substring(0, 40) + "...",
-      EPC: o.epc?.toFixed(2),
-      Payout: o.payout?.toFixed(2),
-      URL: o.url.includes("areyourealhuman") ? "fallback" : "direct"
-    }))
-  );
-  return offers;
+export const fetchOffers = async (): Promise<Offer[]> => {
+  try {
+    const ip = await getVisitorIP();
+
+    // 1. Fetch initial batch
+    const rawOffers = await fetchFromAPI(ip, 1, 40);
+
+    const mapped: Offer[] = rawOffers.map((o: any, i: number) => ({
+      id: o.offerid ?? `off-${i}`,
+      title: o.name_short ?? o.name,
+      description: o.adcopy ?? o.description,
+      url: o.link,
+      image: o.picture,
+      type: (o.category || "").toUpperCase(),
+      epc: parseFloat(o.epc) || 0,
+      payout: parseFloat(o.payout) || 0
+    }));
+
+    // 2. Filter for CPI / App Install offers
+    const cpiOffers = mapped.filter(o =>
+      o.type.includes("CPI") ||
+      o.type.includes("APP") ||
+      o.type.includes("INSTALL")
+    );
+
+    // 3. LOGIC: IF JUST ONE (OR MORE) CPI EXISTS -> SHOW ONLY 1
+    if (cpiOffers.length > 0) {
+      console.log("🔥 CPI MODE ACTIVE: Isolating top install offer.");
+      
+      // Sort by EPC to pick the highest converter
+      const topOffer = cpiOffers.sort((a, b) => b.epc - a.epc)[0];
+      
+      return [topOffer]; // Returns an array with exactly 1 offer
+    }
+
+    // 4. FALLBACK: If no CPI, try high-EPC PIN submits
+    const pinOffers = mapped
+      .filter(o => o.type.includes("PIN") && o.epc >= 0.2)
+      .sort((a, b) => b.epc - a.epc);
+
+    if (pinOffers.length > 0) {
+      return pinOffers.slice(0, 4);
+    }
+
+    // 5. ULTIMATE FALLBACK: Best 4 general offers
+    return mapped
+      .sort((a, b) => b.epc - a.epc)
+      .slice(0, 4);
+
+  } catch (err) {
+    console.error("❌ Offer Fetch Error", err);
+    return [];
+  }
 };
