@@ -467,14 +467,14 @@ export default function DownloadPage() {
   return (
     <div className="min-h-screen bg-[#FFFDF5] pb-10 font-sans overflow-x-hidden" dir={locale === "ar" ? "rtl" : "ltr"}>
       
-      {/* 1. STATUS BAR */}
-      <div className="bg-white border-b border-slate-100 py-3 px-6 flex justify-between items-center sticky top-0 z-50 backdrop-blur-md bg-white/80 shadow-sm">
+      
+      {/* <div className="bg-white border-b border-slate-100 py-3 px-6 flex justify-between items-center sticky top-0 z-50 backdrop-blur-md bg-white/80 shadow-sm">
         <div className="flex items-center gap-2">
           <div className="w-2 h-2 bg-emerald-500 rounded-full animate-pulse" />
           <span className="text-[10px] font-bold text-slate-500 uppercase tracking-wider">{onlineUsers} ACTIVE </span>
-        </div>
+        </div> */}
        
-      </div>
+      {/* </div> */}
 
       <div className="w-full max-w-md mx-auto px-6 pt-8 space-y-10">
         
