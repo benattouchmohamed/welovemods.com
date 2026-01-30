@@ -106,7 +106,7 @@ const Index = () => {
     title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
 
   return (
-    <div className="min-h-screen bg-[#F8FAFC] flex flex-col">
+    <div className="min-h-screen  bg-[#FFFBEB] flex flex-col">
       <Helmet>
         <title>WeLoveMods | Top Game Mods for iPhone & Android – 2026</title>
       </Helmet>
