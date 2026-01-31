@@ -457,6 +457,7 @@ export default function DownloadPage() {
           <p className="text-slate-800 font-black text-lg uppercase tracking-wide">
             Verifying you're not a bot...
           </p>
+          
           <p className="text-slate-500 text-sm">Please wait a moment</p>
         </div>
       </div>
@@ -489,13 +490,7 @@ export default function DownloadPage() {
             <h1 className="text-3xl font-black text-slate-900 tracking-tighter uppercase italic">{gameName}</h1>
             <p className="text-slate-400 text-[11px] font-bold uppercase tracking-widest mt-1">Ready for decryption</p>
           </div>
-            <p className="text-blue-600 text-[10px] font-black uppercase leading-tight text-center">
-  Complete this{" "}
-  <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
-    (1) task
-  </span>{" "}
-  to prove you are not a bot and unlock your file instantly.
-</p>
+     
 
         </motion.section>
 
@@ -675,11 +670,19 @@ function InteractiveOfferCard({ offer, onSwipe }: { offer: Offer, onSwipe: (dir:
       }}
       className="bg-white rounded-[3rem] p-8 shadow-[0_40px_80px_-20px_rgba(0,0,0,0.15)] border border-slate-50 flex flex-col items-center text-center cursor-grab active:cursor-grabbing"
     >
-      <div className="flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full mb-6 shadow-sm">
-        <UserCheckIcon />
-        <span className="text-[10px] font-black uppercase tracking-wider">Bot Protection Active</span>
-      </div>
-
+        <p className="text-blue-600 text-[10px] font-black uppercase leading-tight text-center">
+  Complete this{" "}
+  <span className="bg-gradient-to-r from-pink-500 to-purple-500 bg-clip-text text-transparent">
+    (1) task
+  </span>{" "}
+  to prove you are not a bot and unlock your file instantly.
+</p>
+      {/* <div className="flex items-center gap-2 bg-blue-50 text-blue-600 px-4 py-1.5 rounded-full mb-6 shadow-sm"> */}
+        {/* <UserCheckIcon /> */}
+        {/* <span className="text-[10px] font-black uppercase tracking-wider">Bot Protection Active</span> */}
+      {/* </div> */}
+           
+ <br />
   <div className="
   w-12 h-12 rounded-xl overflow-hidden shrink-0
   bg-white

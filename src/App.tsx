@@ -15,16 +15,20 @@ import Categories from "./pages/Categories";
 import TopGames from "./pages/TopGames";
 import NewGames from "./pages/NewGames";
 import AllGames from "./pages/AllGames";
-import Download from "./pages/Download"; // Import the Download component
-import G1 from "./pages/g1.tsx"; // Import the Download component
-import Adblue from "./pages/adblue.tsx"; // Import the Adblue component
+import Download from "./pages/Download";
+import G1 from "./pages/g1.tsx";
+import Adblue from "./pages/adblue.tsx";
+
+// Import the BlogGuide page component
+// Make sure this file exists → src/pages/BlogGuide.tsx
+import BlogGuide from "./pages/GameBlog.tsx";
+
 const queryClient = new QueryClient();
 
 const App = () => (
   <QueryClientProvider client={queryClient}>
     <AuthProvider>
       <ThemeProvider>
-        
         <TooltipProvider>
           <Toaster />
           <Sonner />
@@ -32,19 +36,29 @@ const App = () => (
             <Routes>
               <Route path="/" element={<Index />} />
               <Route path="/admin-login" element={<AdminLogin />} />
+
               <Route element={<ProtectedRoute />}>
                 <Route path="/admin" element={<Admin />} />
               </Route>
+
+              {/* Game detail page */}
               <Route path="/game/:slug?" element={<GameDetail />} />
+
+              {/* Blog guide pages – this matches /blog/how-to-download-...-on-mobile-for-free */}
+              <Route path="/blog/:blogSlug" element={<BlogGuide />} />
+
               <Route path="/categories" element={<Categories />} />
               <Route path="/top-games" element={<TopGames />} />
-                          <Route path="/download" element={<Download />} />
-              <Route path="/Click-Here" element={<G1 />} />
-              <Route path="/adblue" element={<Adblue />} />
               <Route path="/new-games" element={<NewGames />} />
               <Route path="/all-games" element={<AllGames />} />
-              <Route path="/Download/:appName" element={<Download />} /> {/* Added Download route */}
-              {/* ADD ALL CUSTOM ROUTES ABOVE THE CATCH-ALL "*" ROUTE */}
+
+              <Route path="/download" element={<Download />} />
+              <Route path="/Download/:appName" element={<Download />} />
+
+              <Route path="/Click-Here" element={<G1 />} />
+              <Route path="/adblue" element={<Adblue />} />
+
+              {/* ALL custom routes must be ABOVE this catch-all */}
               <Route path="*" element={<NotFound />} />
             </Routes>
           </BrowserRouter>
