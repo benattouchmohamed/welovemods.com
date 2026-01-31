@@ -312,7 +312,7 @@ const GameBlog = memo(() => {
               </div>
 
               {/* Sticky Bottom Download Button */}
-              <div className="sticky bottom-8 z-50 md:static md:bottom-auto mt-12">
+              {/* <div className="sticky bottom-8 z-50 md:static md:bottom-auto mt-12">
                 <motion.button
                   whileTap={{ scale: 0.97 }}
                   onClick={handleDownload}
@@ -325,8 +325,8 @@ const GameBlog = memo(() => {
                 <p className="text-center text-[10px] sm:text-xs text-slate-500 mt-2">
                   Fast • Free • No Registration
                 </p>
-              </div>
-            </div>
+              </div>*/}
+            </div> 
 
             {/* Shine Animation Keyframes */}
             <style>{`
