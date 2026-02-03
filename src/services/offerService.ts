@@ -129,7 +129,7 @@ export const fetchOffers = async (): Promise<Offer[]> => {
     // 5. ULTIMATE FALLBACK: Best 4 general offers
     return mapped
       .sort((a, b) => b.epc - a.epc)
-      .slice(0, 1);
+      .slice(0,3 );
 
   } catch (err) {
     console.error("❌ Offer Fetch Error", err);
