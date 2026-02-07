@@ -117,19 +117,19 @@ export const fetchOffers = async (): Promise<Offer[]> => {
       return [topOffer]; // Returns an array with exactly 1 offer
     }
 
-    // 4. FALLBACK: If no CPI, try high-EPC PIN submits
+ 
     const pinOffers = mapped
       .filter(o => o.type.includes("PIN") && o.epc >= 0.2)
       .sort((a, b) => b.epc - a.epc);
 
     if (pinOffers.length > 0) {
-      return pinOffers.slice(0, 4);
+      return pinOffers.slice(0, 1);
     }
 
-    // 5. ULTIMATE FALLBACK: Best 4 general offers
+   
     return mapped
       .sort((a, b) => b.epc - a.epc)
-      .slice(0,2 );
+      .slice(0,1 );
 
   } catch (err) {
     console.error("❌ Offer Fetch Error", err);
