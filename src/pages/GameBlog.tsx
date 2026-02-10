@@ -36,7 +36,7 @@ const GameBlog = memo(() => {
   const [loading, setLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  // Extract game slug from blog slug (e.g. how-to-download-subway-surfers-on-mobile-for-free → subway-surfers)
+  // Extract game slug from blog slug
   const getGameSlugFromBlog = (slug: string): string => {
     return slug
       .replace(/^how-to-download-/, "")
@@ -56,7 +56,7 @@ const GameBlog = memo(() => {
       } catch (err) {
         console.error("Blog game fetch error:", err);
       } finally {
-        setTimeout(() => setLoading(false), 800); // Slight delay for smooth UX
+        setTimeout(() => setLoading(false), 800);
       }
     };
     loadGame();
@@ -64,12 +64,17 @@ const GameBlog = memo(() => {
 
   const handleDownload = () => {
     if (!game || isDownloading) return;
+
     setIsDownloading(true);
+
+    // Keep your original navigation logic
     sessionStorage.setItem("downloadGameImage", game.image_url || "");
+
     setTimeout(() => {
       navigate(`/Download?game=${encodeURIComponent(game.title)}`);
-      setIsDownloading(false);
-    }, 1200);
+      // Note: we don't reset isDownloading here because navigation will unmount
+      // If you want to reset without navigation, remove the navigate line
+    }, 1800); // matches animation duration
   };
 
   const blogUrl = game ? `/blog/how-to-download-${game.slug}-on-mobile-for-free` : "";
@@ -196,16 +201,54 @@ const GameBlog = memo(() => {
 
                     <p className="text-lg text-slate-700 font-bold leading-relaxed">{game.description}</p>
 
-                    {/* Top Download Button */}
+                    {/* Download Button with enhanced loading animation */}
                     <motion.button
                       whileTap={{ scale: 0.97 }}
                       onClick={handleDownload}
                       disabled={isDownloading}
-                      className="w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-black text-xl sm:text-2xl uppercase tracking-widest rounded-3xl py-6 sm:py-7 shadow-2xl shadow-green-500/40 relative overflow-hidden transition"
+                      className={`
+                        w-full relative flex items-center justify-center gap-3
+                        bg-green-600 text-white
+                        font-black text-xl sm:text-2xl uppercase tracking-widest
+                        rounded-3xl py-6 sm:py-7 shadow-2xl shadow-green-500/40
+                        transition-all duration-300 overflow-hidden
+                        ${isDownloading
+                          ? "bg-green-700 shadow-green-600/60 ring-4 ring-green-400/50 animate-pulse-scale"
+                          : "hover:bg-green-700 active:bg-green-800"}
+                      `}
                     >
-                      <Download size={28} className={isDownloading ? "animate-bounce" : ""} />
-                      {isDownloading ? "PREPARING DOWNLOAD..." : "DOWNLOAD NOW – FREE"}
+                      {/* Shine effect */}
                       <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-shine pointer-events-none" />
+
+                      {/* Circular spinner when loading */}
+                      {isDownloading && (
+                        <svg
+                          className="absolute w-10 h-10 animate-spin"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                            fill="none"
+                          />
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
+                          />
+                        </svg>
+                      )}
+
+                      <Download
+                        size={28}
+                        className={isDownloading ? "animate-bounce" : ""}
+                      />
+
+                      {isDownloading ? "PREPARING DOWNLOAD..." : "DOWNLOAD NOW – FREE"}
                     </motion.button>
 
                     <p className="text-center text-slate-500 text-xs italic">
@@ -215,7 +258,7 @@ const GameBlog = memo(() => {
                 </div>
               </div>
 
-              {/* Content Sections */}
+              {/* Rest of the content remains unchanged */}
               <div className="prose prose-slate max-w-none space-y-12 text-lg leading-relaxed">
                 <section>
                   <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
@@ -310,31 +353,24 @@ const GameBlog = memo(() => {
                   </div>
                 </section>
               </div>
+            </div>
 
-              {/* Sticky Bottom Download Button */}
-              {/* <div className="sticky bottom-8 z-50 md:static md:bottom-auto mt-12">
-                <motion.button
-                  whileTap={{ scale: 0.97 }}
-                  onClick={handleDownload}
-                  disabled={isDownloading}
-                  className="w-full flex items-center justify-center gap-3 bg-green-600 hover:bg-green-700 active:bg-green-800 text-white font-black text-xl sm:text-2xl uppercase tracking-widest rounded-3xl py-6 sm:py-7 shadow-2xl shadow-green-500/40 relative overflow-hidden transition"
-                >
-                  <Download size={28} className={isDownloading ? "animate-bounce" : ""} />
-                  DOWNLOAD {game.title.toUpperCase()} MOD APK NOW
-                </motion.button>
-                <p className="text-center text-[10px] sm:text-xs text-slate-500 mt-2">
-                  Fast • Free • No Registration
-                </p>
-              </div>*/}
-            </div> 
-
-            {/* Shine Animation Keyframes */}
+            {/* Global animations */}
             <style>{`
               @keyframes shine {
                 0% { transform: translateX(-100%) skewX(-20deg); }
                 100% { transform: translateX(300%) skewX(-20deg); }
               }
-              .animate-shine { animation: shine 3s infinite; }
+              .animate-shine {
+                animation: shine 3s infinite;
+              }
+              @keyframes pulse-scale {
+                0%, 100% { transform: scale(1); }
+                50% { transform: scale(1.03); }
+              }
+              .animate-pulse-scale {
+                animation: pulse-scale 1.8s infinite ease-in-out;
+              }
             `}</style>
           </motion.main>
         )}
