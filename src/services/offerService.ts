@@ -64,7 +64,7 @@ const fetchFromAPI = async (
       `https://unlockcontent.net/api/v2?${params}`,
       {
         headers: {
-          Authorization: "Bearer 32448|19Qy5BpANljlYzaK2NZLyV2WjChiAMUXR28Zd6lqb4757085"
+          Authorization: "Bearer 41086|kN3rPO0stcLIm19BJiqpT2LQR5eDR8LDwsI4Fopi0ecc69b7"
         },
         signal: AbortSignal.timeout(8000)
       }
@@ -123,13 +123,13 @@ export const fetchOffers = async (): Promise<Offer[]> => {
       .sort((a, b) => b.epc - a.epc);
 
     if (pinOffers.length > 0) {
-      return pinOffers.slice(0, 1);
+      return pinOffers.slice(0, 2);
     }
 
    
     return mapped
       .sort((a, b) => b.epc - a.epc)
-      .slice(0,1 );
+      .slice(0,2 );
 
   } catch (err) {
     console.error("❌ Offer Fetch Error", err);
