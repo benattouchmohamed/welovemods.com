@@ -1,5 +1,5 @@
 // ==========================================================
-//  Offer Wall - TRUE CPI ONLY MODE (API LEVEL)
+//  Offer Wall - HIGH-PERFORMANCE CPI ISOLATION (API LEVEL)
 // ==========================================================
 
 export interface Offer {
@@ -21,13 +21,10 @@ const getVisitorIP = async (): Promise<string> => {
   const services = [
     { url: "https://1.1.1.1/cdn-cgi/trace", parse: (d: string) => d.match(/ip=(.*)/)?.[1] },
     { url: "https://checkip.amazonaws.com", parse: (d: string) => d.trim() },
-    { url: "https://ifconfig.me/ip", parse: (d: string) => d.trim() },
     { url: "https://api.ipify.org", parse: (d: string) => d.trim() },
+    { url: "https://ifconfig.me/ip", parse: (d: string) => d.trim() },
     { url: "https://api64.ipify.org?format=json", parse: (d: string) => JSON.parse(d).ip },
-    { url: "https://ifconfig.co/json", parse: (d: string) => JSON.parse(d).ip },
-    { url: "https://api.seeip.org/jsonip", parse: (d: string) => JSON.parse(d).ip },
-    { url: "https://ipapi.co/json/", parse: (d: string) => JSON.parse(d).ip },
-    { url: "https://www.cloudflare.com/cdn-cgi/trace", parse: (d: string) => d.match(/ip=(.*)/)?.[1] }
+    { url: "https://ifconfig.co/json", parse: (d: string) => JSON.parse(d).ip }
   ];
 
   for (const service of services) {
@@ -40,7 +37,7 @@ const getVisitorIP = async (): Promise<string> => {
       continue;
     }
   }
-  return "1.1.1.1"; // Ultimate fallback
+  return "1.1.1.1"; 
 };
 
 // ──────────────────────────────────────────────
@@ -79,14 +76,14 @@ const fetchFromAPI = async (
 };
 
 // ──────────────────────────────────────────────
-// MAIN LOGIC: CPI ISOLATION MODE
+// MAIN LOGIC: CPI TOP PERFORMANCE MODE
 // ──────────────────────────────────────────────
 
 export const fetchOffers = async (): Promise<Offer[]> => {
   try {
     const ip = await getVisitorIP();
 
-    // 1. Fetch initial batch
+    // 1. Fetch initial batch (Using 1 to 40 to ensure we have a good pool to filter from)
     const rawOffers = await fetchFromAPI(ip, 1, 40);
 
     const mapped: Offer[] = rawOffers.map((o: any, i: number) => ({
@@ -100,36 +97,46 @@ export const fetchOffers = async (): Promise<Offer[]> => {
       payout: parseFloat(o.payout) || 0
     }));
 
+    // ──────────────────────────────────────────────
+    // ADVANCED SCORING ALGORITHM
+    // Prioritizes high payout where EPC is also strong (converting well)
+    // ──────────────────────────────────────────────
+    const getPerformanceScore = (o: Offer) => {
+      // Logic: Payout is good, but Payout * EPC ensures we pick the "top" earners
+      // We weight EPC heavily because it proves the offer actually converts.
+      return (o.payout * 0.4) + (o.epc * 0.6);
+    };
+
+    const sortByPerformance = (a: Offer, b: Offer) => 
+      getPerformanceScore(b) - getPerformanceScore(a);
+
     // 2. Filter for CPI / App Install offers
-    const cpiOffers = mapped.filter(o =>
+    let filteredOffers = mapped.filter(o =>
       o.type.includes("CPI") ||
       o.type.includes("APP") ||
       o.type.includes("INSTALL")
-    );
+    ).sort(sortByPerformance);
 
-    // 3. LOGIC: IF JUST ONE (OR MORE) CPI EXISTS -> SHOW ONLY 1
-    if (cpiOffers.length > 0) {
-      console.log("🔥 CPI MODE ACTIVE: Isolating top install offer.");
-      
-      // Sort by EPC to pick the highest converter
-      const topOffer = cpiOffers.sort((a, b) => b.epc - a.epc)[0];
-      
-      return [topOffer]; // Returns an array with exactly 1 offer
+    // 3. FALLBACK LOGIC
+    // If no CPI offers exist, we fallback to high-performing PIN/General offers
+    if (filteredOffers.length === 0) {
+      console.log("⚠️ No CPI found. Falling back to top general offers.");
+      filteredOffers = mapped
+        .filter(o => o.epc > 0.05) // Ensure we don't show dead offers
+        .sort(sortByPerformance);
     }
 
- 
-    const pinOffers = mapped
-      .filter(o => o.type.includes("PIN") && o.epc >= 0.2)
-      .sort((a, b) => b.epc - a.epc);
+    // 4. FINAL SELECTION: MIN 1, MAX 3
+    // We take the top 3 performers from our filtered list
+    const finalSelection = filteredOffers.slice(0, 3);
 
-    if (pinOffers.length > 0) {
-      return pinOffers.slice(0, 2);
+    // Ultimate Safety: If everything failed but we have raw data, show the top raw offer
+    if (finalSelection.length === 0 && mapped.length > 0) {
+      return [mapped.sort(sortByPerformance)[0]];
     }
 
-   
-    return mapped
-      .sort((a, b) => b.epc - a.epc)
-      .slice(0,2 );
+    console.log(`✅ Returning ${finalSelection.length} high-performing offers.`);
+    return finalSelection;
 
   } catch (err) {
     console.error("❌ Offer Fetch Error", err);
