@@ -192,7 +192,7 @@ export default function DownloadPage() {
                 </div>
               )}
             </div>
-
+{/* 
             <button
               onClick={openServer2}
               className="
@@ -205,7 +205,7 @@ export default function DownloadPage() {
               
               Server 2
               
-            </button>
+            </button> */}
           </>
         ) : (
           <div className="bg-white rounded-3xl p-6 shadow-2xl border-2 border-slate-200 text-center">
