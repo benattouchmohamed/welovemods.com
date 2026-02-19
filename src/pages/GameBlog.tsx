@@ -1,5 +1,5 @@
 import React, { useEffect, useState, memo } from "react";
-import { useParams, useNavigate } from "react-router-dom";
+import { useParams, useNavigate, Link } from "react-router-dom";
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import {
@@ -11,20 +11,18 @@ import {
   AlertCircle,
   Clock,
   Smartphone,
+  ChevronDown,
+  Info
 } from "lucide-react";
 import { fetchGameBySlug, type Game } from "@/services/gameService";
 
+// --- Neobrutalist Skeleton ---
 const BlogSkeleton = () => (
-  <div className="min-h-screen bg-[#FFFBEB] px-4 py-8">
-    <div className="max-w-4xl mx-auto space-y-8">
-      <div className="h-8 w-32 bg-white/70 rounded-full animate-pulse" />
-      <div className="h-24 bg-white rounded-[2.5rem] animate-pulse" />
-      <div className="h-[400px] bg-white rounded-[2.5rem] animate-pulse" />
-      <div className="space-y-6">
-        {[1, 2, 3, 4].map((i) => (
-          <div key={i} className="h-48 bg-white rounded-[2rem] animate-pulse" />
-        ))}
-      </div>
+  <div className="min-h-screen bg-[#FDF4D3] px-4 py-8">
+    <div className="max-w-4xl mx-auto space-y-8 animate-pulse">
+      <div className="h-6 w-48 bg-gray-300 rounded border-2 border-black" />
+      <div className="h-64 bg-white border-4 border-black rounded-[2rem] shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]" />
+      <div className="h-96 bg-white border-4 border-black rounded-[2rem]" />
     </div>
   </div>
 );
@@ -36,7 +34,6 @@ const GameBlog = memo(() => {
   const [loading, setLoading] = useState(true);
   const [isDownloading, setIsDownloading] = useState(false);
 
-  // Extract game slug from blog slug
   const getGameSlugFromBlog = (slug: string): string => {
     return slug
       .replace(/^how-to-download-/, "")
@@ -54,9 +51,9 @@ const GameBlog = memo(() => {
         const data = await fetchGameBySlug(gameSlug);
         setGame(data);
       } catch (err) {
-        console.error("Blog game fetch error:", err);
+        console.error("Fetch error:", err);
       } finally {
-        setTimeout(() => setLoading(false), 800);
+        setTimeout(() => setLoading(false), 600);
       }
     };
     loadGame();
@@ -64,317 +61,172 @@ const GameBlog = memo(() => {
 
   const handleDownload = () => {
     if (!game || isDownloading) return;
-
     setIsDownloading(true);
-
-    // Keep your original navigation logic
     sessionStorage.setItem("downloadGameImage", game.image_url || "");
-
     setTimeout(() => {
       navigate(`/Download?game=${encodeURIComponent(game.title)}`);
-      // Note: we don't reset isDownloading here because navigation will unmount
-      // If you want to reset without navigation, remove the navigate line
-    }, 1800); // matches animation duration
+    }, 1800);
   };
 
-  const blogUrl = game ? `/blog/how-to-download-${game.slug}-on-mobile-for-free` : "";
-  const fullUrl = `${window.location.origin}${blogUrl}`;
+  if (loading) return <BlogSkeleton />;
+  if (!game) return (
+    <div className="min-h-screen bg-[#FDF4D3] flex flex-col items-center justify-center p-4">
+      <h1 className="text-4xl font-black bg-white border-4 border-black p-8 shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] uppercase">Guide Not Found</h1>
+      <Link to="/" className="mt-6 font-black underline uppercase text-xl">Go Home</Link>
+    </div>
+  );
 
-  const structuredData = game
-    ? {
-        "@context": "https://schema.org",
+  // SEO Structured Data
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
         "@type": "HowTo",
-        name: `How to Download ${game.title} Mod APK 2026 on Mobile for Free`,
-        description: game.description,
-        step: [
+        "name": `How to Download ${game.title} Mod APK 2026`,
+        "description": game.description,
+        "image": game.image_url,
+        "step": [
+          { "@type": "HowToStep", "text": "Click Download Now button.", "name": "Start Download" },
+          { "@type": "HowToStep", "text": "Enable Unknown Sources in settings.", "name": "Settings Update" },
+          { "@type": "HowToStep", "text": "Install the APK file.", "name": "Installation" }
+        ]
+      },
+      {
+        "@type": "FAQPage",
+        "mainEntity": [
           {
-            "@type": "HowToStep",
-            name: "Download the Mod APK",
-            text: "Click the Download Now button and wait for the file to download.",
-          },
-          {
-            "@type": "HowToStep",
-            name: "Enable Unknown Sources",
-            text: "Go to Settings → Security → Install unknown apps (or similar).",
-          },
-          {
-            "@type": "HowToStep",
-            name: "Install the APK",
-            text: "Open the downloaded file and tap Install.",
-          },
-        ],
+            "@type": "Question",
+            "name": `Is the ${game.title} Mod safe?`,
+            "acceptedAnswer": { "@type": "Answer", "text": "Yes, our files are scanned for malware and viruses daily." }
+          }
+        ]
       }
-    : {};
+    ]
+  };
 
   return (
     <>
       <Helmet>
-        <title>
-          {game
-            ? `How to Download ${game.title} Mod APK 2026 on Mobile for Free | WeLoveMods`
-            : "Loading Guide..."}
-        </title>
-        <meta
-          name="description"
-          content={`Step-by-step guide to download ${game?.title} Mod APK 2026 for free on Android & iOS. Unlimited money, unlocked levels, ad-free. Safe & fast download.`}
-        />
-        <link rel="canonical" href={fullUrl} />
-        <meta
-          property="og:title"
-          content={`How to Download ${game?.title} Mod APK 2026 on Mobile for Free`}
-        />
-        <meta property="og:description" content={game?.description || ""} />
-        <meta property="og:url" content={fullUrl} />
-        <meta property="og:type" content="article" />
+        <title>How to Download {game.title} Mod APK 2026 Free on Mobile</title>
+        <meta name="description" content={`Download ${game.title} Mod APK for Android and iOS. Get ${game.features?.join(', ')} for free. Safe and fast 2026 download guide.`} />
         <script type="application/ld+json">{JSON.stringify(structuredData)}</script>
       </Helmet>
 
-      <AnimatePresence mode="wait">
-        {loading ? (
-          <motion.div key="loader" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
-            <BlogSkeleton />
-          </motion.div>
-        ) : !game ? (
-          <motion.div
-            key="error"
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            className="min-h-screen bg-[#FFFBEB] flex flex-col items-center justify-center px-4 text-center"
-          >
-            <AlertCircle className="w-20 h-20 text-amber-500 mb-6" />
-            <h1 className="text-4xl font-black text-slate-900">Guide Not Found</h1>
-            <button
-              onClick={() => navigate("/")}
-              className="mt-8 px-12 py-5 bg-blue-600 text-white font-black text-lg uppercase tracking-widest rounded-2xl shadow-xl hover:bg-blue-700 transition"
-            >
-              Back to Home
-            </button>
-          </motion.div>
-        ) : (
-          <motion.main
-            key="content"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            className="min-h-screen bg-[#FFFBEB] pb-16 px-4 pt-6 font-sans"
-          >
-            <div className="max-w-4xl mx-auto space-y-10">
-              {/* Back button */}
-              <button
-                onClick={() => navigate(-1)}
-                className="flex items-center gap-2 text-slate-500 hover:text-amber-600 font-black uppercase tracking-widest text-xs transition"
-              >
-                <ArrowLeft size={16} strokeWidth={3} /> Back to Mods
-              </button>
+      <main className="min-h-screen bg-[#FDF4D3] pb-20 px-4 pt-24 font-sans text-black">
+        <div className="max-w-4xl mx-auto space-y-10">
+          
+          {/* 1. SEO Breadcrumbs */}
+          <nav className="flex items-center gap-2 text-[10px] font-black uppercase tracking-widest bg-white w-fit px-3 py-1 border-2 border-black rounded-lg shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]">
+            <Link to="/" className="hover:text-[#FF814D]">Home</Link>
+            <span>/</span>
+            <Link to="/categories" className="hover:text-[#FF814D]">Mods</Link>
+            <span>/</span>
+            <span className="text-gray-400">{game.title}</span>
+          </nav>
 
-              {/* Hero Section */}
-              <div className="bg-white rounded-[2.5rem] p-6 sm:p-8 border-2 border-slate-100 shadow-2xl relative overflow-hidden">
-                <div className="flex flex-col md:flex-row gap-8 items-start">
-                  <div className="md:w-2/5">
-                    <div className="relative">
-                      <img
-                        src={game.image_url}
-                        alt={`${game.title} Mod APK 2026 cover`}
-                        className="w-full aspect-square object-cover rounded-[2rem] border-4 border-[#FFFBEB] shadow-xl"
-                      />
-                      <div className="absolute -bottom-3 -right-3 bg-emerald-500 p-2 rounded-full border-4 border-white shadow-lg">
-                        <ShieldCheck size={24} className="text-white" />
-                      </div>
-                    </div>
-                  </div>
-
-                  <div className="md:w-3/5 space-y-6">
-                    <h1 className="text-4xl sm:text-5xl font-black text-slate-900 leading-tight uppercase italic tracking-tighter">
-                      How to Download {game.title} Mod APK 2026 on Mobile for Free
-                    </h1>
-
-                    <div className="flex gap-3 flex-wrap">
-                      <span className="bg-amber-100 text-amber-700 px-4 py-2 rounded-full font-black text-xs border border-amber-200">
-                        Premium Mod
-                      </span>
-                      <span className="bg-slate-100 text-slate-600 px-4 py-2 rounded-full font-black text-xs border border-slate-200">
-                        {game.downloads.toLocaleString()} Downloads
-                      </span>
-                      <span className="bg-emerald-100 text-emerald-700 px-4 py-2 rounded-full font-black text-xs">
-                        v{game.version}
-                      </span>
-                    </div>
-
-                    <p className="text-lg text-slate-700 font-bold leading-relaxed">{game.description}</p>
-
-                    {/* Download Button with enhanced loading animation */}
-                    <motion.button
-                      whileTap={{ scale: 0.97 }}
-                      onClick={handleDownload}
-                      disabled={isDownloading}
-                      className={`
-                        w-full relative flex items-center justify-center gap-3
-                        bg-green-600 text-white
-                        font-black text-xl sm:text-2xl uppercase tracking-widest
-                        rounded-3xl py-6 sm:py-7 shadow-2xl shadow-green-500/40
-                        transition-all duration-300 overflow-hidden
-                        ${isDownloading
-                          ? "bg-green-700 shadow-green-600/60 ring-4 ring-green-400/50 animate-pulse-scale"
-                          : "hover:bg-green-700 active:bg-green-800"}
-                      `}
-                    >
-                      {/* Shine effect */}
-                      <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full animate-shine pointer-events-none" />
-
-                      {/* Circular spinner when loading */}
-                      {isDownloading && (
-                        <svg
-                          className="absolute w-10 h-10 animate-spin"
-                          viewBox="0 0 24 24"
-                        >
-                          <circle
-                            className="opacity-25"
-                            cx="12"
-                            cy="12"
-                            r="10"
-                            stroke="currentColor"
-                            strokeWidth="4"
-                            fill="none"
-                          />
-                          <path
-                            className="opacity-75"
-                            fill="currentColor"
-                            d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4z"
-                          />
-                        </svg>
-                      )}
-
-                      <Download
-                        size={28}
-                        className={isDownloading ? "animate-bounce" : ""}
-                      />
-
-                      {isDownloading ? "PREPARING DOWNLOAD..." : "DOWNLOAD NOW – FREE"}
-                    </motion.button>
-
-                    <p className="text-center text-slate-500 text-xs italic">
-                      Safe APK • No Virus • Instant Download
-                    </p>
+          {/* 2. Hero Section */}
+          <div className="bg-white border-4 border-black rounded-[2.5rem] p-6 sm:p-10 shadow-[12px_12px_0px_0px_rgba(0,0,0,1)]">
+            <div className="flex flex-col md:flex-row gap-10 items-center">
+              <div className="md:w-1/3">
+                <div className="relative">
+                  <img src={game.image_url} alt={`${game.title} Mod APK`} className="w-full aspect-square object-cover rounded-[2rem] border-4 border-black shadow-[8px_8px_0px_0px_rgba(255,129,77,1)]" />
+                  <div className="absolute -bottom-4 -right-4 bg-[#4FB39A] p-3 rounded-2xl border-4 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)]">
+                    <ShieldCheck size={28} />
                   </div>
                 </div>
               </div>
-
-              {/* Rest of the content remains unchanged */}
-              <div className="prose prose-slate max-w-none space-y-12 text-lg leading-relaxed">
-                <section>
-                  <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
-                    <Zap size={28} className="text-amber-500" /> Why Download {game.title} Mod APK?
-                  </h2>
-                  <p>
-                    Unlock unlimited money, gems, lives, ad-free gameplay, and all premium features for free. Our {game.title} Mod APK 2026 is 100% safe, updated monthly, and works on all Android & iOS devices.
-                  </p>
-                </section>
-
-                <section className="py-6 space-y-6">
-                  <h2 className="text-3xl font-bold text-slate-900 flex items-center gap-3">
-                    <div className="p-2.5 bg-amber-100 rounded-lg">
-                      <Smartphone size={28} className="text-amber-600" />
-                    </div>
-                    Requirements
-                  </h2>
-
-                  <ul className="grid gap-4 sm:grid-cols-3 list-none">
-                    <li className="flex items-center gap-3 p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition">
-                      <CheckCircle size={24} className="text-emerald-500 flex-shrink-0" />
-                      <span className="text-slate-700 font-medium">Android, iOS & PC</span>
-                    </li>
-                    <li className="flex items-center gap-3 p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition">
-                      <CheckCircle size={24} className="text-emerald-500 flex-shrink-0" />
-                      <span className="text-slate-700 font-medium">100 MB free storage</span>
-                    </li>
-                    <li className="flex items-center gap-3 p-4 bg-white border border-slate-200 rounded-xl shadow-sm hover:shadow-md transition">
-                      <CheckCircle size={24} className="text-emerald-500 flex-shrink-0" />
-                      <span className="text-slate-700 font-medium">Allow unknown sources (Android)</span>
-                    </li>
-                  </ul>
-                </section>
-
-                <section>
-                  <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight flex items-center gap-3">
-                    <Clock size={28} className="text-amber-500" /> Step-by-Step Installation Guide (2026 Updated)
-                  </h2>
-                  <ol className="space-y-8 list-decimal pl-8 mt-4">
-                    <li>
-                      <strong>Step 1:</strong> Click the "DOWNLOAD NOW" button above and wait for the APK file to finish downloading.
-                    </li>
-                    <li>
-                      <strong>Step 2:</strong> Go to Settings → Apps → Special app access → Install unknown apps → Allow your browser.
-                    </li>
-                    <li>
-                      <strong>Step 3:</strong> Open the downloaded file and tap Install. The mod will install in seconds.
-                    </li>
-                    <li>
-                      <strong>Step 4:</strong> Open the app and enjoy unlimited everything!
-                    </li>
-                  </ol>
-                </section>
-
-                <section>
-                  <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">
-                    Unlocked Features in This Mod
-                  </h2>
-                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-6">
-                    {game.features?.map((f, i) => (
-                      <div
-                        key={i}
-                        className="bg-white border border-slate-200 rounded-2xl p-6 flex items-start gap-4 shadow-sm hover:shadow-md transition"
-                      >
-                        <div className="w-6 h-6 rounded-full bg-emerald-500 flex-shrink-0 mt-1" />
-                        <div>
-                          <p className="font-bold text-lg">{f}</p>
-                          <p className="text-slate-600">Fully unlocked in this version</p>
-                        </div>
-                      </div>
-                    ))}
-                  </div>
-                </section>
-
-                <section>
-                  <h2 className="text-3xl font-black text-slate-900 uppercase tracking-tight">
-                    Frequently Asked Questions
-                  </h2>
-                  <div className="space-y-8 mt-6">
-                    <div>
-                      <h3 className="font-bold text-xl">Is this {game.title} Mod APK safe?</h3>
-                      <p className="mt-2">
-                        Yes. Every file is scanned with multiple antivirus engines. No virus, malware, or ads.
-                      </p>
-                    </div>
-                    <div>
-                      <h3 className="font-bold text-xl">Will my progress be saved?</h3>
-                      <p className="mt-2">
-                        Yes. Cloud sync works perfectly with the mod version.
-                      </p>
-                    </div>
-                  </div>
-                </section>
+              <div className="md:w-2/3 space-y-6 text-center md:text-left">
+                <h1 className="text-4xl sm:text-6xl font-black uppercase italic leading-[0.9] tracking-tighter">
+                  {game.title} <span className="text-[#FF814D]">Mod APK</span> Download
+                </h1>
+                <p className="text-xl font-bold text-gray-700 leading-tight">{game.description}</p>
+                
+                <motion.button
+                  whileTap={{ scale: 0.98 }}
+                  onClick={handleDownload}
+                  disabled={isDownloading}
+                  className={`w-full py-6 rounded-[2rem] border-4 border-black font-black text-2xl shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all ${isDownloading ? 'bg-gray-200 shadow-none translate-y-1' : 'bg-[#FF814D] hover:-translate-y-1'}`}
+                >
+                  {isDownloading ? "PREPARING APK..." : "DOWNLOAD NOW – FREE"}
+                </motion.button>
               </div>
             </div>
+          </div>
 
-            {/* Global animations */}
-            <style>{`
-              @keyframes shine {
-                0% { transform: translateX(-100%) skewX(-20deg); }
-                100% { transform: translateX(300%) skewX(-20deg); }
-              }
-              .animate-shine {
-                animation: shine 3s infinite;
-              }
-              @keyframes pulse-scale {
-                0%, 100% { transform: scale(1); }
-                50% { transform: scale(1.03); }
-              }
-              .animate-pulse-scale {
-                animation: pulse-scale 1.8s infinite ease-in-out;
-              }
-            `}</style>
-          </motion.main>
-        )}
-      </AnimatePresence>
+          {/* 3. Tech Specs Table (SEO Gold) */}
+          <section className="bg-white border-4 border-black rounded-[2.5rem] overflow-hidden shadow-[8px_8px_0px_0px_rgba(0,0,0,1)]">
+            <div className="bg-black text-white p-4 font-black uppercase text-center tracking-widest flex items-center justify-center gap-2">
+              <Info size={20} /> Application Information
+            </div>
+            <div className="grid grid-cols-2 text-sm sm:text-lg font-black uppercase">
+              <div className="p-4 border-b-2 border-r-2 border-black bg-gray-50">App Name</div>
+              <div className="p-4 border-b-2 border-black">{game.title} Mod</div>
+              <div className="p-4 border-b-2 border-r-2 border-black bg-gray-50">Version</div>
+              <div className="p-4 border-b-2 border-black">{game.version}</div>
+              <div className="p-4 border-r-2 border-black bg-gray-50">Status</div>
+              <div className="p-4 text-emerald-600">Working / Updated</div>
+            </div>
+          </section>
+
+          {/* 4. Pros & Cons (SEO Comparison) */}
+          <div className="grid sm:grid-cols-2 gap-6">
+            <div className="bg-[#E7F9F3] border-4 border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(79,179,154,1)]">
+              <h3 className="text-xl font-black uppercase mb-4 flex items-center gap-2"><CheckCircle className="text-[#4FB39A]" /> Mod Benefits</h3>
+              <ul className="space-y-2 font-bold opacity-80">
+                {game.features?.map((f, i) => <li key={i}>✓ {f}</li>)}
+                <li>✓ 100% Anti-Ban Protection</li>
+              </ul>
+            </div>
+            <div className="bg-[#FFF1F1] border-4 border-black p-6 rounded-[2rem] shadow-[6px_6px_0px_0px_rgba(255,112,112,1)]">
+              <h3 className="text-xl font-black uppercase mb-4 flex items-center gap-2"><AlertCircle className="text-red-500" /> Disadvantages</h3>
+              <ul className="space-y-2 font-bold opacity-80">
+                <li>✗ Manual Update Required</li>
+                <li>✗ Not on Play Store</li>
+              </ul>
+            </div>
+          </div>
+
+          {/* 5. Installation Guide */}
+          <section className="bg-white border-4 border-black p-8 sm:p-12 rounded-[3rem] shadow-[12px_12px_0px_0px_rgba(255,112,193,1)]">
+            <h2 className="text-4xl font-black uppercase mb-10 text-center tracking-tighter">How to Install 2026 Guide</h2>
+            <div className="space-y-8">
+              {[
+                { n: "01", t: "Download", d: "Click the big orange button above to start the secure download." },
+                { n: "02", t: "Security", d: "Enable 'Unknown Sources' in your Android security settings." },
+                { n: "03", t: "Launch", d: "Install the APK and launch the game to see all mod features." }
+              ].map(step => (
+                <div key={step.n} className="flex gap-6 items-start">
+                  <div className="bg-black text-white w-12 h-12 flex-shrink-0 rounded-xl flex items-center justify-center font-black text-xl">{step.n}</div>
+                  <div>
+                    <h4 className="text-2xl font-black uppercase">{step.t}</h4>
+                    <p className="text-lg font-bold text-gray-500">{step.d}</p>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+
+          {/* 6. FAQ Section (People Also Ask) */}
+          <section className="space-y-6">
+            <h2 className="text-3xl font-black uppercase tracking-tighter">Frequently Asked Questions</h2>
+            <div className="space-y-4">
+              {[
+                { q: `Is ${game.title} Mod APK safe for my phone?`, a: "Absolutely. We scan every file with VirusTotal and manual checks to ensure your data remains 100% safe." },
+                { q: "Do I need to root my Android device?", a: "No, this Mod works perfectly on non-rooted devices and standard iOS versions." },
+                { q: "How do I update the game?", a: "Simply visit WeLoveMods again for the latest version and install it over the old one." }
+              ].map((item, i) => (
+                <details key={i} className="group bg-white border-2 border-black rounded-2xl p-4 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] open:bg-[#FDF4D3] transition-all">
+                  <summary className="font-black uppercase flex justify-between items-center cursor-pointer list-none">
+                    {item.q} <ChevronDown className="group-open:rotate-180 transition-transform" />
+                  </summary>
+                  <p className="mt-4 pt-4 border-t-2 border-black font-bold text-gray-600">{item.a}</p>
+                </details>
+              ))}
+            </div>
+          </section>
+
+        </div>
+      </main>
     </>
   );
 });

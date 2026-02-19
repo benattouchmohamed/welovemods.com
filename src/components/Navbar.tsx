@@ -4,39 +4,31 @@ import { Home, List, Flame, Sparkles, Heart, X, Menu } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- Theme Aligned Config ---
+// --- Theme Aligned Config: Using Brand colors and Neobrutalist shadows ---
 const NAV_CONFIG = [
   { 
     to: '/', 
     icon: Home, 
     label: 'Home', 
-    bg: 'bg-sky-500', 
-    shadow: 'shadow-sky-700',
-    glow: 'hover:shadow-[0_0_20px_rgba(14,165,233,0.4)]'
+    bg: 'bg-[#FF814D]', // Brand Orange
   },
   { 
     to: '/categories', 
     icon: List, 
     label: 'Cats', 
-    bg: 'bg-indigo-500', 
-    shadow: 'shadow-indigo-700',
-    glow: 'hover:shadow-[0_0_20px_rgba(99,102,241,0.4)]'
+    bg: 'bg-[#4FB39A]', // Brand Teal
   },
   { 
     to: '/top-games', 
     icon: Flame, 
     label: 'Top', 
-    bg: 'bg-orange-500', 
-    shadow: 'shadow-orange-700',
-    glow: 'hover:shadow-[0_0_20px_rgba(249,115,22,0.4)]'
+    bg: 'bg-[#FF70C1]', // Brand Pink
   },
   { 
     to: '/new-games', 
     icon: Sparkles, 
     label: 'New', 
-    bg: 'bg-emerald-500', 
-    shadow: 'shadow-emerald-700',
-    glow: 'hover:shadow-[0_0_20px_rgba(16,185,129,0.4)]'
+    bg: 'bg-yellow-400', 
   },
 ];
 
@@ -53,27 +45,27 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Header with higher Z-Index than Search Suggestions */}
-      <header className="fixed top-0 left-0 right-0 z-[100] px-4 py-3 md:px-8 md:py-4">
+      {/* Header with High Contrast Neobrutalism */}
+      <header className="fixed top-0 left-0 right-0 z-[100] px-4 py-4 md:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="bg-white/80 backdrop-blur-md border-b-2 border-sky-100 rounded-[1.5rem] md:rounded-[2.5rem] shadow-[0_8px_30px_rgb(0,0,0,0.04)] flex items-center justify-between px-4 py-2 md:px-8 md:py-3 transition-all">
+          <div className="bg-white border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between px-4 py-2 md:px-8 md:py-3 transition-all">
             
-            {/* Logo - Matching Index Sky Theme */}
+            {/* Logo - Matching Youform Hero Style */}
             <Link to="/" onClick={playSound} className="flex items-center gap-2 group">
               <motion.div
-                className="bg-orange-500 p-2 md:p-2.5 rounded-xl md:rounded-2xl shadow-lg shadow-sky-200"
+                className="bg-[#FF814D] p-2 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                 whileHover={{ scale: 1.05, rotate: -5 }}
               >
-                <Heart className="w-5 h-5 text-white fill-white" />
+                <Heart className="w-5 h-5 text-black fill-black" />
               </motion.div>
-              <span className="text-xl md:text-2xl font-black text-slate-800 tracking-tighter">
-                welove<span className="text-orange-500">mods</span>
+              <span className="text-xl md:text-2xl font-black text-black tracking-tighter uppercase">
+                welove<span className="text-[#FF814D]">mods</span>
               </span>
             </Link>
 
             {/* Desktop Navigation */}
             {!isMobile && (
-              <nav className="flex items-center gap-3">
+              <nav className="flex items-center gap-4">
                 {NAV_CONFIG.map((item) => (
                   <DesktopNavLink
                     key={item.to}
@@ -85,11 +77,11 @@ const Navbar: React.FC = () => {
               </nav>
             )}
 
-            {/* Mobile Menu Button - Styled like Index Search */}
+            {/* Mobile Menu Button - Hard Border Style */}
             {isMobile && (
               <button
                 onClick={() => setIsMenuOpen(true)}
-                className="w-10 h-10 flex items-center justify-center rounded-xl bg-sky-100 text-sky-600 active:scale-90 transition-all"
+                className="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-black bg-[#FDF4D3] text-black active:translate-y-[2px] active:shadow-none transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
               >
                 <Menu size={20} strokeWidth={3} />
               </button>
@@ -106,23 +98,23 @@ const Navbar: React.FC = () => {
               initial={{ opacity: 0 }} 
               animate={{ opacity: 1 }} 
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-sky-900/20 backdrop-blur-sm"
+              className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
               onClick={() => setIsMenuOpen(false)}
             />
             <motion.nav
               initial={{ x: '100%' }} 
               animate={{ x: 0 }} 
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 30, stiffness: 300 }}
-              className="relative w-[80%] max-w-sm bg-white h-full shadow-2xl p-6 flex flex-col gap-4"
+              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
+              className="relative w-[80%] max-w-sm bg-[#FDF4D3] h-full border-l-4 border-black p-6 flex flex-col gap-4 shadow-[-8px_0px_0px_0px_rgba(0,0,0,0.1)]"
             >
               <div className="flex justify-between items-center mb-6">
-                <span className="text-xl font-black text-slate-800">Explore</span>
+                <span className="text-2xl font-black text-black uppercase tracking-tight">Explore</span>
                 <button 
                   onClick={() => setIsMenuOpen(false)} 
-                  className="p-2 bg-slate-50 rounded-full text-slate-400"
+                  className="p-2 border-2 border-black bg-white rounded-full text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
                 >
-                  <X size={20} />
+                  <X size={20} strokeWidth={3} />
                 </button>
               </div>
 
@@ -131,17 +123,17 @@ const Navbar: React.FC = () => {
                   key={item.to}
                   to={item.to}
                   onClick={() => { playSound(); setIsMenuOpen(false); }}
-                  className={`flex items-center gap-4 px-5 py-4 rounded-2xl font-black text-white text-lg shadow-lg ${item.bg} ${item.shadow} active:scale-95 transition-all`}
+                  className={`flex items-center gap-4 px-5 py-4 rounded-xl font-black text-black text-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-none transition-all ${item.bg}`}
                 >
-                  <div className="bg-white/20 p-2 rounded-lg">
-                    <item.icon className="w-5 h-5" />
+                  <div className="bg-white border-2 border-black p-2 rounded-lg">
+                    <item.icon className="w-5 h-5" strokeWidth={3} />
                   </div>
-                  {item.label}
+                  <span className="uppercase tracking-tight">{item.label}</span>
                 </Link>
               ))}
               
-              <div className="mt-auto p-4 bg-sky-50 rounded-3xl border border-sky-100 text-center">
-                <p className="text-xs font-bold text-sky-600 uppercase tracking-widest">Version 2.0.26</p>
+              <div className="mt-auto p-4 bg-white border-2 border-black rounded-2xl text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]">
+                <p className="text-xs font-black text-black uppercase tracking-widest">Version 2.0.26</p>
               </div>
             </motion.nav>
           </div>
@@ -151,16 +143,16 @@ const Navbar: React.FC = () => {
   );
 };
 
-const DesktopNavLink = ({ to, icon: Icon, label, bg, shadow, glow, active, onClick }: any) => (
+const DesktopNavLink = ({ to, icon: Icon, label, bg, active, onClick }: any) => (
   <Link to={to} onClick={onClick} className="relative group">
     <motion.div
-      className={`flex items-center gap-2 px-4 py-2 rounded-xl font-black text-white text-sm transition-all duration-200 
-        ${bg} ${glow} ${active ? 'scale-105 ring-4 ring-sky-100' : `${shadow} hover:-translate-y-0.5`}
+      className={`flex items-center gap-2 px-4 py-2 rounded-xl font-black text-black text-sm border-2 border-black transition-all duration-200 
+        ${bg} ${active ? 'translate-y-[2px] shadow-none' : 'shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]'}
       `}
       whileTap={{ scale: 0.95 }}
     >
-      <Icon className={`w-4 h-4 ${active ? 'animate-pulse' : ''}`} />
-      <span>{label}</span>
+      <Icon className={`w-4 h-4 text-black`} strokeWidth={3} />
+      <span className="uppercase tracking-tight">{label}</span>
     </motion.div>
   </Link>
 );

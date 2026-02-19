@@ -9,30 +9,26 @@ import {
   Star,
   Loader2,
   X,
+  ChevronLeft,
+  Terminal,
+  Activity,
+  UserCheck,
+  AlertCircle
 } from "lucide-react";
 import { fetchOffers, type Offer } from "@/services/offerService";
 import { useLocale, t } from "@/hooks/useLocale";
-import { motion, AnimatePresence, PanInfo } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 
-const LangPicker = lazy(() => import("./LangPicker"));
+const ITEMS_PER_PAGE = 6;
 
 export default function DownloadPage() {
   const [locale] = useLocale();
   const i18n = useMemo(() => t(locale), [locale]);
-
   const [offers, setOffers] = useState<Offer[]>([]);
   const [loading, setLoading] = useState(true);
   const [gameName, setGameName] = useState("Mod");
   const [gameImage, setGameImage] = useState<string | null>(null);
-  const [isVerified, setIsVerified] = useState(false);
-  const [currentIndex, setCurrentIndex] = useState(0);
-  const [isPaused, setIsPaused] = useState(false);
-  const [iframeUrl, setIframeUrl] = useState<string | null>(null);
-
-  const fallbackUrl = "https://applocked.store/cl/i/8dkk3k";
-  const hasAutoOpened = useRef(false);
-
-  const onlineUsers = useMemo(() => Math.floor(Math.random() * 500) + 1200, []);
+  const [currentPage, setCurrentPage] = useState(1);
 
   useEffect(() => {
     const params = new URLSearchParams(window.location.search);
@@ -45,340 +41,144 @@ export default function DownloadPage() {
         const data = await fetchOffers();
         if (mounted) setOffers(data || []);
       } finally {
-        if (mounted) setTimeout(() => setLoading(false), 800);
+        if (mounted) setTimeout(() => setLoading(false), 1200);
       }
     };
     loadData();
     return () => { mounted = false; };
   }, []);
 
-  // Auto-open Server 2 iframe when no offers
-  useEffect(() => {
-    if (!loading && offers.length === 0 && !hasAutoOpened.current) {
-      setIframeUrl(fallbackUrl);
-      hasAutoOpened.current = true;
-    }
-  }, [loading, offers.length]);
+  const totalPages = Math.ceil(offers.length / ITEMS_PER_PAGE);
+  const currentOffers = offers.slice((currentPage - 1) * ITEMS_PER_PAGE, currentPage * ITEMS_PER_PAGE);
 
-  useEffect(() => {
-    if (offers.length <= 1 || isPaused || isVerified) return;
-    const interval = setInterval(() => {
-      setCurrentIndex((prev) => (prev + 1) % offers.length);
-    }, 5000);
-    return () => clearInterval(interval);
-  }, [offers.length, isPaused, isVerified]);
-
-  const handleNext = () => setCurrentIndex((prev) => (prev + 1) % offers.length);
-  const handlePrev = () => setCurrentIndex((prev) => (prev - 1 + offers.length) % offers.length);
-
-  const openServer2 = () => setIframeUrl(fallbackUrl);
-  const closeIframe = () => setIframeUrl(null);
-
-  if (loading) {
-    return (
-      <div className="min-h-screen bg-[#FFFBEB] flex flex-col items-center justify-center gap-6 px-6">
-        <Loader2 className="w-14 h-14 text-blue-600 animate-spin" strokeWidth={2.5} />
-        <div className="text-center space-y-2">
-          <p className="text-slate-800 font-black text-lg uppercase tracking-wide">
-            Verifying you're not a bot...
-          </p>
-          <p className="text-slate-500 text-sm">Please wait a moment</p>
-        </div>
-      </div>
-    );
-  }
+  if (loading) return (
+    <div className="min-h-screen bg-[#FDF4D3] flex flex-col items-center justify-center font-sans">
+      <div className="w-20 h-20 border-8 border-black border-t-[#FF814D] rounded-full animate-spin shadow-[6px_6px_0_#000]" />
+      <p className="mt-8 font-black text-2xl uppercase italic tracking-tighter">Bypassing Bot Detection...</p>
+    </div>
+  );
 
   return (
-    <div
-      className="min-h-screen bg-[#FFFBEB] pb-8 font-sans overflow-x-hidden"
-      dir={locale === "ar" ? "rtl" : "ltr"}
-    >
-      {/* ACTIVITY TICKER */}
-      <div className="bg-slate-900 text-white py-2 overflow-hidden whitespace-nowrap border-b border-slate-800">
+    <div className="min-h-screen bg-[#FDF4D3] pb-20 font-sans text-black selection:bg-[#FF814D]">
+      {/* 1. TOP TICKER */}
+      <div className="bg-black text-white py-3 overflow-hidden border-b-4 border-black sticky top-0 z-50">
         <motion.div
-          animate={{ x: ["100%", "-100%"] }}
+          animate={{ x: ["0%", "-50%"] }}
           transition={{ repeat: Infinity, duration: 25, ease: "linear" }}
-          className="flex gap-10 items-center text-[10px] font-black uppercase tracking-widest"
+          className="flex gap-16 items-center text-xs font-black uppercase italic tracking-[0.2em]"
         >
-          <span className="flex items-center gap-2">
-            <div className="w-1.5 h-1.5 bg-emerald-500 rounded-full" /> {onlineUsers} USERS ONLINE
-          </span>
-          <span className="text-amber-400">● New unlock: {gameName}</span>
-          <span>● System Status: Secure</span>
+          {[...Array(2)].map((_, i) => (
+            <React.Fragment key={i}>
+              <span className="flex items-center gap-2"><Activity size={14} className="text-[#FF814D]" /> ENCRYPTED CONNECTION ESTABLISHED</span>
+              <span className="text-[#FF814D]">● AWAITING HUMAN INPUT ●</span>
+              <span>VERIFYING DEVICE COMPATIBILITY...</span>
+            </React.Fragment>
+          ))}
         </motion.div>
       </div>
 
-      <div className="w-full max-w-md mx-auto px-5 pt-5 pb-6 space-y-5">
-        <header className="flex justify-end">
-          <Suspense fallback={<div className="w-3 h-3" />}>
-            {/* <LangPicker /> */}
-          </Suspense>
-        </header>
-
-        <section className="rounded-[2.5rem] p-5 border-b-[8px] border-amber-400 shadow-2xl relative overflow-hidden border-2 border-slate-100 bg-white">
-          <div className="flex items-center gap-4 relative z-10">
-            <div className="relative shrink-0">
-              <div className="w-20 h-20 rounded-[1.8rem] overflow-hidden border-4 border-[#FFFBEB] shadow-xl rotate-[-2deg]">
-                <img src={gameImage || "/fallback-game.png"} alt={gameName} className="w-full h-full object-cover" />
-              </div>
-              <div className="absolute -bottom-1 -right-1 bg-emerald-500 p-1.5 rounded-full border-4 border-white shadow-sm">
-                <ShieldCheck size={14} className="text-white" strokeWidth={3} />
-              </div>
-            </div>
-            <div className="min-w-0">
-              <h1 className="text-2xl font-black text-slate-900 leading-none uppercase italic tracking-tighter truncate">
-                {gameName}
-              </h1>
-              <div className="inline-flex items-center gap-1.5 mt-2 bg-slate-100 text-slate-600 px-2 py-0.5 rounded-md">
-                <Lock size={10} />
-                <span className="text-[9px] font-black uppercase tracking-widest">{i18n.syncing}</span>
-              </div>
-            </div>
+      <div className="max-w-6xl mx-auto px-4 pt-10 space-y-8">
+        
+        {/* 2. MAIN INSTRUCTION BANNER (NEW) */}
+        <section className="bg-[#FF814D] border-4 border-black rounded-[1.5rem] p-4 shadow-neo flex items-center gap-4 animate-bounce-subtle">
+          <div className="bg-black text-white p-3 rounded-xl">
+             <UserCheck size={32} strokeWidth={3} />
           </div>
-          <div className="mt-4 pt-4 border-t border-slate-50">
-            <h2 className="text-lg font-black text-slate-800 uppercase leading-tight tracking-tight">
-              {i18n.completeTasks}
-            </h2>
-            <p className="text-slate-500 font-bold text-xs uppercase mt-0.5 opacity-70">
-              {i18n.autoRedirect}
-            </p>
+          <div>
+            <h2 className="text-xl md:text-2xl font-black uppercase italic leading-none">Human Verification Required</h2>
+            <p className="font-bold text-sm uppercase mt-1">Complete <span className="underline decoration-2">1 task</span> below to unlock your game instantly.</p>
           </div>
         </section>
 
-        <div className="py-3.5 px-5 rounded-2xl border-2 border-slate-900 shadow-[4px_4px_0px_#000] flex items-center bg-white text-slate-900">
-          <div className="flex items-center gap-3">
-            <div className="w-4 h-4 border-2 border-slate-200 border-t-slate-900 rounded-full animate-spin" />
-            <span className="font-black text-[11px] uppercase tracking-wider italic">
-              Verifying Completion...
-            </span>
+        {/* 3. GAME HEADER */}
+        <section className="relative">
+          <div className="absolute -inset-2 bg-black rounded-[2.5rem] rotate-1 opacity-10" />
+          <div className="relative bg-white border-4 border-black rounded-[2rem] p-6 flex flex-col md:flex-row items-center gap-8 shadow-neo-md">
+            {/* <div className="relative">
+              <img 
+                src={gameImage || "/fallback.png"} 
+                className="w-28 h-28 md:w-32 md:h-32 rounded-[1.5rem] border-4 border-black shadow-neo-orange object-cover" 
+              />
+              <div className="absolute -bottom-3 -right-3 bg-white border-4 border-black p-2 rounded-xl">
+                <Lock size={20} strokeWidth={3} className="text-[#FF814D]" />
+              </div>
+            </div> */}
+            
+            <div className="text-center md:text-left space-y-2 flex-1">
+              <h1 className="text-3xl md:text-5xl font-black uppercase italic tracking-tighter leading-none">
+                {gameName} <span className="text-[#FF814D]">LOCKED</span>
+              </h1>
+              <p className="text-gray-500 font-bold uppercase text-xs tracking-widest">Device: Detected & Verified | Status: Ready to Install</p>
+            </div>
           </div>
+        </section>
+
+        {/* 4. TASK LIST HEADER */}
+        <div className="bg-black text-white px-6 py-4 rounded-2xl flex justify-between items-center shadow-neo">
+           <div className="flex items-center gap-3">
+              <AlertCircle className="text-[#FF814D]" size={20} strokeWidth={3} />
+              <span className="font-black uppercase tracking-widest text-sm">Select 1 Offer to Verify</span>
+           </div>
+           <span className="hidden sm:block font-mono text-[10px] opacity-60">ID: {Math.random().toString(36).substring(7).toUpperCase()}</span>
         </div>
 
-        {offers.length > 0 ? (
-          <>
-            <div
-              className="relative px-1"
-              onMouseEnter={() => setIsPaused(true)}
-              onMouseLeave={() => setIsPaused(false)}
-            >
-              <div className="relative min-h-[240px]">
-                <AnimatePresence mode="wait">
-                  {offers.map((offer, idx) =>
-                    idx === currentIndex ? (
-                      <OfferCard
-                        key={offer.id}
-                        offer={offer}
-                        i18n={i18n}
-                        onVerify={() => setIsVerified(true)}
-                        onNext={handleNext}
-                        onPrev={handlePrev}
-                      />
-                    ) : null
-                  )}
-                </AnimatePresence>
-              </div>
+        {/* 5. THE OFFERS */}
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          {currentOffers.map((offer) => (
+            <OfferCard key={offer.id} offer={offer} />
+          ))}
+        </div>
 
-              {offers.length > 1 && (
-                <div className="flex justify-center gap-1.5 mt-4">
-                  {offers.map((_, idx) => (
-                    <button
-                      key={idx}
-                      onClick={() => setCurrentIndex(idx)}
-                      className={`h-1.5 transition-all duration-300 rounded-full ${
-                        idx === currentIndex ? "w-6 bg-blue-600" : "w-1.5 bg-slate-300"
-                      }`}
-                    />
-                  ))}
-                </div>
-              )}
-            </div>
-{/* 
-            <button
-              onClick={openServer2}
-              className="
-                w-full flex items-center justify-center gap-2 mt-5
-                bg-emerald-600 hover:bg-emerald-700 active:bg-emerald-800
-                text-white font-black text-sm uppercase tracking-widest
-                rounded-xl py-4 shadow-lg active:translate-y-0.5 transition-all
-              "
-            >
-              
-              Server 2
-              
-            </button> */}
-          </>
-        ) : (
-          <div className="bg-white rounded-3xl p-6 shadow-2xl border-2 border-slate-200 text-center">
-            <h3 className="font-black text-xl text-slate-800 uppercase tracking-tight mb-3">
-              No offers available
-            </h3>
-            <p className="text-slate-600">
-              Opening alternative verification server...
-            </p>
+        {/* Pagination */}
+        {totalPages > 1 && (
+          <div className="flex justify-center gap-4 pt-4">
+             <button onClick={() => setCurrentPage(p => p-1)} disabled={currentPage === 1} className="bg-white border-4 border-black p-3 rounded-xl shadow-neo disabled:opacity-30">
+                <ChevronLeft strokeWidth={4} />
+             </button>
+             <div className="bg-white border-4 border-black px-6 flex items-center font-black rounded-xl shadow-neo">
+                {currentPage} / {totalPages}
+             </div>
+             <button onClick={() => setCurrentPage(p => p+1)} disabled={currentPage === totalPages} className="bg-white border-4 border-black p-3 rounded-xl shadow-neo disabled:opacity-30">
+                <ChevronRight strokeWidth={4} />
+             </button>
           </div>
         )}
 
-        <footer className="text-center pt-3">
-          <p className="text-[8px] font-black text-slate-300 uppercase tracking-[0.3em] italic opacity-40">
-            Validated Cloud Protocol v.2.0.4
-          </p>
-        </footer>
       </div>
-
-      {/* FULLSCREEN IFRAME OVERLAY */}
-      <AnimatePresence>
-        {iframeUrl && (
-          <motion.div
-            initial={{ opacity: 0, scale: 0.95 }}
-            animate={{ opacity: 1, scale: 1 }}
-            exit={{ opacity: 0, scale: 0.95 }}
-            className="fixed inset-0 z-[100] bg-white flex flex-col"
-          >
-            <div className="bg-slate-900 text-white px-4 py-3 flex justify-between items-center">
-              <span className="font-black uppercase tracking-wide text-sm">Server 2 Verification</span>
-              <button
-                onClick={closeIframe}
-                className="p-1.5 rounded-full hover:bg-slate-800 transition-colors"
-              >
-                <X size={20} />
-              </button>
-            </div>
-
-            <div className="flex-1 relative bg-slate-50">
-              <div className="absolute inset-0 flex items-center justify-center -z-10">
-                <div className="w-10 h-10 border-4 border-blue-600 border-t-transparent rounded-full animate-spin" />
-              </div>
-              <iframe
-                src={iframeUrl}
-                className="w-full h-full border-none relative z-10"
-                title="Verification Portal"
-                allow="fullscreen"
-                allowFullScreen
-                sandbox="allow-scripts allow-same-origin allow-forms allow-popups allow-popups-to-escape-sandbox"
-              />
-            </div>
-          </motion.div>
-        )}
-      </AnimatePresence>
     </div>
   );
 }
 
-function OfferCard({
-  offer,
-  i18n,
-  onVerify,
-  onNext,
-  onPrev,
-}: {
-  offer: Offer;
-  i18n: any;
-  onVerify: () => void;
-  onNext: () => void;
-  onPrev: () => void;
-}) {
-  const [isExpanded, setIsExpanded] = useState(false);
-  const description = offer.description || "Follow internal steps to verify device and unlock link instantly.";
-  const isLongText = description.length > 90;
-
-  const handleDragEnd = (event: any, info: PanInfo) => {
-    const swipeThreshold = 100;
-    if (info.offset.x < -swipeThreshold) onNext();
-    else if (info.offset.x > swipeThreshold) onPrev();
-  };
-
+function OfferCard({ offer }: { offer: Offer }) {
   return (
     <motion.div
-      drag="x"
-      dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.7}
-      onDragEnd={handleDragEnd}
-      initial={{ x: 100, opacity: 0 }}
-      animate={{ x: 0, opacity: 1 }}
-      exit={{ x: -100, opacity: 0 }}
-      transition={{ type: "spring", stiffness: 300, damping: 30 }}
-      className="
-        absolute inset-0
-        bg-white rounded-[2rem]
-        p-4 pt-5
-        shadow-2xl border-2 border-blue-500/10
-        flex flex-col gap-3
-        touch-none cursor-grab active:cursor-grabbing
-      "
+      whileHover={{ y: -5 }}
+      className="bg-white border-4 border-black rounded-[2rem] p-6 shadow-neo-lg flex flex-col h-full group"
     >
-      <div className="absolute inset-0 rounded-[2rem] border-2 border-blue-500/20 animate-pulse pointer-events-none" />
-
-      <div className="flex items-center gap-3">
-        <div className="w-11 h-11 rounded-xl overflow-hidden bg-slate-100 border border-slate-200 shrink-0">
-          <img
-            src={offer.image || "/fallback-offer.png"}
-            alt={offer.title}
-            className="w-full h-full object-cover"
-            draggable={false}
-          />
+      <div className="flex gap-4 mb-4">
+        <div className="w-16 h-16 rounded-xl border-4 border-black overflow-hidden bg-gray-50 shadow-neo shrink-0">
+          <img src={offer.image} className="w-full h-full object-cover" alt="" />
         </div>
-        <div className="flex-1 min-w-0">
-          <h3 className="font-black text-slate-900 uppercase text-sm leading-tight truncate">
-            {offer.title}
-          </h3>
-          <div className="flex items-center gap-0.5 mt-1">
-            {[...Array(5)].map((_, i) => (
-              <Star
-                key={i}
-                size={14}
-                className="text-yellow-500 fill-yellow-400 drop-shadow-sm"
-                strokeWidth={2.5}
-              />
-            ))}
+        <div className="min-w-0">
+          <div className="flex items-center gap-1 mb-1">
+            <Star size={12} className="fill-yellow-400" />
+            <span className="text-[10px] font-black uppercase">Instant Unlock</span>
           </div>
-          <div className="flex items-center gap-1 mt-0.5">
-            <Zap size={9} className="fill-blue-500 text-blue-500" />
-            <span className="text-[8px] font-black text-blue-600 uppercase italic">High Success Rate</span>
-          </div>
+          <h3 className="font-black text-lg leading-none uppercase tracking-tight truncate">{offer.title}</h3>
         </div>
       </div>
 
-      <div className="relative flex-grow-0">
-        <div
-          className={`text-slate-700 font-bold text-[11px] leading-snug uppercase tracking-tight ${
-            isExpanded ? "max-h-[110px] overflow-y-auto pr-1" : "line-clamp-4"
-          }`}
-        >
-          {description}
-        </div>
-
-        {isLongText && (
-          <button
-            onClick={(e) => {
-              e.stopPropagation();
-              setIsExpanded(!isExpanded);
-            }}
-            className="text-blue-600 text-[10px] font-black mt-1.5 uppercase underline decoration-2 underline-offset-2"
-          >
-            {isExpanded ? "Show Less" : "Show More..."}
-          </button>
-        )}
-      </div>
+      <p className="font-bold text-gray-600 text-[13px] leading-tight mb-6 flex-1 italic">
+        "Complete this quick offer to verify you are human and unlock {offer.title} instantly."
+      </p>
 
       <button
-        onClick={(e) => {
-          e.stopPropagation();
-          window.open(offer.url, "_blank", "noopener,noreferrer");
-          setTimeout(onVerify, 2500);
-        }}
-        className="
-          mt-auto
-          w-full flex items-center justify-center gap-2
-          bg-blue-600 hover:bg-blue-700 active:bg-blue-800
-          text-white font-black text-sm uppercase tracking-widest
-          rounded-xl py-3.5
-          shadow-lg active:translate-y-0.5 transition-all
-          z-20
-        "
+        onClick={() => window.open(offer.url, "_blank")}
+        className="w-full bg-[#FF814D] border-4 border-black rounded-xl py-4 font-black text-base uppercase italic tracking-tighter shadow-neo group-hover:bg-[#ff966c] active:translate-y-1 active:shadow-none transition-all flex items-center justify-center gap-2"
       >
-        <Fingerprint size={17} />
-        {i18n.btn || "INSTALL & VERIFY"}
-        <ChevronRight size={15} strokeWidth={3} />
+        <Fingerprint size={20} strokeWidth={3} />
+        Complete & Verify
+        <ChevronRight size={18} strokeWidth={4} />
       </button>
     </motion.div>
   );

@@ -126,7 +126,17 @@ body {
   background: hsl(var(--cartoon-purple));
   border-radius: 20px;
 }
+h1, h2, button {
+  /* Use a heavy sans-serif weight */
+  font-weight: 900 !important;
+  letter-spacing: -0.03em;
+}
 
+/* Remove default focus ring to keep the neobrutalist look clean */
+input:focus {
+  ring: none;
+  outline: none;
+}
 /* -------------------------------------------------
    6. ANIMATIONS
    ------------------------------------------------- */

@@ -8,15 +8,15 @@ import GameCard from "@/components/GameCard";
 import { fetchGames } from "@/services/gameService";
 import type { Game } from "@/services/gameService";
 
-// --- Configuration ---
 const ITEMS_PER_PAGE = 12; 
 const SEARCH_DEBOUNCE_MS = 300;
 
+// Update Skeleton to match the "Card" aesthetic
 const SkeletonCard = memo(() => (
-  <div className="bg-white border border-sky-200 rounded-2xl p-3 shadow-sm animate-pulse">
-    <div className="aspect-square bg-sky-100 rounded-xl mb-3" />
-    <div className="h-4 bg-sky-200 rounded-full mb-2" />
-    <div className="h-3 bg-orange-100 rounded-full w-2/3" />
+  <div className="bg-white border-2 border-black rounded-xl p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] animate-pulse">
+    <div className="aspect-square bg-gray-100 rounded-lg mb-3" />
+    <div className="h-4 bg-gray-200 rounded-full mb-2" />
+    <div className="h-3 bg-gray-100 rounded-full w-2/3" />
   </div>
 ));
 
@@ -40,7 +40,6 @@ const Index = () => {
   const searchRef = useRef<HTMLDivElement>(null);
   const debouncedSearchQuery = useDebounce(searchQuery.trim().toLowerCase(), SEARCH_DEBOUNCE_MS);
 
-  // Close suggestions on outside click
   useEffect(() => {
     const handleClickOutside = (e: MouseEvent) => {
       if (searchRef.current && !searchRef.current.contains(e.target as Node)) {
@@ -51,7 +50,6 @@ const Index = () => {
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
 
-  // Initial Fetch
   useEffect(() => {
     let isMounted = true;
     const load = async () => {
@@ -69,7 +67,6 @@ const Index = () => {
     return () => { isMounted = false; };
   }, []);
 
-  // Filter logic
   const filteredGames = useMemo(() => {
     if (!debouncedSearchQuery) return games;
     return games.filter(g =>
@@ -78,22 +75,14 @@ const Index = () => {
     );
   }, [games, debouncedSearchQuery]);
 
-  // Pagination Logic
   const totalPages = Math.ceil(filteredGames.length / ITEMS_PER_PAGE);
   const displayedGames = useMemo(() => {
     const start = (currentPage - 1) * ITEMS_PER_PAGE;
     return filteredGames.slice(start, start + ITEMS_PER_PAGE);
   }, [filteredGames, currentPage]);
 
-  // Reset to page 1 when searching
-  useEffect(() => {
-    setCurrentPage(1);
-  }, [debouncedSearchQuery]);
-
-  // Scroll to top on page change
-  useEffect(() => {
-    window.scrollTo({ top: 0, behavior: 'smooth' });
-  }, [currentPage]);
+  useEffect(() => { setCurrentPage(1); }, [debouncedSearchQuery]);
+  useEffect(() => { window.scrollTo({ top: 0, behavior: 'smooth' }); }, [currentPage]);
 
   const suggestions = useMemo(() => {
     if (searchQuery.length < 2) return [];
@@ -106,15 +95,17 @@ const Index = () => {
     title.toLowerCase().replace(/\s+/g, "-").replace(/[^\w-]/g, "");
 
   return (
-    <div className="min-h-screen  bg-[#FFFBEB] flex flex-col">
+    <div className="min-h-screen bg-[#FDF4D3] flex flex-col font-sans">
       <Helmet>
-        <title>WeLoveMods | Top Game Mods for iPhone & Android – 2026</title>
+        <title>WeLoveMods | Top Game Mods – 2026</title>
       </Helmet>
 
-      <header className="w-full px-4 pt-20 pb-6 text-center z-50">
-        <section className="w-full max-w-md mx-auto relative" ref={searchRef}> <br />
-          <div className="relative flex items-center px-4 py-3 rounded-full bg-white shadow-xl shadow-sky-100/50 border border-sky-100 focus-within:ring-2 focus-within:ring-sky-400 transition-all">
-            <Search className="w-5 h-5 text-sky-500" />
+      {/* Header with Styled Search */}
+      <header className="w-full px-4 pt-16 pb-8 text-center z-50">
+       <br /> <br />
+        <section className="w-full max-w-md mx-auto relative" ref={searchRef}>
+          <div className="relative flex items-center px-4 py-4 rounded-xl bg-white border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] transition-all focus-within:translate-x-[-2px] focus-within:translate-y-[-2px] focus-within:shadow-[6px_6px_0px_0px_rgba(0,0,0,1)]">
+            <Search className="w-6 h-6 text-black" strokeWidth={3} />
             <input
               type="search"
               placeholder="Search 1,000+ mods..."
@@ -124,26 +115,26 @@ const Index = () => {
                 setSearchQuery(e.target.value);
                 setShowSuggestions(true);
               }}
-              className="ml-2 flex-1 bg-transparent text-slate-800 placeholder-slate-300 outline-none text-sm font-bold"
+              className="ml-3 flex-1 bg-transparent text-black placeholder-gray-400 outline-none text-lg font-extrabold"
             />
             {searchQuery && (
               <button onClick={() => { setSearchQuery(""); setShowSuggestions(false); }}>
-                <X className="w-4 h-4 text-slate-400" />
+                <X className="w-5 h-5 text-black" strokeWidth={3} />
               </button>
             )}
           </div>
           
-          {/* Suggestions Dropdown (Same as before) */}
+          {/* Suggestions Dropdown with Neobrutalist style */}
           <AnimatePresence>
             {showSuggestions && suggestions.length > 0 && (
               <motion.div 
-                initial={{ opacity: 0, y: -10 }}
+                initial={{ opacity: 0, y: 5 }}
                 animate={{ opacity: 1, y: 0 }}
-                exit={{ opacity: 0, y: -10 }}
-                className="absolute top-full left-0 right-0 mt-2 bg-white rounded-2xl shadow-2xl border border-slate-100 overflow-hidden z-[100]"
+                exit={{ opacity: 0, y: 5 }}
+                className="absolute top-[110%] left-0 right-0 bg-white rounded-xl border-2 border-black shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] overflow-hidden z-[100]"
               >
-                <div className="p-2 border-b border-slate-50 flex items-center gap-2 text-[10px] font-black text-sky-400 px-4 uppercase tracking-widest">
-                  <TrendingUp size={12} /> Suggestions
+                <div className="p-3 border-b-2 border-black bg-[#FF70C1] flex items-center gap-2 text-xs font-black text-black uppercase tracking-widest">
+                  <TrendingUp size={14} strokeWidth={3} /> Suggestions
                 </div>
                 {suggestions.map((game) => (
                   <button
@@ -152,12 +143,12 @@ const Index = () => {
                       navigate(`/game/${createSlug(game.title)}`);
                       setShowSuggestions(false);
                     }}
-                    className="w-full flex items-center gap-3 px-4 py-3 hover:bg-sky-50 transition-colors border-b border-slate-50 last:border-0 text-left"
+                    className="w-full flex items-center gap-4 px-4 py-4 hover:bg-[#FDF4D3] transition-colors border-b-2 border-black last:border-0 text-left"
                   >
-                    <img src={game.image_url} alt="" className="w-8 h-8 rounded-lg object-cover bg-slate-100" />
+                    <img src={game.image_url} alt="" className="w-10 h-10 rounded-lg border-2 border-black object-cover" />
                     <div className="flex-1 overflow-hidden">
-                      <p className="text-sm font-bold text-slate-700 truncate">{game.title}</p>
-                      <p className="text-[10px] text-sky-500 font-bold uppercase">v{game.version}</p>
+                      <p className="text-md font-black text-black truncate uppercase">{game.title}</p>
+                      <p className="text-[12px] text-gray-600 font-bold uppercase">v{game.version}</p>
                     </div>
                   </button>
                 ))}
@@ -167,8 +158,9 @@ const Index = () => {
         </section>
       </header>
 
-      <main className="flex-1 w-full px-2 md:px-6 pb-12">
-        <div className="grid grid-cols-3 md:grid-cols-4 gap-2 md:gap-6 max-w-6xl mx-auto">
+      {/* Main Grid */}
+      <main className="flex-1 w-full px-4 md:px-6 pb-20">
+        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-6 max-w-6xl mx-auto">
           {isLoading ? (
             Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => <SkeletonCard key={i} />)
           ) : (
@@ -176,10 +168,11 @@ const Index = () => {
               <motion.div
                 key={game.id}
                 layout
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
+                initial={{ opacity: 0, scale: 0.9 }}
+                animate={{ opacity: 1, scale: 1 }}
+                whileHover={{ y: -5 }}
               >
+                {/* Ensure GameCard inside also uses border-2 border-black */}
                 <GameCard game={game} />
               </motion.div>
             ))
@@ -188,28 +181,27 @@ const Index = () => {
 
         {/* --- Pagination Controls --- */}
         {!isLoading && totalPages > 1 && (
-          <div className="flex justify-center items-center gap-2 mt-12 pb-10">
+          <div className="flex justify-center items-center gap-3 mt-16">
             <button
               onClick={() => setCurrentPage(prev => Math.max(prev - 1, 1))}
               disabled={currentPage === 1}
-              className="p-2 rounded-xl bg-white border border-sky-100 disabled:opacity-30 text-sky-600 shadow-sm"
+              className="p-3 rounded-xl bg-white border-2 border-black disabled:opacity-30 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-none transition-all"
             >
-              <ChevronLeft size={20} />
+              <ChevronLeft size={24} strokeWidth={3} />
             </button>
             
-            <div className="flex gap-1">
+            <div className="flex gap-2">
               {[...Array(totalPages)].map((_, i) => {
                 const pageNum = i + 1;
-                // Only show current, first, last, and neighbors for clean UI
                 if (pageNum === 1 || pageNum === totalPages || Math.abs(pageNum - currentPage) <= 1) {
                   return (
                     <button
                       key={pageNum}
                       onClick={() => setCurrentPage(pageNum)}
-                      className={`w-10 h-10 rounded-xl font-bold transition-all ${
+                      className={`w-12 h-12 rounded-xl font-black text-lg transition-all border-2 border-black ${
                         currentPage === pageNum 
-                        ? "bg-sky-500 text-white shadow-lg shadow-sky-200" 
-                        : "bg-white text-slate-600 border border-sky-50 hover:border-sky-200"
+                        ? "bg-[#FF814D] shadow-none translate-y-[2px]" 
+                        : "bg-white shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:translate-y-[-2px]"
                       }`}
                     >
                       {pageNum}
@@ -217,7 +209,7 @@ const Index = () => {
                   );
                 }
                 if (Math.abs(pageNum - currentPage) === 2) {
-                   return <span key={pageNum} className="px-1 text-slate-300">...</span>;
+                   return <span key={pageNum} className="self-end px-1 font-black">...</span>;
                 }
                 return null;
               })}
@@ -226,9 +218,9 @@ const Index = () => {
             <button
               onClick={() => setCurrentPage(prev => Math.min(prev + 1, totalPages))}
               disabled={currentPage === totalPages}
-              className="p-2 rounded-xl bg-white border border-sky-100 disabled:opacity-30 text-sky-600 shadow-sm"
+              className="p-3 rounded-xl bg-white border-2 border-black disabled:opacity-30 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-none transition-all"
             >
-              <ChevronRight size={20} />
+              <ChevronRight size={24} strokeWidth={3} />
             </button>
           </div>
         )}

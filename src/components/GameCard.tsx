@@ -21,32 +21,31 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
 
   return (
     <motion.div
-      whileHover={{ y: -5, scale: 1.02 }}
-      whileTap={{ scale: 0.96 }}
+      whileHover={{ y: -4, x: -4 }}
       className="group"
     >
-      <Link to={`/game/${createSlug(game.title)}`} className="block">
-        {/* Adjusted padding and border radius for 3-column mobile layout */}
-        <div className="bg-white rounded-[1rem] md:rounded-[2rem] p-1.5 md:p-3 shadow-sm border border-slate-100 group-hover:border-sky-200 transition-all duration-300 h-full flex flex-col">
+      <Link to={`/game/${createSlug(game.title)}`} className="block h-full">
+        {/* Main Card Container: Neobrutalist Style */}
+        <div className="bg-white border-2 border-black rounded-xl p-2 md:p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 h-full flex flex-col">
           
-          {/* Visual Container - Aspect ratio keeps it square even on small screens */}
-          <div className="relative aspect-square rounded-[0.8rem] md:rounded-[1.5rem] overflow-hidden mb-2 md:mb-4">
+          {/* Image Container */}
+          <div className="relative aspect-square rounded-lg overflow-hidden mb-3 border-2 border-black">
             <img
               src={game.image_url || '/placeholder.svg'}
               alt={game.title}
-              className="w-full h-full object-cover transform group-hover:scale-110 transition-transform duration-500"
+              className="w-full h-full object-cover"
               loading="lazy"
             />
 
-            {/* Badges - Simplified for Mobile */}
-            <div className="absolute top-1 left-1 flex flex-col gap-0.5">
+            {/* Badges: High Contrast / Flat Colors */}
+            <div className="absolute top-1 left-1 flex flex-col gap-1">
               {game.is_new && (
-                <span className="bg-[#4ADE80] text-white text-[7px] md:text-[9px] font-black px-1 md:px-2 py-0.5 rounded shadow-sm uppercase w-fit">
+                <span className="bg-[#FF70C1] text-black border border-black text-[8px] md:text-[10px] font-black px-1.5 py-0.5 rounded uppercase w-fit">
                   NEW
                 </span>
               )}
               {game.is_mod && (
-                <span className="bg-[#3B82F6] text-white text-[7px] md:text-[9px] font-black px-1 md:px-2 py-0.5 rounded shadow-sm uppercase w-fit">
+                <span className="bg-[#4FB39A] text-black border border-black text-[8px] md:text-[10px] font-black px-1.5 py-0.5 rounded uppercase w-fit">
                   MOD
                 </span>
               )}
@@ -54,28 +53,24 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
           </div>
 
           {/* Info Section */}
-          <div className="px-0.5 flex-1 flex flex-col justify-between">
-            <div>
-              {/* Title size optimized for 3-in-row */}
-              <h3 className="font-black text-[10px] md:text-[15px] text-slate-800 leading-tight line-clamp-2 uppercase tracking-tighter md:tracking-tight mb-1">
-                {game.title}
-              </h3>
+          <div className="flex-1 flex flex-col">
+            <h3 className="font-black text-[11px] md:text-[16px] text-black leading-tight line-clamp-2 uppercase tracking-tighter mb-2">
+              {game.title}
+            </h3>
 
-              {/* Version & Rating - Compacted */}
-              <div className="flex items-center justify-between mb-2">
-                <div className="scale-[0.65] md:scale-100 origin-left">
-                  <RatingStars rating={game.rating} />
-                </div>
-                <span className="text-[8px] md:text-[10px] font-bold text-slate-400">v{game.version}</span>
+            <div className="flex items-center justify-between mb-3">
+              <div className="scale-[0.7] md:scale-90 origin-left">
+                <RatingStars rating={game.rating} />
               </div>
+              <span className="text-[9px] md:text-[11px] font-black text-gray-500 uppercase">v{game.version}</span>
             </div>
 
-            {/* Optimized Download Button */}
-            <div className="relative">
-              <div className="w-full bg-[#4ADE80] text-white font-black rounded-lg md:rounded-xl flex items-center justify-center gap-1 py-1.5 md:py-2.5 shadow-[0_3px_0_0_#16A34A] md:shadow-[0_4px_0_0_#16A34A] group-active:shadow-none group-active:translate-y-[2px] transition-all">
-                <Download size={10} className="md:w-4 md:h-4" strokeWidth={4} />
-                <span className="text-[8px] md:text-xs uppercase tracking-tighter">
-                  Download
+            {/* The "Youform Orange" Download Button */}
+            <div className="mt-auto">
+              <div className="w-full bg-[#FF814D] border-2 border-black text-black font-black rounded-lg flex items-center justify-center gap-1 py-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-active:shadow-none group-active:translate-y-[2px] transition-all">
+                <Download size={14} strokeWidth={3} />
+                <span className="text-[10px] md:text-xs uppercase tracking-tight">
+                  Get Mod
                 </span>
               </div>
             </div>
