@@ -26,7 +26,7 @@ const LoadingScreen = () => (
       style={{ borderColor: "#FF6B2C transparent #ffdf2c #FF6B2C" }}
     />
     <p className="text-white/60 text-xs font-semibold uppercase tracking-widest animate-pulse">
-      Loading offers...
+      Loading ...
     </p>
   </div>
 );
