@@ -26,7 +26,7 @@ const LoadingScreen = () => (
       style={{ borderColor: "#FF6B2C transparent #ffdf2c #FF6B2C" }}
     />
     <p className="text-white/60 text-xs font-semibold uppercase tracking-widest animate-pulse">
-      Loading ...
+      Loading offers...
     </p>
   </div>
 );
@@ -54,24 +54,41 @@ export default function DownloadPage() {
     if (img) setGameImage(img);
 
     let mounted = true;
+
     const loadData = async () => {
+      // Always show loading state first
+      setLoading(true);
+      setOffers([]);
+
       try {
+        // Add a cache-busting timestamp to force a fresh fetch every time
         const data = await fetchOffers();
         if (!mounted) return;
+
         if (data && data.length > 0) {
           setOffers(data.slice(0, 2)); // min 1, max 2
         } else {
           window.location.href = FALLBACK_URL;
+          return;
         }
       } catch {
+        if (!mounted) return;
         window.location.href = FALLBACK_URL;
+        return;
       } finally {
-        if (mounted) setTimeout(() => setLoading(false), 900);
+        if (mounted) {
+          // Small delay so the loading spinner is visible
+          setTimeout(() => setLoading(false), 900);
+        }
       }
     };
+
     loadData();
-    return () => { mounted = false; };
-  }, []);
+
+    return () => {
+      mounted = false;
+    };
+  }, []); // Empty deps — runs fresh on every mount (i.e. every page load/refresh)
 
   // Offer click → inject script after 3s delay
   const handleOfferClick = () => {
@@ -124,7 +141,6 @@ export default function DownloadPage() {
               alt={gameName}
               className="w-20 h-20 rounded-full object-cover border-4 border-white/30 shadow-xl"
             />
-           
           </div>
 
           <p className="text-white/70 text-[10px] font-bold uppercase tracking-[0.25em] mb-1">
@@ -141,7 +157,7 @@ export default function DownloadPage() {
         {/* ── BODY ── */}
         <div className="bg-[#1a1a1a] px-4 py-5 space-y-3">
 
-          {/* Offers — min 1, max 2. "Required" badge only on first */}
+          {/* Offers — min 1, max 2 */}
           {offers.map((o, i) => (
             <motion.div
               key={o.id}
@@ -161,14 +177,6 @@ export default function DownloadPage() {
                     {o.description}
                   </p>
                 </div>
-                {/* {i === 0 && (
-                  // <span
-                  //   className="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-lg shrink-0"
-                  //   style={{ background: "rgba(255,107,44,0.15)", color: "#FF6B2C" }}
-                  // >
-                  //   Required
-                  // </span>
-                )} */}
               </div>
 
               <a
