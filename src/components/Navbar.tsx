@@ -4,33 +4,17 @@ import { Home, List, Flame, Sparkles, Heart, X, Menu } from 'lucide-react';
 import { useIsMobile } from '@/hooks/use-mobile';
 import { motion, AnimatePresence } from 'framer-motion';
 
-// --- Theme Aligned Config: Using Brand colors and Neobrutalist shadows ---
 const NAV_CONFIG = [
-  { 
-    to: '/', 
-    icon: Home, 
-    label: 'Home', 
-    bg: 'bg-[#FF814D]', // Brand Orange
-  },
-  { 
-    to: '/categories', 
-    icon: List, 
-    label: 'Cats', 
-    bg: 'bg-[#4FB39A]', // Brand Teal
-  },
-  { 
-    to: '/top-games', 
-    icon: Flame, 
-    label: 'Top', 
-    bg: 'bg-[#FF70C1]', // Brand Pink
-  },
-  { 
-    to: '/new-games', 
-    icon: Sparkles, 
-    label: 'New', 
-    bg: 'bg-yellow-400', 
-  },
+  { to: '/',           icon: Home,     label: 'Home'  },
+  { to: '/categories', icon: List,     label: 'Cats'  },
+  { to: '/top-games',  icon: Flame,    label: 'Top'   },
+  { to: '/new-games',  icon: Sparkles, label: 'New'   },
 ];
+
+const ORANGE = '#FF6B2C';
+const ORANGE_DARK = '#E8541A';
+const ORANGE_GLOW = 'rgba(255,107,44,0.35)';
+const ORANGE_SOFT = 'rgba(255,107,44,0.10)';
 
 const Navbar: React.FC = () => {
   const isMobile = useIsMobile();
@@ -45,27 +29,47 @@ const Navbar: React.FC = () => {
 
   return (
     <>
-      {/* Header with High Contrast Neobrutalism */}
-      <header className="fixed top-0 left-0 right-0 z-[100] px-4 py-4 md:px-8">
+      <header className="fixed top-0 left-0 right-0 z-[100] px-4 py-3 md:px-8">
         <div className="mx-auto max-w-6xl">
-          <div className="bg-white border-2 border-black rounded-2xl shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] flex items-center justify-between px-4 py-2 md:px-8 md:py-3 transition-all">
-            
-            {/* Logo - Matching Youform Hero Style */}
-            <Link to="/" onClick={playSound} className="flex items-center gap-2 group">
+          <div
+            className="relative flex items-center justify-between px-4 py-2.5 md:px-6 md:py-3 rounded-2xl overflow-hidden"
+            style={{
+              background: 'rgba(255,255,255,0.92)',
+              backdropFilter: 'blur(16px)',
+              border: `1.5px solid rgba(255,107,44,0.25)`,
+              boxShadow: `0 4px 24px ${ORANGE_GLOW}, 0 1px 0 rgba(255,255,255,0.8) inset`,
+            }}
+          >
+            {/* Subtle orange top-edge glow line */}
+            <span
+              className="absolute top-0 left-8 right-8 h-[2px] rounded-full"
+              style={{ background: `linear-gradient(90deg, transparent, ${ORANGE}, transparent)` }}
+            />
+
+            {/* Logo */}
+            <Link to="/" onClick={playSound} className="flex items-center gap-2.5 group">
               <motion.div
-                className="bg-[#FF814D] p-2 rounded-xl border-2 border-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
-                whileHover={{ scale: 1.05, rotate: -5 }}
+                whileHover={{ scale: 1.08, rotate: -8 }}
+                whileTap={{ scale: 0.95 }}
+                className="relative p-2 rounded-xl"
+                style={{
+                  background: `linear-gradient(135deg, ${ORANGE}, ${ORANGE_DARK})`,
+                  boxShadow: `0 4px 12px ${ORANGE_GLOW}`,
+                }}
               >
-                <Heart className="w-5 h-5 text-black fill-black" />
+                <Heart className="w-4 h-4 text-white fill-white" />
+                {/* Shine */}
+                <span className="absolute inset-0 rounded-xl"
+                  style={{ background: 'linear-gradient(135deg, rgba(255,255,255,0.3) 0%, transparent 60%)' }} />
               </motion.div>
-              <span className="text-xl md:text-2xl font-black text-black tracking-tighter uppercase">
-                welove<span className="text-[#FF814D]">mods</span>
+              <span className="text-lg md:text-xl font-extrabold tracking-tight text-gray-900">
+                welove<span style={{ color: ORANGE }}>mods</span>
               </span>
             </Link>
 
-            {/* Desktop Navigation */}
+            {/* Desktop Nav */}
             {!isMobile && (
-              <nav className="flex items-center gap-4">
+              <nav className="flex items-center gap-1">
                 {NAV_CONFIG.map((item) => (
                   <DesktopNavLink
                     key={item.to}
@@ -77,14 +81,20 @@ const Navbar: React.FC = () => {
               </nav>
             )}
 
-            {/* Mobile Menu Button - Hard Border Style */}
+            {/* Mobile Menu Button */}
             {isMobile && (
-              <button
+              <motion.button
+                whileTap={{ scale: 0.92 }}
                 onClick={() => setIsMenuOpen(true)}
-                className="w-10 h-10 flex items-center justify-center rounded-xl border-2 border-black bg-[#FDF4D3] text-black active:translate-y-[2px] active:shadow-none transition-all shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+                className="w-9 h-9 flex items-center justify-center rounded-xl"
+                style={{
+                  background: ORANGE_SOFT,
+                  border: `1.5px solid rgba(255,107,44,0.3)`,
+                  color: ORANGE,
+                }}
               >
-                <Menu size={20} strokeWidth={3} />
-              </button>
+                <Menu size={18} strokeWidth={2.5} />
+              </motion.button>
             )}
           </div>
         </div>
@@ -94,46 +104,97 @@ const Navbar: React.FC = () => {
       <AnimatePresence>
         {isMobile && isMenuOpen && (
           <div className="fixed inset-0 z-[110] flex justify-end">
-            <motion.div 
-              initial={{ opacity: 0 }} 
-              animate={{ opacity: 1 }} 
+            <motion.div
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
               exit={{ opacity: 0 }}
-              className="absolute inset-0 bg-black/40 backdrop-blur-[2px]"
+              className="absolute inset-0 bg-black/25 backdrop-blur-sm"
               onClick={() => setIsMenuOpen(false)}
             />
             <motion.nav
-              initial={{ x: '100%' }} 
-              animate={{ x: 0 }} 
+              initial={{ x: '100%' }}
+              animate={{ x: 0 }}
               exit={{ x: '100%' }}
-              transition={{ type: 'spring', damping: 25, stiffness: 200 }}
-              className="relative w-[80%] max-w-sm bg-[#FDF4D3] h-full border-l-4 border-black p-6 flex flex-col gap-4 shadow-[-8px_0px_0px_0px_rgba(0,0,0,0.1)]"
+              transition={{ type: 'spring', damping: 28, stiffness: 220 }}
+              className="relative w-[75%] max-w-sm h-full p-6 flex flex-col gap-2.5"
+              style={{
+                background: 'rgba(255,255,255,0.97)',
+                backdropFilter: 'blur(20px)',
+                borderLeft: `2px solid rgba(255,107,44,0.2)`,
+                boxShadow: `-8px 0 40px ${ORANGE_GLOW}`,
+              }}
             >
-              <div className="flex justify-between items-center mb-6">
-                <span className="text-2xl font-black text-black uppercase tracking-tight">Explore</span>
-                <button 
-                  onClick={() => setIsMenuOpen(false)} 
-                  className="p-2 border-2 border-black bg-white rounded-full text-black shadow-[2px_2px_0px_0px_rgba(0,0,0,1)]"
+              {/* Orange edge accent */}
+              <span
+                className="absolute left-0 top-12 bottom-12 w-[3px] rounded-full"
+                style={{ background: `linear-gradient(180deg, transparent, ${ORANGE}, transparent)` }}
+              />
+
+              {/* Drawer Header */}
+              <div className="flex justify-between items-center mb-5">
+                <div className="flex items-center gap-2">
+                  <span
+                    className="w-2 h-2 rounded-full"
+                    style={{ background: ORANGE, boxShadow: `0 0 8px ${ORANGE_GLOW}` }}
+                  />
+                  <span className="text-lg font-extrabold text-gray-900 tracking-tight">Explore</span>
+                </div>
+                <motion.button
+                  whileTap={{ scale: 0.92 }}
+                  onClick={() => setIsMenuOpen(false)}
+                  className="w-8 h-8 flex items-center justify-center rounded-xl"
+                  style={{ background: ORANGE_SOFT, color: ORANGE }}
                 >
-                  <X size={20} strokeWidth={3} />
-                </button>
+                  <X size={15} strokeWidth={2.5} />
+                </motion.button>
               </div>
 
-              {NAV_CONFIG.map((item) => (
-                <Link
-                  key={item.to}
-                  to={item.to}
-                  onClick={() => { playSound(); setIsMenuOpen(false); }}
-                  className={`flex items-center gap-4 px-5 py-4 rounded-xl font-black text-black text-lg border-2 border-black shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] active:translate-y-[2px] active:shadow-none transition-all ${item.bg}`}
-                >
-                  <div className="bg-white border-2 border-black p-2 rounded-lg">
-                    <item.icon className="w-5 h-5" strokeWidth={3} />
-                  </div>
-                  <span className="uppercase tracking-tight">{item.label}</span>
-                </Link>
-              ))}
-              
-              <div className="mt-auto p-4 bg-white border-2 border-black rounded-2xl text-center shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]">
-                <p className="text-xs font-black text-black uppercase tracking-widest">Version 2.0.26</p>
+              {/* Nav Links */}
+              {NAV_CONFIG.map((item, i) => {
+                const isActive = pathname === item.to;
+                return (
+                  <motion.div
+                    key={item.to}
+                    initial={{ opacity: 0, x: 20 }}
+                    animate={{ opacity: 1, x: 0 }}
+                    transition={{ delay: i * 0.05 }}
+                  >
+                    <Link
+                      to={item.to}
+                      onClick={() => { playSound(); setIsMenuOpen(false); }}
+                      className="flex items-center gap-3 px-4 py-3.5 rounded-xl font-semibold text-sm transition-all duration-200"
+                      style={
+                        isActive
+                          ? {
+                              background: `linear-gradient(135deg, ${ORANGE}, ${ORANGE_DARK})`,
+                              color: 'white',
+                              boxShadow: `0 4px 16px ${ORANGE_GLOW}`,
+                            }
+                          : {
+                              background: ORANGE_SOFT,
+                              color: 'hsl(var(--foreground))',
+                              border: `1px solid rgba(255,107,44,0.15)`,
+                            }
+                      }
+                    >
+                      <span
+                        className="w-8 h-8 flex items-center justify-center rounded-lg shrink-0"
+                        style={{
+                          background: isActive ? 'rgba(255,255,255,0.2)' : 'rgba(255,107,44,0.12)',
+                        }}
+                      >
+                        <item.icon className="w-4 h-4" strokeWidth={2} style={{ color: isActive ? 'white' : ORANGE }} />
+                      </span>
+                      <span>{item.label}</span>
+                    </Link>
+                  </motion.div>
+                );
+              })}
+
+              {/* Footer */}
+              <div className="mt-auto px-4 py-3 rounded-xl text-center"
+                style={{ background: ORANGE_SOFT, border: `1px solid rgba(255,107,44,0.15)` }}>
+                <p className="text-[11px] font-semibold" style={{ color: ORANGE }}>Version 2.0.26</p>
               </div>
             </motion.nav>
           </div>
@@ -143,16 +204,35 @@ const Navbar: React.FC = () => {
   );
 };
 
-const DesktopNavLink = ({ to, icon: Icon, label, bg, active, onClick }: any) => (
-  <Link to={to} onClick={onClick} className="relative group">
+const DesktopNavLink = ({ to, icon: Icon, label, active, onClick }: any) => (
+  <Link to={to} onClick={onClick}>
     <motion.div
-      className={`flex items-center gap-2 px-4 py-2 rounded-xl font-black text-black text-sm border-2 border-black transition-all duration-200 
-        ${bg} ${active ? 'translate-y-[2px] shadow-none' : 'shadow-[3px_3px_0px_0px_rgba(0,0,0,1)] hover:-translate-y-0.5 hover:shadow-[5px_5px_0px_0px_rgba(0,0,0,1)]'}
-      `}
-      whileTap={{ scale: 0.95 }}
+      whileTap={{ scale: 0.94 }}
+      whileHover={{ y: -1 }}
+      className="relative flex items-center gap-1.5 px-3.5 py-2 rounded-xl text-sm font-semibold transition-all duration-200"
+      style={
+        active
+          ? {
+              background: `linear-gradient(135deg, ${ORANGE}, ${ORANGE_DARK})`,
+              color: 'white',
+              boxShadow: `0 4px 14px ${ORANGE_GLOW}`,
+            }
+          : {
+              color: '#666',
+              background: 'transparent',
+            }
+      }
     >
-      <Icon className={`w-4 h-4 text-black`} strokeWidth={3} />
-      <span className="uppercase tracking-tight">{label}</span>
+      <Icon className="w-3.5 h-3.5" strokeWidth={2} />
+      <span>{label}</span>
+
+      {/* Hover underline for inactive */}
+      {!active && (
+        <motion.span
+          className="absolute bottom-1 left-3 right-3 h-[2px] rounded-full opacity-0 group-hover:opacity-100"
+          style={{ background: ORANGE }}
+        />
+      )}
     </motion.div>
   </Link>
 );

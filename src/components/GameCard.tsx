@@ -21,15 +21,14 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
 
   return (
     <motion.div
-      whileHover={{ y: -4, x: -4 }}
+      whileHover={{ y: -3 }}
       className="group"
     >
       <Link to={`/game/${createSlug(game.title)}`} className="block h-full">
-        {/* Main Card Container: Neobrutalist Style */}
-        <div className="bg-white border-2 border-black rounded-xl p-2 md:p-3 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] group-hover:shadow-[8px_8px_0px_0px_rgba(0,0,0,1)] transition-all duration-200 h-full flex flex-col">
-          
+        <div className="bg-white border border-[hsl(var(--border))] rounded-xl p-2 md:p-3 shadow-[var(--shadow-blue)] hover:shadow-[var(--shadow-lg)] transition-all duration-200 h-full flex flex-col">
+
           {/* Image Container */}
-          <div className="relative aspect-square rounded-lg overflow-hidden mb-3 border-2 border-black">
+          <div className="relative aspect-square rounded-lg overflow-hidden mb-3">
             <img
               src={game.image_url || '/placeholder.svg'}
               alt={game.title}
@@ -37,16 +36,16 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
               loading="lazy"
             />
 
-            {/* Badges: High Contrast / Flat Colors */}
+            {/* Badges */}
             <div className="absolute top-1 left-1 flex flex-col gap-1">
               {game.is_new && (
-                <span className="bg-[#FF70C1] text-black border border-black text-[8px] md:text-[10px] font-black px-1.5 py-0.5 rounded uppercase w-fit">
-                  NEW
+                <span className="bg-[hsl(var(--cartoon-pink))] text-white text-[8px] md:text-[10px] font-semibold px-1.5 py-0.5 rounded-md w-fit">
+                  New
                 </span>
               )}
               {game.is_mod && (
-                <span className="bg-[#4FB39A] text-black border border-black text-[8px] md:text-[10px] font-black px-1.5 py-0.5 rounded uppercase w-fit">
-                  MOD
+                <span className="bg-[hsl(var(--cartoon-green))] text-white text-[8px] md:text-[10px] font-semibold px-1.5 py-0.5 rounded-md w-fit">
+                  Mod
                 </span>
               )}
             </div>
@@ -54,7 +53,7 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
 
           {/* Info Section */}
           <div className="flex-1 flex flex-col">
-            <h3 className="font-black text-[11px] md:text-[16px] text-black leading-tight line-clamp-2 uppercase tracking-tighter mb-2">
+            <h3 className="font-bold text-[11px] md:text-[15px] text-[hsl(var(--foreground))] leading-tight line-clamp-2 mb-2">
               {game.title}
             </h3>
 
@@ -62,15 +61,39 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
               <div className="scale-[0.7] md:scale-90 origin-left">
                 <RatingStars rating={game.rating} />
               </div>
-              <span className="text-[9px] md:text-[11px] font-black text-gray-500 uppercase">v{game.version}</span>
+              <span className="text-[9px] md:text-[11px] font-medium text-[hsl(var(--muted-foreground))]">v{game.version}</span>
             </div>
 
-            {/* The "Youform Orange" Download Button */}
+            {/* Download Button — glassy green with shimmer */}
             <div className="mt-auto">
-              <div className="w-full bg-[#FF814D] border-2 border-black text-black font-black rounded-lg flex items-center justify-center gap-1 py-2 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] group-active:shadow-none group-active:translate-y-[2px] transition-all">
-                <Download size={14} strokeWidth={3} />
-                <span className="text-[10px] md:text-xs uppercase tracking-tight">
-                  Get Mod
+              <div
+                className="relative w-full overflow-hidden rounded-xl flex items-center justify-center gap-1.5 py-2 transition-all duration-300 group-hover:scale-[1.03]"
+                style={{
+                  background: 'linear-gradient(135deg, #22c55e 0%, #16a34a 50%, #15803d 100%)',
+                  boxShadow: '0 0 0 1px rgba(34,197,94,0.4), 0 4px 14px rgba(22,163,74,0.45), inset 0 1px 0 rgba(255,255,255,0.25)',
+                }}
+              >
+                {/* Shimmer stripe on hover */}
+                <span
+                  className="pointer-events-none absolute inset-0 -translate-x-full group-hover:translate-x-full transition-transform duration-700 ease-in-out"
+                  style={{
+                    background: 'linear-gradient(90deg, transparent, rgba(255,255,255,0.18), transparent)',
+                  }}
+                />
+
+                {/* Icon bubble */}
+                <span
+                  className="flex items-center justify-center rounded-lg w-5 h-5 shrink-0"
+                  style={{
+                    background: 'rgba(255,255,255,0.18)',
+                    backdropFilter: 'blur(4px)',
+                  }}
+                >
+                  <Download size={11} strokeWidth={2.5} className="text-white" />
+                </span>
+
+                <span className="text-white text-[10px] md:text-[11px] font-bold tracking-wide">
+                  Download
                 </span>
               </div>
             </div>
