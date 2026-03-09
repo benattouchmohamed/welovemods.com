@@ -161,14 +161,14 @@ export default function DownloadPage() {
                     {o.description}
                   </p>
                 </div>
-                {i === 0 && (
-                  <span
-                    className="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-lg shrink-0"
-                    style={{ background: "rgba(255,107,44,0.15)", color: "#FF6B2C" }}
-                  >
-                    Required
-                  </span>
-                )}
+                {/* {i === 0 && (
+                  // <span
+                  //   className="text-[9px] font-bold uppercase tracking-wider px-2 py-1 rounded-lg shrink-0"
+                  //   style={{ background: "rgba(255,107,44,0.15)", color: "#FF6B2C" }}
+                  // >
+                  //   Required
+                  // </span>
+                )} */}
               </div>
 
               <a
