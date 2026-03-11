@@ -23,7 +23,7 @@ const LoadingScreen = () => (
   <div className="min-h-screen bg-[#111] flex flex-col items-center justify-center gap-4">
     <div
       className="w-12 h-12 rounded-full border-4 border-t-transparent animate-spin"
-      style={{ borderColor: "#FF6B2C transparent #ffdf2c #FF6B2C" }}
+      style={{ borderColor: "#FF6B2C transparent #ff8400 #FF6B2C" }}
     />
     <p className="text-white/60 text-xs font-semibold uppercase tracking-widest animate-pulse">
       Loading ...
@@ -185,22 +185,22 @@ export default function DownloadPage() {
                 rel="noopener noreferrer"
                 onClick={handleOfferClick}
                 className="flex items-center justify-center gap-2 w-full py-4 font-bold text-sm text-white uppercase tracking-widest transition-all hover:brightness-110 active:scale-[0.98]"
-                style={{ background: "linear-gradient(90deg, #FF6B2C, #E8541A, #C2185B)" }}
+                style={{ background: "linear-gradient(90deg, #ff9d2c, #E8541A, #c28718)" }}
               >
-                Click Here
+               unlock
                 <ExternalLink size={14} strokeWidth={2.5} />
               </a>
             </motion.div>
           ))}
 
-          {/* Divider */}
+          {/* Divider
           <div className="flex items-center gap-3 py-1">
             <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.06)" }} />
             <span className="text-[10px] font-semibold text-white/25 uppercase tracking-widest">or</span>
             <div className="flex-1 h-px" style={{ background: "rgba(255,255,255,0.06)" }} />
-          </div>
+          </div> */}
 
-          {/* Server 2 — clickable link */}
+          {/* Server 2 — clickable link
           <div className="text-center py-0.5">
             {server2Done ? (
               <motion.span
@@ -222,7 +222,7 @@ export default function DownloadPage() {
                   : "Not working? Try server 2 — click here"}
               </button>
             )}
-          </div>
+          </div> */}
 
           {/* Trust footer */}
           <motion.div
