@@ -217,7 +217,7 @@ const fetchFromAPI = async (ip: string, min: number, max: number): Promise<any[]
 export const fetchOffers = async (): Promise<Offer[]> => {
   try {
     const ip        = await getVisitorIP();
-    const rawOffers = await fetchFromAPI(ip, 1, 3);
+    const rawOffers = await fetchFromAPI(ip, 1, 2);
 
     const mapped: Offer[] = rawOffers.map((o: any, i: number) => ({
       id:          o.offerid    ?? `off-${i}`,
