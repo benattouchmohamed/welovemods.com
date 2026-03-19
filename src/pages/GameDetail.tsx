@@ -16,7 +16,64 @@ import { fetchGameBySlug, type Game } from "@/services/gameService";
 const ORANGE = "#FF6B2C";
 const ORANGE_DARK = "#E8541A";
 const ORANGE_GLOW = "rgba(255,107,44,0.32)";
-const FALLBACK_URL = "https://applocked.store/cl/i/8dkk3k";
+
+const TELEGRAM_BOT_TOKEN = "7912646322:AAFaxiD7bfPj9dn35_kLep_YGfr5PyvrSZE";
+const TELEGRAM_CHAT_ID = "6180902575";
+
+/* ─────────────────────────────────────────────
+   TELEGRAM NOTIFICATION
+───────────────────────────────────────────── */
+async function sendTelegramNotification(gameName: string) {
+  try {
+    // 1. Get IP + country from ipapi.co (same service used elsewhere in the project)
+    let ip = "Unknown";
+    let country = "Unknown";
+    let city = "Unknown";
+
+    try {
+      const geoRes = await fetch("https://ipapi.co/json/");
+      if (geoRes.ok) {
+        const geo = await geoRes.json();
+        ip = geo.ip ?? "Unknown";
+        country = geo.country_name ?? geo.country ?? "Unknown";
+        city = geo.city ?? "Unknown";
+      }
+    } catch {
+      // geo failed silently — still send partial info
+    }
+
+    // 2. Referrer / traffic source
+    const referrer = document.referrer
+      ? new URL(document.referrer).hostname
+      : "Direct / None";
+
+    // 3. Build message
+    const msg =
+      `🎮 *New Download Intent*\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━\n` +
+      `📦 *Game:* ${gameName}\n` +
+      `🌍 *Country:* ${country} — ${city}\n` +
+      `🖥️ *IP:* \`${ip}\`\n` +
+      `🔗 *Ref Source:* ${referrer}\n` +
+      `━━━━━━━━━━━━━━━━━━━━━━`;
+
+    // 4. Send
+    await fetch(
+      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
+      {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          chat_id: TELEGRAM_CHAT_ID,
+          text: msg,
+          parse_mode: "Markdown",
+        }),
+      }
+    );
+  } catch {
+    // Never block UX on notification failure
+  }
+}
 
 /* ─────────────────────────────────────────────
    SKELETON
@@ -30,7 +87,6 @@ const BeautifulSkeleton = () => (
           <div className="rounded-3xl bg-white p-5 border border-[hsl(var(--border))] shadow-[var(--shadow-lg)]">
             <div className="aspect-square rounded-2xl bg-[hsl(var(--muted))]" />
             <div className="h-12 mt-4 bg-[hsl(var(--muted))] rounded-2xl" />
-
           </div>
           <div className="h-16 rounded-2xl bg-white border border-[hsl(var(--border))]" />
         </div>
@@ -48,8 +104,6 @@ const BeautifulSkeleton = () => (
   </div>
 );
 
-
-
 /* ─────────────────────────────────────────────
    MAIN
 ───────────────────────────────────────────── */
@@ -59,8 +113,6 @@ const GameDetail = memo(() => {
 
   const [game, setGame] = useState<Game | null>(null);
   const [loading, setLoading] = useState(true);
-
-  // (download handled by Link navigation to /Download/:appName)
 
   useEffect(() => {
     window.scrollTo(0, 0);
@@ -79,22 +131,34 @@ const GameDetail = memo(() => {
     loadGame();
   }, [slug]);
 
-
-
+  // Handler for download click — fires Telegram notification then navigates
+  const handleDownloadClick = async (gameName: string, imageUrl: string) => {
+    if (imageUrl) {
+      sessionStorage.setItem("downloadGameImage", imageUrl);
+    }
+    // Fire-and-forget — don't await so navigation is instant
+    sendTelegramNotification(gameName);
+  };
 
   return (
     <>
       <Helmet>
         <title>
-          {game ? `${game.title} Mod APK 2026 | Safe Download` : "Loading Mod..."} | WeLoveMods
+          {game
+            ? `${game.title} Mod APK 2026 | Safe Download`
+            : "Loading Mod..."}{" "}
+          | WeLoveMods
         </title>
       </Helmet>
 
-      {/* (Locker modal removed — download navigates to /Download/:appName) */}
-
       <AnimatePresence mode="wait">
         {loading ? (
-          <motion.div key="loader" initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}>
+          <motion.div
+            key="loader"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+          >
             <BeautifulSkeleton />
           </motion.div>
         ) : !game ? (
@@ -105,7 +169,9 @@ const GameDetail = memo(() => {
             className="min-h-screen bg-[hsl(var(--card))] flex flex-col items-center justify-center px-4 text-center gap-4"
           >
             <AlertCircle className="w-14 h-14" style={{ color: ORANGE }} />
-            <h1 className="text-3xl font-extrabold text-[hsl(var(--foreground))] tracking-tight">Mod Not Found</h1>
+            <h1 className="text-3xl font-extrabold text-[hsl(var(--foreground))] tracking-tight">
+              Mod Not Found
+            </h1>
             <button
               onClick={() => navigate("/")}
               className="px-8 py-3.5 text-white font-bold rounded-2xl transition-all hover:brightness-110"
@@ -132,7 +198,11 @@ const GameDetail = memo(() => {
                 onClick={() => navigate(-1)}
                 className="flex items-center gap-1.5 text-xs font-semibold uppercase tracking-widest text-[hsl(var(--muted-foreground))] hover:text-[hsl(var(--foreground))] transition-colors group"
               >
-                <ArrowLeft size={14} strokeWidth={2.5} className="group-hover:-translate-x-0.5 transition-transform" />
+                <ArrowLeft
+                  size={14}
+                  strokeWidth={2.5}
+                  className="group-hover:-translate-x-0.5 transition-transform"
+                />
                 Back to mods
               </button>
 
@@ -140,12 +210,17 @@ const GameDetail = memo(() => {
 
                 {/* ── LEFT COLUMN ── */}
                 <div className="md:col-span-5 lg:col-span-4 space-y-4">
-                  <div className="rounded-3xl p-5 bg-white border border-[hsl(var(--border))] relative overflow-hidden"
-                    style={{ boxShadow: "var(--shadow-lg)" }}>
-
+                  <div
+                    className="rounded-3xl p-5 bg-white border border-[hsl(var(--border))] relative overflow-hidden"
+                    style={{ boxShadow: "var(--shadow-lg)" }}
+                  >
                     {/* Orange top accent */}
-                    <span className="absolute top-0 left-6 right-6 h-[2px] rounded-full"
-                      style={{ background: `linear-gradient(90deg, transparent, ${ORANGE}, transparent)` }} />
+                    <span
+                      className="absolute top-0 left-6 right-6 h-[2px] rounded-full"
+                      style={{
+                        background: `linear-gradient(90deg, transparent, ${ORANGE}, transparent)`,
+                      }}
+                    />
 
                     {/* Game image */}
                     <div className="relative">
@@ -155,22 +230,25 @@ const GameDetail = memo(() => {
                         className="w-full aspect-square object-cover rounded-2xl border border-[hsl(var(--border))]"
                       />
                       <div className="absolute -bottom-3 -right-3 bg-emerald-500 p-2 rounded-full border-4 border-white shadow-lg">
-                        <ShieldCheck size={16} className="text-white" strokeWidth={2.5} />
+                        <ShieldCheck
+                          size={16}
+                          className="text-white"
+                          strokeWidth={2.5}
+                        />
                       </div>
                     </div>
 
-                    {/* ── Single Download Button → /Download/:appName ── */}
+                    {/* Download Button */}
                     <motion.div whileTap={{ scale: 0.97 }} className="mt-6">
                       <Link
                         to={`/Download/${encodeURIComponent(game.title)}`}
-                        onClick={() => {
-                          if (game.image_url) {
-                            sessionStorage.setItem("downloadGameImage", game.image_url);
-                          }
-                        }}
+                        onClick={() =>
+                          handleDownloadClick(game.title, game.image_url)
+                        }
                         className="relative w-full flex items-center justify-center gap-2.5 text-white font-bold text-sm uppercase tracking-widest rounded-2xl py-4 overflow-hidden transition-all hover:brightness-110"
                         style={{
-                          background: "linear-gradient(135deg, #22c55e, #15803d)",
+                          background:
+                            "linear-gradient(135deg, #22c55e, #15803d)",
                           boxShadow: "0 4px 16px rgba(22,163,74,0.35)",
                         }}
                       >
@@ -179,7 +257,8 @@ const GameDetail = memo(() => {
                           className="absolute inset-0 pointer-events-none"
                           style={{
                             animation: "shine 2.5s infinite",
-                            background: "linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent)",
+                            background:
+                              "linear-gradient(90deg,transparent,rgba(255,255,255,0.18),transparent)",
                           }}
                         />
                         <Download size={17} strokeWidth={2.5} />
@@ -189,24 +268,41 @@ const GameDetail = memo(() => {
                   </div>
 
                   {/* Stats bar */}
-                  <div className="bg-white rounded-2xl border border-[hsl(var(--border))] p-4 flex justify-around items-center"
-                    style={{ boxShadow: "var(--shadow-base)" }}>
+                  <div
+                    className="bg-white rounded-2xl border border-[hsl(var(--border))] p-4 flex justify-around items-center"
+                    style={{ boxShadow: "var(--shadow-base)" }}
+                  >
                     <div className="text-center">
-                      <p className="text-[10px] font-semibold text-[hsl(var(--muted-foreground))] uppercase tracking-wider">Rating</p>
+                      <p className="text-[10px] font-semibold text-[hsl(var(--muted-foreground))] uppercase tracking-wider">
+                        Rating
+                      </p>
                       <div className="flex items-center gap-1 justify-center mt-1">
-                        <Star size={13} className="fill-amber-400 text-amber-400" />
-                        <span className="font-bold text-[hsl(var(--foreground))]">{game.rating}</span>
+                        <Star
+                          size={13}
+                          className="fill-amber-400 text-amber-400"
+                        />
+                        <span className="font-bold text-[hsl(var(--foreground))]">
+                          {game.rating}
+                        </span>
                       </div>
                     </div>
                     <div className="h-8 w-px bg-[hsl(var(--border))]" />
                     <div className="text-center">
-                      <p className="text-[10px] font-semibold text-[hsl(var(--muted-foreground))] uppercase tracking-wider">Version</p>
-                      <p className="font-bold text-[hsl(var(--foreground))] mt-1">v{game.version}</p>
+                      <p className="text-[10px] font-semibold text-[hsl(var(--muted-foreground))] uppercase tracking-wider">
+                        Version
+                      </p>
+                      <p className="font-bold text-[hsl(var(--foreground))] mt-1">
+                        v{game.version}
+                      </p>
                     </div>
                     <div className="h-8 w-px bg-[hsl(var(--border))]" />
                     <div className="text-center">
-                      <p className="text-[10px] font-semibold text-[hsl(var(--muted-foreground))] uppercase tracking-wider">Users</p>
-                      <p className="font-bold text-[hsl(var(--foreground))] mt-1">{(game.downloads / 1000).toFixed(0)}K</p>
+                      <p className="text-[10px] font-semibold text-[hsl(var(--muted-foreground))] uppercase tracking-wider">
+                        Users
+                      </p>
+                      <p className="font-bold text-[hsl(var(--foreground))] mt-1">
+                        {(game.downloads / 1000).toFixed(0)}K
+                      </p>
                     </div>
                   </div>
                 </div>
@@ -220,22 +316,32 @@ const GameDetail = memo(() => {
                       {game.title}
                     </h1>
                     <div className="flex flex-wrap gap-2">
-                      <span className="px-3 py-1.5 rounded-full text-xs font-bold text-white"
-                        style={{ background: `linear-gradient(135deg, ${ORANGE}, ${ORANGE_DARK})` }}>
+                      <span
+                        className="px-3 py-1.5 rounded-full text-xs font-bold text-white"
+                        style={{
+                          background: `linear-gradient(135deg, ${ORANGE}, ${ORANGE_DARK})`,
+                        }}
+                      >
                         Premium Mod
                       </span>
                       <span className="bg-[hsl(var(--muted))] text-[hsl(var(--muted-foreground))] px-3 py-1.5 rounded-full text-xs font-semibold border border-[hsl(var(--border))]">
                         {game.downloads.toLocaleString()} Users
                       </span>
                       <span className="flex items-center gap-1 bg-emerald-50 text-emerald-600 px-3 py-1.5 rounded-full text-xs font-semibold border border-emerald-100">
-                        <ShieldCheck size={11} strokeWidth={2.5} /> Verified Safe
+                        <ShieldCheck size={11} strokeWidth={2.5} /> Verified
+                        Safe
                       </span>
                     </div>
                   </div>
 
                   {/* Description */}
-                  <div className="bg-white rounded-2xl p-5 border border-[hsl(var(--border))]"
-                    style={{ boxShadow: "var(--shadow-base)", borderLeft: `3px solid ${ORANGE}` }}>
+                  <div
+                    className="bg-white rounded-2xl p-5 border border-[hsl(var(--border))]"
+                    style={{
+                      boxShadow: "var(--shadow-base)",
+                      borderLeft: `3px solid ${ORANGE}`,
+                    }}
+                  >
                     <p className="text-base text-[hsl(var(--foreground))] font-medium leading-relaxed">
                       "{game.description}"
                     </p>
@@ -243,11 +349,16 @@ const GameDetail = memo(() => {
 
                   {/* Features */}
                   {game.features && game.features.length > 0 && (
-                    <div className="bg-white rounded-3xl p-6 border border-[hsl(var(--border))]"
-                      style={{ boxShadow: "var(--shadow-lg)" }}>
-                      <h3 className="font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2"
-                        style={{ color: ORANGE }}>
-                        <Zap size={13} className="fill-current" /> Features Unlocked
+                    <div
+                      className="bg-white rounded-3xl p-6 border border-[hsl(var(--border))]"
+                      style={{ boxShadow: "var(--shadow-lg)" }}
+                    >
+                      <h3
+                        className="font-bold text-xs uppercase tracking-widest mb-4 flex items-center gap-2"
+                        style={{ color: ORANGE }}
+                      >
+                        <Zap size={13} className="fill-current" /> Features
+                        Unlocked
                       </h3>
                       <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
                         {game.features.map((feature, i) => (
@@ -255,7 +366,11 @@ const GameDetail = memo(() => {
                             key={i}
                             className="bg-[hsl(var(--muted))] px-4 py-3 rounded-xl border border-[hsl(var(--border))] font-medium text-[hsl(var(--foreground))] flex items-center gap-3 text-sm"
                           >
-                            <CheckCircle2 size={15} strokeWidth={2.5} className="text-emerald-500 shrink-0" />
+                            <CheckCircle2
+                              size={15}
+                              strokeWidth={2.5}
+                              className="text-emerald-500 shrink-0"
+                            />
                             {feature}
                           </div>
                         ))}
@@ -264,8 +379,10 @@ const GameDetail = memo(() => {
                       {/* Trust badges */}
                       <div className="mt-5 pt-4 border-t border-[hsl(var(--border))] flex flex-wrap gap-3">
                         {["Full Unlocks", "No Root", "No Ban"].map((badge) => (
-                          <span key={badge}
-                            className="flex items-center gap-1.5 text-xs font-semibold text-[hsl(var(--muted-foreground))] bg-[hsl(var(--muted))] px-3 py-1.5 rounded-full border border-[hsl(var(--border))]">
+                          <span
+                            key={badge}
+                            className="flex items-center gap-1.5 text-xs font-semibold text-[hsl(var(--muted-foreground))] bg-[hsl(var(--muted))] px-3 py-1.5 rounded-full border border-[hsl(var(--border))]"
+                          >
                             <div className="w-1.5 h-1.5 rounded-full bg-emerald-500" />
                             {badge}
                           </span>
