@@ -5,19 +5,12 @@ import { useNavigate } from "react-router-dom";
 import { motion, AnimatePresence } from "framer-motion";
 import Navbar from "@/components/Navbar";
 import GameCard from "@/components/GameCard";
+import LoadingSkeleton from "@/components/LoadingSkeleton";
 import { fetchGames } from "@/services/gameService";
 import type { Game } from "@/services/gameService";
 
 const ITEMS_PER_PAGE = 12;
 const SEARCH_DEBOUNCE_MS = 300;
-
-const SkeletonCard = memo(() => (
-  <div className="bg-[hsl(var(--card))] border border-[hsl(var(--border))] rounded-xl p-3 shadow-[var(--shadow-blue)] animate-pulse">
-    <div className="aspect-square bg-[hsl(var(--muted))] rounded-lg mb-3" />
-    <div className="h-4 bg-[hsl(var(--muted))] rounded-full mb-2" />
-    <div className="h-3 bg-[hsl(var(--muted))] rounded-full w-2/3" />
-  </div>
-));
 
 function useDebounce<T>(value: T, delay: number): T {
   const [debouncedValue, setDebouncedValue] = useState<T>(value);
@@ -96,7 +89,13 @@ const Index = () => {
   return (
     <div className="min-h-screen bg-[hsl(var(--card))] flex flex-col">
       <Helmet>
-        <title>WeLoveMods | Top Game Mods – 2026</title>
+        <title>WeLoveMods – Download MOD APK Games & Premium Apps Free (2026)</title>
+        <meta name="description" content="Download the best MOD APK games and premium Android apps for free. Unlimited coins, unlocked features, 100% safe. Updated daily on WeLoveMods." />
+        <link rel="canonical" href="https://welovemods.com/" />
+        <meta property="og:title" content="WeLoveMods – Top MOD APK Games & Apps 2026" />
+        <meta property="og:description" content="Get free modded Android games with unlimited coins, unlocked levels, and premium apps. Safe & fast downloads." />
+        <meta property="og:url" content="https://welovemods.com/" />
+        <meta property="og:type" content="website" />
       </Helmet>
 
       {/* Search Header */}
@@ -186,21 +185,21 @@ const Index = () => {
 
       {/* Main Grid */}
       <main className="flex-1 w-full px-4 md:px-6 pb-20">
-        <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
-          {isLoading
-            ? Array.from({ length: ITEMS_PER_PAGE }).map((_, i) => <SkeletonCard key={i} />)
-            : displayedGames.map((game) => (
-                <motion.div
-                  key={game.id}
-                  layout
-                  initial={{ opacity: 0, scale: 0.95 }}
-                  animate={{ opacity: 1, scale: 1 }}
-                  transition={{ duration: 0.2 }}
-                >
-                  <GameCard game={game} />
-                </motion.div>
-              ))}
-        </div>
+        {isLoading ? (
+          <LoadingSkeleton />
+        ) : (
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-4 gap-4 sm:gap-6 max-w-6xl mx-auto">
+            {displayedGames.map((game, index) => (
+              <div
+                key={game.id}
+                className="animate-stagger-fade-in"
+                style={{ animationDelay: `${index * 0.06}s` }}
+              >
+                <GameCard game={game} />
+              </div>
+            ))}
+          </div>
+        )}
 
         {/* Pagination */}
         {!isLoading && totalPages > 1 && (

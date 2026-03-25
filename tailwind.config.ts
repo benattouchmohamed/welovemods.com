@@ -213,17 +213,22 @@ export default {
           "100%": { backgroundPosition: "200% 0" },
         },
         // Custom bounce for that U.S. Game Style
-        "squish": {
-          "0%, 100%": { transform: "scale(1, 1)" },
-          "50%": { transform: "scale(1.05, 0.95)" },
-        }
-      },
-      animation: {
-        "accordion-down": "accordion-down 0.2s ease-out",
-        "accordion-up": "accordion-up 0.2s ease-out",
-        shimmer: "shimmer 1.8s infinite",
-        squish: "squish 0.5s ease-in-out",
-      },
+        "squish": {
+          "0%, 100%": { transform: "scale(1, 1)" },
+          "50%": { transform: "scale(1.05, 0.95)" },
+        },
+        "stagger-fade-in": {
+          "0%": { opacity: "0", transform: "translateY(16px) scale(0.97)" },
+          "100%": { opacity: "1", transform: "translateY(0) scale(1)" },
+        },
+      },
+      animation: {
+        "accordion-down": "accordion-down 0.2s ease-out",
+        "accordion-up": "accordion-up 0.2s ease-out",
+        shimmer: "shimmer 1.8s infinite",
+        squish: "squish 0.5s ease-in-out",
+        "stagger-fade-in": "stagger-fade-in 0.4s ease-out both",
+      },
     },
   },
   plugins: [

@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { memo } from 'react';
 import { Link } from 'react-router-dom';
 import { Download } from 'lucide-react';
 import { motion } from 'framer-motion';
@@ -9,7 +9,7 @@ interface GameCardProps {
   game: Game;
 }
 
-const GameCard: React.FC<GameCardProps> = ({ game }) => {
+const GameCard: React.FC<GameCardProps> = memo(({ game }) => {
   const createSlug = (title: string) => {
     return title
       .toLowerCase()
@@ -31,9 +31,12 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
           <div className="relative aspect-square rounded-lg overflow-hidden mb-3">
             <img
               src={game.image_url || '/placeholder.svg'}
-              alt={game.title}
+              alt={`Download ${game.title} Mod APK free`}
               className="w-full h-full object-cover"
               loading="lazy"
+              decoding="async"
+              width={300}
+              height={300}
             />
 
             {/* Badges */}
@@ -102,6 +105,6 @@ const GameCard: React.FC<GameCardProps> = ({ game }) => {
       </Link>
     </motion.div>
   );
-};
+});
 
 export default GameCard;

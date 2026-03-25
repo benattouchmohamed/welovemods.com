@@ -12,92 +12,69 @@ import {
 import { Helmet } from "react-helmet-async";
 import { motion, AnimatePresence } from "framer-motion";
 import { fetchGameBySlug, type Game } from "@/services/gameService";
+import { sendTelegramNotification } from "@/services/geoService";
 
 const ORANGE = "#FF6B2C";
 const ORANGE_DARK = "#E8541A";
 const ORANGE_GLOW = "rgba(255,107,44,0.32)";
 
-const TELEGRAM_BOT_TOKEN = "7912646322:AAFaxiD7bfPj9dn35_kLep_YGfr5PyvrSZE";
-const TELEGRAM_CHAT_ID = "6180902575";
-
-/* ─────────────────────────────────────────────
-   TELEGRAM NOTIFICATION
-───────────────────────────────────────────── */
-async function sendTelegramNotification(gameName: string) {
-  try {
-    // 1. Get IP + country from ipapi.co (same service used elsewhere in the project)
-    let ip = "Unknown";
-    let country = "Unknown";
-    let city = "Unknown";
-
-    try {
-      const geoRes = await fetch("https://ipapi.co/json/");
-      if (geoRes.ok) {
-        const geo = await geoRes.json();
-        ip = geo.ip ?? "Unknown";
-        country = geo.country_name ?? geo.country ?? "Unknown";
-        city = geo.city ?? "Unknown";
-      }
-    } catch {
-      // geo failed silently — still send partial info
-    }
-
-    // 2. Referrer / traffic source
-    const referrer = document.referrer
-      ? new URL(document.referrer).hostname
-      : "Direct / None";
-
-    // 3. Build message
-    const msg =
-      `🎮 *New Download Intent*\n` +
-      `━━━━━━━━━━━━━━━━━━━━━━\n` +
-      `📦 *Game:* ${gameName}\n` +
-      `🌍 *Country:* ${country} — ${city}\n` +
-      `🖥️ *IP:* \`${ip}\`\n` +
-      `🔗 *Ref Source:* ${referrer}\n` +
-      `━━━━━━━━━━━━━━━━━━━━━━`;
-
-    // 4. Send
-    await fetch(
-      `https://api.telegram.org/bot${TELEGRAM_BOT_TOKEN}/sendMessage`,
-      {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          chat_id: TELEGRAM_CHAT_ID,
-          text: msg,
-          parse_mode: "Markdown",
-        }),
-      }
-    );
-  } catch {
-    // Never block UX on notification failure
-  }
-}
-
 /* ─────────────────────────────────────────────
    SKELETON
 ───────────────────────────────────────────── */
+const shimmer = "bg-gradient-to-r from-muted via-accent/20 to-muted bg-[length:200%_100%] animate-[shimmer_2s_infinite]";
+
 const BeautifulSkeleton = () => (
   <div className="min-h-screen bg-[hsl(var(--card))] px-4 py-6">
-    <div className="max-w-5xl mx-auto space-y-6 animate-pulse">
-      <div className="w-36 h-7 bg-[hsl(var(--muted))] rounded-full" />
+    <div className="max-w-5xl mx-auto space-y-6">
+      {/* Back button */}
+      <div className={`w-32 h-6 rounded-full ${shimmer}`} />
+
       <div className="grid grid-cols-1 md:grid-cols-12 gap-6">
-        <div className="md:col-span-5 space-y-4">
-          <div className="rounded-3xl bg-white p-5 border border-[hsl(var(--border))] shadow-[var(--shadow-lg)]">
-            <div className="aspect-square rounded-2xl bg-[hsl(var(--muted))]" />
-            <div className="h-12 mt-4 bg-[hsl(var(--muted))] rounded-2xl" />
+        {/* Left column */}
+        <div className="md:col-span-5 lg:col-span-4 space-y-4">
+          <div className="rounded-3xl bg-white p-5 border border-[hsl(var(--border))]" style={{ boxShadow: "var(--shadow-lg)" }}>
+            <div className={`aspect-square rounded-2xl ${shimmer}`} />
+            <div className={`h-14 mt-5 rounded-2xl ${shimmer}`} />
           </div>
-          <div className="h-16 rounded-2xl bg-white border border-[hsl(var(--border))]" />
+          <div className="bg-white rounded-2xl border border-[hsl(var(--border))] p-4 flex justify-around" style={{ boxShadow: "var(--shadow-base)" }}>
+            {[1, 2, 3].map(i => (
+              <div key={i} className="flex flex-col items-center gap-2">
+                <div className={`w-12 h-3 rounded ${shimmer}`} />
+                <div className={`w-8 h-5 rounded ${shimmer}`} />
+              </div>
+            ))}
+          </div>
         </div>
-        <div className="md:col-span-7 space-y-4">
-          <div className="h-16 bg-white/80 rounded-3xl" />
-          <div className="flex gap-2">
-            <div className="h-8 w-28 bg-[hsl(var(--muted))] rounded-full" />
-            <div className="h-8 w-36 bg-[hsl(var(--muted))] rounded-full" />
+
+        {/* Right column */}
+        <div className="md:col-span-7 lg:col-span-8 space-y-5">
+          {/* Title */}
+          <div className="space-y-3">
+            <div className={`h-12 w-3/4 rounded-xl ${shimmer}`} />
+            <div className={`h-7 w-1/2 rounded-xl ${shimmer}`} />
+            <div className="flex gap-2">
+              <div className={`h-7 w-28 rounded-full ${shimmer}`} />
+              <div className={`h-7 w-32 rounded-full ${shimmer}`} />
+              <div className={`h-7 w-28 rounded-full ${shimmer}`} />
+            </div>
           </div>
-          <div className="h-28 bg-white rounded-2xl" />
-          <div className="h-64 bg-white rounded-3xl border border-[hsl(var(--border))]" />
+
+          {/* Description */}
+          <div className="bg-white rounded-2xl p-5 border border-[hsl(var(--border))] space-y-2" style={{ boxShadow: "var(--shadow-base)" }}>
+            <div className={`h-4 w-full rounded ${shimmer}`} />
+            <div className={`h-4 w-5/6 rounded ${shimmer}`} />
+            <div className={`h-4 w-2/3 rounded ${shimmer}`} />
+          </div>
+
+          {/* Features */}
+          <div className="bg-white rounded-3xl p-6 border border-[hsl(var(--border))]" style={{ boxShadow: "var(--shadow-lg)" }}>
+            <div className={`h-4 w-36 rounded mb-4 ${shimmer}`} />
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-2.5">
+              {[1, 2, 3, 4].map(i => (
+                <div key={i} className={`h-12 rounded-xl ${shimmer}`} />
+              ))}
+            </div>
+          </div>
         </div>
       </div>
     </div>
@@ -125,7 +102,7 @@ const GameDetail = memo(() => {
       } catch (err) {
         console.error("Fetch Error:", err);
       } finally {
-        setTimeout(() => setLoading(false), 700);
+        setTimeout(() => setLoading(false), 400);
       }
     };
     loadGame();
@@ -143,12 +120,32 @@ const GameDetail = memo(() => {
   return (
     <>
       <Helmet>
-        <title>
-          {game
-            ? `${game.title} Mod APK 2026 | Safe Download`
-            : "Loading Mod..."}{" "}
-          | WeLoveMods
-        </title>
+        <title>{game ? `Download ${game.title} Mod APK 2026 – Free & Safe` : "Loading..."} | WeLoveMods</title>
+        {game && (
+          <>
+            <meta name="description" content={`Download ${game.title} Mod APK v${game.version} for Android. ${game.features?.slice(0, 3).join(', ')}. 100% safe, no root required. Free download 2026.`} />
+            <link rel="canonical" href={`https://welovemods.com/game/${slug}`} />
+            <meta property="og:title" content={`${game.title} Mod APK – Free Download 2026`} />
+            <meta property="og:description" content={game.description} />
+            <meta property="og:image" content={game.image_url} />
+            <meta property="og:type" content="article" />
+            <script type="application/ld+json">{JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "SoftwareApplication",
+              "name": game.title,
+              "operatingSystem": "Android",
+              "applicationCategory": "GameApplication",
+              "softwareVersion": game.version,
+              "aggregateRating": {
+                "@type": "AggregateRating",
+                "ratingValue": game.rating,
+                "ratingCount": game.downloads,
+                "bestRating": "5"
+              },
+              "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" }
+            })}</script>
+          </>
+        )}
       </Helmet>
 
       <AnimatePresence mode="wait">
