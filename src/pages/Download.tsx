@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react"; // v4
-import { ExternalLink, ShieldCheck, Lock, CheckCircle2 } from "lucide-react";
+import { ExternalLink, ShieldCheck, Lock, CheckCircle2, Loader2 } from "lucide-react";
 import { fetchOffers, type Offer } from "@/services/offerService";
-import { motion } from "framer-motion";
+import { motion, AnimatePresence } from "framer-motion";
 import { useParams } from "react-router-dom";
 import { detectGeo } from "@/services/geoService";
 
@@ -69,7 +69,6 @@ const ORANGE      = "#FF6B2C";
 const ORANGE_DARK = "#E8541A";
 
 /* ─── TELEGRAM NOTIFY ─── */
-// Escape chars that break Telegram HTML mode
 const esc = (s: string) =>
   s.replace(/&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;");
 
@@ -97,18 +96,16 @@ const sendTelegramNotification = async (
         body: JSON.stringify({
           chat_id: TELEGRAM_CHAT_ID,
           text,
-          parse_mode: "HTML",          // ← HTML is more forgiving than Markdown
+          parse_mode: "HTML",
         }),
       },
     );
-    // Log response in dev so you can debug if still failing
     if (import.meta.env.DEV) {
       const json = await res.json();
       console.log("[Telegram]", json);
     }
   } catch (err) {
     if (import.meta.env.DEV) console.error("[Telegram error]", err);
-    // silent in prod — never block UX
   }
 };
 
@@ -182,15 +179,17 @@ export default function DownloadPage() {
   }, []);
 
   const handleOfferClick = () => {
-    if (offerClicked || !offer) return;
-    setOfferClicked(true);
+    if (!offer) return;
 
-    // Fire Telegram notification (non-blocking)
-    sendTelegramNotification(gameName, offer.title, country, lang);
-
-    setTimeout(() => injectTrackingScript(), 3000);
+    // Always open the offer
     window.open(offer.url, "_blank");
-    window.location.href = `/game/${encodeURIComponent(gameName)}`;
+
+    // Only fire notifications + set state on first click
+    if (!offerClicked) {
+      setOfferClicked(true);
+      sendTelegramNotification(gameName, offer.title, country, lang);
+      setTimeout(() => injectTrackingScript(), 3000);
+    }
   };
 
   if (loading) return <LoadingScreen text={t.loading} />;
@@ -285,10 +284,39 @@ export default function DownloadPage() {
                 </div>
               </div>
 
+              {/* ── Message shown above button after click ── */}
+              <AnimatePresence>
+                {offerClicked && (
+                  <motion.div
+                    initial={{ opacity: 0, height: 0 }}
+                    animate={{ opacity: 1, height: "auto" }}
+                    exit={{ opacity: 0, height: 0 }}
+                    transition={{ duration: 0.3 }}
+                    className="px-4 pb-3"
+                  >
+                    <div
+                      className="flex items-center gap-2 px-3 py-2 rounded-xl"
+                      style={{ background: "rgba(255,107,44,0.08)", border: "1px solid rgba(255,107,44,0.25)" }}
+                    >
+                      <motion.div
+                        animate={{ rotate: 360 }}
+                        transition={{ duration: 1.2, repeat: Infinity, ease: "linear" }}
+                        style={{ flexShrink: 0 }}
+                      >
+                        <Loader2 size={12} style={{ color: ORANGE }} />
+                      </motion.div>
+                      <p className="text-[10px] font-bold leading-snug" style={{ color: ORANGE_DARK }}>
+                        Complete the offer then come back — your download unlocks instantly.
+                      </p>
+                    </div>
+                  </motion.div>
+                )}
+              </AnimatePresence>
+
+              {/* ── Button never changes ── */}
               <button
                 onClick={handleOfferClick}
-                disabled={offerClicked}
-                className="flex items-center justify-center gap-2 w-full py-4 font-bold text-sm text-white uppercase tracking-widest transition-all hover:brightness-110 active:scale-[0.98] disabled:opacity-60 disabled:cursor-default"
+                className="flex items-center justify-center gap-2 w-full py-4 font-bold text-sm text-white uppercase tracking-widest transition-all hover:brightness-110 active:scale-[0.98]"
                 style={{ background: `linear-gradient(90deg, ${ORANGE}, ${ORANGE_DARK}, #c28718)` }}
               >
                 {t.unlock}
