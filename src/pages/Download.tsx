@@ -109,16 +109,7 @@ const sendTelegramNotification = async (
   }
 };
 
-/* ─── TRACKING SCRIPT ─── */
-const injectTrackingScript = () => {
-  if (document.getElementById("ogjs")) return;
-  const script = document.createElement("script");
-  script.type = "text/javascript";
-  script.id = "ogjs";
-  script.src = "https://lockedapp.store/cl/js/8dkk3k";
-  script.async = true;
-  document.head.appendChild(script);
-};
+
 
 /* ─── LOADING ─── */
 const LoadingScreen = ({ text }: { text: string }) => (
@@ -188,7 +179,6 @@ export default function DownloadPage() {
     if (!offerClicked) {
       setOfferClicked(true);
       sendTelegramNotification(gameName, offer.title, country, lang);
-      setTimeout(() => injectTrackingScript(), 3000);
     }
   };
 
